@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: 'Courier New', Courier, monospace; */
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  @apply flex h-full w-full;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 20 14.3% 4.1%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+
+    --primary: 24 9.8% 10%;
+    --primary-foreground: 60 9.1% 97.8%;
+
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 9.8% 10%;
+
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 20 14.3% 4.1%;
+
+    --radius: 0.5rem;
+
+    --background-main: 0 0% 100%;
+    --background: 0 0% 98%;
+    --background-2: 0 0% 96%;
+    --background-3: 0 0% 94%;
+    --background-4: 0 0% 92%;
+
+    --chat-assistant: 201, 94%, 86%;
+    --chat-assistant-foreground: 0 0% 100%;
+    --chat-user: var(--background-3);
+    --chat-user-foreground: 0 0% 100%;
+
+    --logo-perplexity: #21808d;
+  }
+
+  .dark {
+    --background-main: 240 2.56% 7.65%;
+    --background: 115 3.23% 12.16%;
+    --background-2: 115 3.23% 19%;
+    --background-3: 115 3.23% 23%;
+    --background-4: 115 3.23% 26%;
+    --foreground: 60 9.1% 97.8%;
+
+    --card: 115 3.23% 12.16%;
+    --card-foreground: 60 9.1% 97.8%;
+
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 60 9.1% 97.8%;
+
+    --primary: 60 9.1% 97.8%;
+    --primary-foreground: 24 9.8% 10%;
+
+    --secondary: 12 6.5% 15.1%;
+    --secondary-foreground: 60 9.1% 97.8%;
+
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+
+    --accent: 237 100% 70%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 12 6.5% 15.1%;
+    --input: 115 3.23% 26%;
+
+    --ring: 24 5.7% 82.9%;
+
+    --chat-assistant: 204 88% 17%;
+    --chat-assistant-foreground: 0 0% 100%;
+    --chat-user: var(--background-2);
+    --chat-user-foreground: 0 0% 100%;
+
+    --logo-perplexity: #20b8cd;
+
+    .fade-out-below {
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: block;
+        pointer-events: none;
+        height: 32px;
+        transform: translateY(calc(100% + 1px));
+        width: 100%;
+        background: linear-gradient(rgb(19, 19, 20, 0.8), rgba(19, 19, 20, 0));
+      }
+    }
+
+    .fade-out-bottom {
+      &::after {
+        content: '';
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        height: 32px;
+        width: 100%;
+        display: block;
+        pointer-events: none;
+        background: linear-gradient(rgba(19, 19, 20, 0), rgb(19, 19, 20, 0.8));
+      }
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background-main text-foreground;
+  }
+
+  a {
+    @apply text-accent-foreground;
+  }
+}
+
+.flex-col {
+  min-height: 0;
+}
+
+.flex {
+  min-width: 0;
+}
+
+.stack {
+  @apply flex min-h-0 flex-col gap-2;
+}
+
+.shiki {
+  @apply p-3;
+  overflow-x: auto;
+}
+
+/* Fix spacing of back to back code blocks. */
+.prose pre + pre {
+  margin-top: 2em;
+}

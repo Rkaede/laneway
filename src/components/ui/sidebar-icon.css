@@ -1,0 +1,33 @@
+.sidebar-icon[data-open='true']:hover {
+  & .sidebar-icon-top {
+    transform: rotate(45deg);
+  }
+  & .sidebar-icon-bottom {
+    transform: rotate(315deg);
+  }
+}
+
+.sidebar-icon[data-open='false']:hover {
+  & .sidebar-icon-top {
+    transform: rotate(-45deg);
+  }
+  & .sidebar-icon-bottom {
+    transform: rotate(405deg);
+  }
+}
+
+.sidebar-icon line {
+  transition-duration: 0.3s;
+  transition-property: transform;
+  transform-box: fill-box;
+}
+
+.sidebar-icon-top {
+  transform-origin: bottom left;
+  transform: rotate(0deg);
+}
+
+.sidebar-icon-bottom {
+  transform-origin: top left;
+  transform: rotate(360deg);
+}
