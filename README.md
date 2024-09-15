@@ -2,6 +2,10 @@
 
 Just another AI chat app 🤷‍♂️
 
+Head over the [https://laneway.app](https://laneway.app) to use the app directly.
+
+![Laneway Example](https://files.laneway.app/laneway-example.png)
+
 ## Features
 
 - 💬 Chat with multiple AI models in a single session
@@ -10,10 +14,6 @@ Just another AI chat app 🤷‍♂️
 - 🌐 Supports multiple providers (OpenAI, Google, and OpenRouter)
 - ⌨️ Command palette
 - 🔒 Data stored locally in your browser for privacy & speed
-
-## Getting Started
-
-Head over the [Laneway website](https://laneway.app) to use the app directly.
 
 ## Building and Running Locally
 
