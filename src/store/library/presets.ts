@@ -16,9 +16,6 @@ export const presets: PresetProps[] = [
       {
         modelId: 'google/gemini-pro-1.5',
       },
-      {
-        modelId: 'perplexity/llama-3.1-sonar-huge-128k-online',
-      },
     ],
   },
   {
