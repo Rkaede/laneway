@@ -8,6 +8,10 @@ import { createThrottle, formatMessages } from './util';
 
 const throttle = createThrottle();
 const defaultModel = 'openai/chatgpt-4o-latest';
+const headers = {
+  'HTTP-Referer': `https://laneway.app`,
+  'X-Title': `Laneway`,
+};
 
 export async function getStream(messages: MessageProps[], model: string = defaultModel) {
   throttle();
@@ -22,6 +26,7 @@ export async function getStream(messages: MessageProps[], model: string = defaul
   const result = await streamText({
     model: openrouter(model),
     messages: formattedMessages,
+    headers,
   });
 
   return result;
@@ -37,5 +42,9 @@ export async function getText(messages: MessageProps[], model: string = defaultM
     baseURL: 'https://openrouter.ai/api/v1',
   });
 
-  return await generateText({ model: openai(model), messages: formattedMessages });
+  return await generateText({
+    model: openai(model),
+    messages: formattedMessages,
+    headers,
+  });
 }
