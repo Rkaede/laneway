@@ -86,6 +86,26 @@ const openai: Partial<ModelProps>[] = [
     vision: true,
     contextWindow: 128000,
   },
+  {
+    ...defaults.openai,
+    id: 'openai/o1-mini',
+    title: 'o1-mini',
+    provider: [
+      { id: 'openai', modelId: 'o1-mini', primary: true },
+      { id: 'openrouter', modelId: 'openai/o1-mini' },
+    ],
+    contextWindow: 128000,
+  },
+  {
+    ...defaults.openai,
+    id: 'openai/o1-preview',
+    title: 'o1-preview',
+    provider: [
+      { id: 'openai', modelId: 'o1-preview', primary: true },
+      { id: 'openrouter', modelId: 'openai/o1-preview' },
+    ],
+    contextWindow: 128000,
+  },
 ];
 
 const anthropic: Partial<ModelProps>[] = [
