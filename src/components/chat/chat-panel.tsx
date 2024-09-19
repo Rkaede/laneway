@@ -96,10 +96,11 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
 
     const latestMessage = props.chat.messages.at(-1);
 
+    const hasVision = model()?.vision === true;
     const hasImage =
       Array.isArray(latestMessage?.content) &&
       latestMessage?.content.some((part) => part.type === 'image');
-    const shouldSend = hasImage && !model()?.vision === false;
+    const shouldSend = hasImage ? hasVision : true;
 
     if (!shouldSend) {
       return;
