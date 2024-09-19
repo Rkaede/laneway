@@ -496,11 +496,14 @@ const AssistantList: Component<{
     }
   }
 
-  function handleDelete(chatId?: string) {
-    if (chatId) {
+  function handleDelete(id?: string) {
+    console.log(id);
+
+    if (id) {
       props.setLocalPreset((prev) => ({
         ...prev,
-        chats: prev.chats?.filter((chat) => chat.assistantId !== chatId) || [],
+        chats:
+          prev.chats?.filter((chat) => chat.assistantId !== id && chat.modelId !== id) || [],
       }));
     }
   }
@@ -526,7 +529,7 @@ const AssistantList: Component<{
                   assistantId={chat.assistantId}
                   modelId={chat.modelId}
                   presetId={props.presetId}
-                  onDelete={() => handleDelete(chat.assistantId)}
+                  onDelete={() => handleDelete(chat.assistantId || chat.modelId)}
                 />
               )}
             </For>
