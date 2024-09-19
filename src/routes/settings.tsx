@@ -167,7 +167,7 @@ function APIKeys() {
             optionValue="value"
             optionTextValue="label"
             value={openRouterOptions.find((o) => o.value === store.settings.openRouterUsage)}
-            onChange={(value) => setStore('settings', 'openRouterUsage', value.value)}
+            onChange={(value) => value && setStore('settings', 'openRouterUsage', value.value)}
             itemComponent={(props) => (
               <SelectItem item={props.item}>{props.item.rawValue.label}</SelectItem>
             )}
