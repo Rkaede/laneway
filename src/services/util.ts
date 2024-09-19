@@ -1,6 +1,12 @@
+import { CoreMessage, CoreUserMessage } from 'ai';
+
 import { store } from '~/store';
 import { apiKeys } from '~/store/keys';
 import { models } from '~/store/models';
+import { MessageProps } from '~/types';
+import { base64EncodeFile } from '~/util';
+
+import { imageCache } from './image-cache';
 
 export function createThrottle(maxCalls = 10, timeWindow = 60) {
   const callQueue: number[] = [];
@@ -48,4 +54,33 @@ export function getProvider(modelId: string) {
   }
 
   return primaryProvider;
+}
+
+export async function formatMessages(messages: MessageProps[]): Promise<CoreMessage[]> {
+  return Promise.all(
+    messages.map(async (message) => {
+      if (message.role === 'user') {
+        const content = Array.isArray(message.content)
+          ? message.content
+          : [{ type: 'text', text: message.content }];
+        const formattedParts = await Promise.all(
+          content.map(async (part) => {
+            if (part.type === 'image' && 'image' in part) {
+              const imageData = await imageCache.get('/' + part.image.storageId);
+              if (!imageData) return part;
+              const file = new File([imageData], part.image.filename, { type: imageData.type });
+              const base64Image = await base64EncodeFile(file);
+              return { type: 'image', image: base64Image };
+            }
+            return part;
+          }),
+        );
+        return {
+          role: 'user' as const,
+          content: formattedParts,
+        } as CoreUserMessage;
+      }
+      return message as CoreMessage;
+    }),
+  );
 }

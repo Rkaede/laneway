@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from '@solidjs/router';
-import { For, type ParentComponent, Show } from 'solid-js';
+import { createSignal, For, type ParentComponent, Show } from 'solid-js';
 
 import { ChatCard } from '~/components/chat/chat-card';
 import { ChatInput } from '~/components/chat/chat-input';
 import { ChatPanel } from '~/components/chat/chat-panel';
 import { Shortcut } from '~/components/ui/shortcut';
 import { useActionContext } from '~/hooks/use-action-context';
+import { imageCache } from '~/services/image-cache';
 import { setStore, store } from '~/store';
 import {
   actions,
@@ -14,45 +15,88 @@ import {
   setAssistant,
   setSessionInput,
 } from '~/store/actions';
+import { models } from '~/store/models';
+import { ImagePart, MessageProps } from '~/types';
 
 export function Session() {
   const navigate = useNavigate();
   const params = useParams();
   const session = () => store.sessions.find((s) => s.id === params.id);
+  const [attachments, setAttachments] = createSignal<File[] | undefined>();
 
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
+  async function handleSubmit() {
+    const _attachments = attachments();
+    const _isDraft = session()?.id === undefined;
 
-    const _value = session()?.input ?? store.draftSession.input;
+    if (_attachments && _attachments?.length > 0) {
+      const _sessionChats = (session() ? session()?.chats : store.draftSession.chats) || [];
 
-    if (_value === '' || _value === undefined) return;
+      for (const chatId of _sessionChats) {
+        const chat = _isDraft
+          ? store.draftChats.find((c) => c.id === chatId)
+          : store.chats.find((c) => c.id === chatId);
+        const model = models.find((m) => m.id === chat?.modelId);
+
+        if (model?.vision === false) {
+          return; // Early return if any model does not support vision
+        }
+      }
+    }
+
+    const inputValue = session()?.input ?? store.draftSession.input;
+
+    if (inputValue === '' || inputValue === undefined) return;
     setSessionInput('', params.id);
-    const message = { role: 'user', content: _value } as const;
+
+    // if attachments are present, add them to the session
+    const imageCacheFiles: { filename: string; storageId: string }[] = [];
+    if (_attachments) {
+      if (!_attachments?.length) return;
+      for (const file of _attachments) {
+        // generate a unique name for the file
+        const name = file.name + '_' + Date.now();
+        imageCacheFiles.push({ filename: file.name, storageId: name });
+        await imageCache.add(name, file);
+      }
+    }
+
+    const message = {
+      role: 'user',
+      content:
+        imageCacheFiles.length > 0
+          ? [
+              ...imageCacheFiles.map((f) => ({ type: 'image', image: f }) as ImagePart),
+              { type: 'text', text: inputValue },
+            ]
+          : inputValue,
+    } satisfies MessageProps;
     const id = addMessageToSessionChats(message, params.id);
 
     if (!params.id) {
       navigate(`/session/${id}`);
       if (store.settings.generateTitles) {
-        autonameChat(id, _value);
+        autonameChat(id, inputValue);
       }
     }
   }
 
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      handleSubmit(e);
-    }
+  function handleInput(value: string) {
+    setSessionInput(value, params.id);
   }
 
-  function handleInput(e: InputEvent) {
-    setSessionInput((e.currentTarget as HTMLInputElement).value, params.id);
+  function handleFileSelect(file: File) {
+    setAttachments((prev) => [...(prev || []), file]);
+  }
+
+  function handleRemoveFile(file: File) {
+    setAttachments((prev) => prev?.filter((f) => f !== file));
   }
 
   return (
     <div class="relative flex h-full w-full flex-col">
       {/* this column reverse container is needed to keep the scrollbar at the bottom */}
       <div class="flex h-full w-full flex-col-reverse overflow-auto">
-        <Show when={session()} fallback={<BlankSession />}>
+        <Show when={session()} fallback={<BlankSession attachments={attachments()} />}>
           {(s) => (
             <ChatPanelLayout numChats={s().chats.length}>
               <For each={s().chats}>
@@ -64,6 +108,7 @@ export function Session() {
                       chat={chat}
                       sessionId={s().id}
                       onChangeAssistant={(id) => setAssistant(id, chat.id)}
+                      attachments={attachments()}
                     />
                   );
                 }}
@@ -72,20 +117,21 @@ export function Session() {
           )}
         </Show>
       </div>
-      <div class="relative mx-auto flex max-h-60 min-h-16 w-full max-w-[1000px] flex-col gap-1">
-        <div class="relativeflex min-h-16 w-full max-w-[1000px] flex-col overflow-hidden rounded-t-xl border border-background-4 bg-background-2 px-6 pl-0">
-          <ChatInput
-            value={session()?.input ?? store.draftSession.input ?? ''}
-            onInput={handleInput}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
-      </div>
+      <ChatInput
+        hasVision
+        input={session()?.input ?? store.draftSession.input ?? ''}
+        isLoading={false}
+        onInput={handleInput}
+        onSubmit={handleSubmit}
+        onFileSelect={handleFileSelect}
+        onRemoveFile={handleRemoveFile}
+        attachments={attachments()}
+      />
     </div>
   );
 }
 
-function BlankSession() {
+function BlankSession(props: { attachments?: File[] }) {
   function handleAssistantChange(id: string, chatId: string) {
     setStore('draftChats', (c) => c.id === chatId, 'assistantId', id);
   }
@@ -100,6 +146,7 @@ function BlankSession() {
             chat={chat}
             sessionId={store.draftSession.id}
             onChangeAssistant={(id) => handleAssistantChange(id, chat.id)}
+            attachments={props.attachments}
           />
         )}
       </For>

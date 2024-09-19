@@ -4,7 +4,7 @@ import { generateText, streamText } from 'ai';
 import { apiKeys } from '~/store/keys';
 import type { MessageProps } from '~/types';
 
-import { createThrottle } from './util';
+import { createThrottle, formatMessages } from './util';
 
 const throttle = createThrottle();
 const defaultModel = 'openai/chatgpt-4o-latest';
@@ -17,9 +17,11 @@ export async function getStream(messages: MessageProps[], model: string = defaul
     baseURL: 'https://openrouter.ai/api/v1',
   });
 
+  const formattedMessages = await formatMessages(messages);
+
   const result = await streamText({
     model: openrouter(model),
-    messages,
+    messages: formattedMessages,
   });
 
   return result;
@@ -28,10 +30,12 @@ export async function getStream(messages: MessageProps[], model: string = defaul
 export async function getText(messages: MessageProps[], model: string = defaultModel) {
   throttle();
 
+  const formattedMessages = await formatMessages(messages);
+
   const openai = createOpenAI({
     apiKey: apiKeys?.openrouter,
     baseURL: 'https://openrouter.ai/api/v1',
   });
 
-  return await generateText({ model: openai(model), messages });
+  return await generateText({ model: openai(model), messages: formattedMessages });
 }

@@ -24,3 +24,4 @@ export * from './tag';
 export * from './text';
 export * from './textarea';
 export * from './textfield';
+export * from './thumbnail';

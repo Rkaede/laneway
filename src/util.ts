@@ -75,3 +75,18 @@ export function createLog(obj: unknown) {
     console.log(JSON.stringify(obj, null, 2));
   });
 }
+
+export async function base64EncodeFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result.split(',')[1]);
+      } else {
+        reject(new Error('Failed to encode file'));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}

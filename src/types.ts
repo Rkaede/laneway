@@ -1,9 +1,12 @@
 import type { Navigator, Params } from '@solidjs/router';
 import type { Component, JSX } from 'solid-js';
 
+export type TextPart = { type: 'text'; text: string };
+export type ImagePart = { type: 'image'; image: { filename: string; storageId: string } };
+
 export type MessageProps = {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
+  role: 'user' | 'assistant' | 'system' | 'tool';
+  content: Array<ImagePart | TextPart> | string;
   model?: ModelProps;
 };
 

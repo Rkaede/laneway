@@ -10,12 +10,13 @@ import { apiKeys } from '~/store/keys';
 import { models } from '~/store/models';
 import type { ChatProps } from '~/types';
 
-import { AlertApiKey, AlertError, Chatbar, Message } from './components';
+import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './components';
 
 type ChatPanelProps = {
   sessionId: string;
   chat: ChatProps;
   onChangeAssistant: (id: string) => void;
+  attachments?: File[];
 };
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
@@ -70,7 +71,13 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
     streamFn: () => {
       const systemPrompt = assistant()?.systemPrompt;
       const messagesWithSystem = systemPrompt
-        ? [{ role: 'system' as const, content: systemPrompt }, ...props.chat.messages]
+        ? [
+            {
+              role: 'system' as const,
+              content: systemPrompt,
+            },
+            ...props.chat.messages,
+          ]
         : props.chat.messages;
       return providerService()?.getStream(messagesWithSystem, provider()?.modelId);
     },
@@ -87,12 +94,29 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
       return;
     }
 
+    const latestMessage = props.chat.messages.at(-1);
+
+    const hasImage =
+      Array.isArray(latestMessage?.content) &&
+      latestMessage?.content.some((part) => part.type === 'image');
+    const shouldSend = hasImage && !model()?.vision === false;
+
+    if (!shouldSend) {
+      return;
+    }
+
     if (props.chat.messages.at(-1)?.role === 'user') {
       const _provider = model()?.provider;
       if (_provider) {
         const systemPrompt = assistant()?.systemPrompt;
         const messagesWithSystem = systemPrompt
-          ? [{ role: 'system' as const, content: systemPrompt }, ...props.chat.messages]
+          ? [
+              {
+                role: 'system' as const,
+                content: systemPrompt,
+              },
+              ...props.chat.messages,
+            ]
           : props.chat.messages;
         chat.append(messagesWithSystem);
       }
@@ -119,17 +143,25 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             {(message) => <Message {...message} model={model()} />}
           </For>
         </Show>
+
         <Show when={chat.latest}>
           {(message) => <Message content={message().content} role="assistant" />}
         </Show>
+
         <Show when={chat.status === 'loading'}>
           <div class="flex justify-center">
             <Loader />
           </div>
         </Show>
+
+        <Show when={props.attachments && props.attachments.length > 0 && !model()?.vision}>
+          <AlertNoVision />
+        </Show>
+
         <Show when={!isApiKeyConfigured()}>
           <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
         </Show>
+
         <Show when={props.chat.error}>
           {(error) => (
             <AlertError error={error()} onRetry={() => clearChatError(props.chat.id)} />

@@ -4,6 +4,7 @@ import { SolidMarkdown } from 'solid-markdown';
 import { ModelIcon } from '~/components/connected';
 import { IconUser } from '~/components/icons/ui';
 import { Avatar, CodeBlock } from '~/components/ui';
+import { LocalImage } from '~/components/ui/local-image';
 import { store } from '~/store/index';
 import type { MessageProps } from '~/types';
 import { cn } from '~/util';
@@ -13,6 +14,45 @@ const ModelTitle: ParentComponent = (props) => {
     <div class="mb-1 flex items-center gap-1 px-1 text-assistant-foreground/80">
       <span class="text-xs font-semibold">{props.children}</span>
     </div>
+  );
+};
+
+const MarkdownContent: Component<{ text: string }> = (props) => {
+  return (
+    <SolidMarkdown
+      components={{
+        code(codeProps) {
+          return (
+            <Show
+              when={codeProps.inline === true}
+              fallback={
+                <CodeBlock
+                  code={
+                    /* @ts-ignore: this is a depencency bug */
+                    codeProps.node.children[0]?.value ?? ''
+                  }
+                  language={codeProps.class?.split('-')[1] ?? 'plaintext'}
+                  {...codeProps}
+                />
+              }
+            >
+              <span class="mx-[0.2em] inline-block rounded border border-background-4 bg-background-2 px-1 font-mono text-sm">
+                {
+                  /* @ts-ignore: this is a depencency bug */
+                  codeProps.node.children[0]?.value ?? ''
+                }
+              </span>
+            </Show>
+          );
+        },
+      }}
+      class={cn(
+        'prose prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
+        store.settings.theme === 'dark' && 'prose-invert',
+      )}
+    >
+      {props.text}
+    </SolidMarkdown>
   );
 };
 
@@ -38,40 +78,21 @@ export const Message: Component<MessageProps> = (props) => {
         </Avatar>
       </Show>
       <div class="flex-1 space-y-2 overflow-hidden px-1">
-        <SolidMarkdown
-          components={{
-            code(props) {
-              return (
-                <Show
-                  when={props.inline === true}
-                  fallback={
-                    <CodeBlock
-                      code={
-                        /* @ts-ignore: this is a depencency bug */
-                        props.node.children[0]?.value ?? ''
-                      }
-                      language={props.class?.split('-')[1] ?? 'plaintext'}
-                      {...props}
-                    />
-                  }
-                >
-                  <span class="mx-[0.2em] inline-block rounded border border-background-4 bg-background-2 px-1 font-mono text-sm">
-                    {
-                      /* @ts-ignore: this is a depencency bug */
-                      props.node.children[0]?.value ?? ''
-                    }
-                  </span>
-                </Show>
-              );
-            },
-          }}
-          class={cn(
-            'prose prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
-            store.settings.theme === 'dark' && 'prose-invert',
-          )}
-        >
-          {props.content}
-        </SolidMarkdown>
+        {Array.isArray(props.content) ? (
+          props.content
+            .sort((a, b) => (a.type === 'image' ? 1 : b.type === 'image' ? -1 : 0))
+            .map((part) => {
+              if (part.type === 'text') {
+                return <MarkdownContent text={part.text} />;
+              }
+              if (part.type === 'image') {
+                return <LocalImage src={part.image.storageId} />;
+              }
+              return `Unknown part type: ${JSON.stringify(part)}`;
+            })
+        ) : (
+          <MarkdownContent text={props.content} />
+        )}
       </div>
     </MessageContainer>
   );

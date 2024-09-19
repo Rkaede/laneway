@@ -1,6 +1,7 @@
 import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
+import { imageCache } from '~/services/image-cache';
 import type {
   AssistantProps,
   ChatProps,
@@ -113,4 +114,5 @@ if (store.settings.messages.showModelTitle === undefined) {
 
 export const deleteData = () => {
   setStore(createDefaultState());
+  imageCache.clearAll();
 };

@@ -25,6 +25,8 @@ import type {
 import { setStore, store } from '.';
 export * from './actions/assistants';
 
+import { imageCache } from '~/services/image-cache';
+
 import { models } from './models';
 import { createSessionFromPreset } from './util';
 
@@ -126,12 +128,22 @@ export function addMessageToSessionChats(message: MessageProps, inputSessionId?:
 
   if (session) {
     for (const chatId of session.chats) {
-      setStore(
-        'chats',
-        (c) => c.id === chatId,
-        'messages',
-        (messages) => [...messages, message],
-      );
+      const chat = store.chats.find((c) => c.id === chatId);
+      const model = models.find((m) => m.id === chat?.modelId);
+
+      // Check if the message contains image content and if the model supports vision
+      const hasImageContent =
+        Array.isArray(message.content) && message.content.some((part) => part.type === 'image');
+      const supportsVision = model?.vision === true;
+
+      if (!hasImageContent || supportsVision) {
+        setStore(
+          'chats',
+          (c) => c.id === chatId,
+          'messages',
+          (messages) => [...messages, message],
+        );
+      }
     }
   }
   return sessionId;
@@ -171,13 +183,36 @@ export function setSessionInput(input: string, sessionId?: string) {
     setStore('draftSession', 'input', input);
     return;
   }
-
   setStore('sessions', (s) => s.id === sessionId, 'input', input);
+}
+
+function deleteImagesForSession(sessionId: string) {
+  const session = store.sessions.find((s) => s.id === sessionId);
+  if (!session) return;
+
+  session.chats.forEach((chatId) => deleteImagesForChat(chatId));
+}
+
+function deleteImagesForChat(chatId: string) {
+  const chat = store.chats.find((c) => c.id === chatId);
+  if (!chat) return;
+
+  chat.messages.forEach((message) => {
+    if (typeof message.content === 'string') return;
+    message.content.forEach((content) => {
+      if (content.type === 'image' && content.image.storageId) {
+        imageCache.remove(content.image.storageId);
+      }
+    });
+  });
 }
 
 export function deleteSession(sessionId: string) {
   const session = store.sessions.find((s) => s.id === sessionId);
   if (!session) return;
+
+  deleteImagesForSession(sessionId);
+
   setStore(
     'chats',
     store.chats.filter((c) => !session.chats.includes(c.id)),
@@ -201,7 +236,7 @@ export async function autonameChat(sessionId: string, title: string) {
 
   const prompt = summarizeTitle.replace('{{messages}}', title);
   const response = await router.getText({
-    messages: [{ role: 'user', content: prompt }],
+    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }] }],
     modelId: store.settings.systemModel,
   });
 

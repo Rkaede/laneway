@@ -4,7 +4,7 @@ import { generateText, streamText } from 'ai';
 import { apiKeys } from '~/store/keys';
 import type { MessageProps } from '~/types';
 
-import { createThrottle } from './util';
+import { createThrottle, formatMessages } from './util';
 
 const defaultModel = 'gpt-3.5-turbo-instruct';
 const throttle = createThrottle();
@@ -15,7 +15,9 @@ export async function getStream(messages: MessageProps[], model: string = defaul
     apiKey: apiKeys?.openai,
     compatibility: 'strict',
   });
-  return await streamText({ model: openai(model), messages });
+
+  const formattedMessages = await formatMessages(messages);
+  return await streamText({ model: openai(model), messages: formattedMessages });
 }
 
 export async function getText(messages: MessageProps[], model: string = defaultModel) {
@@ -23,5 +25,6 @@ export async function getText(messages: MessageProps[], model: string = defaultM
     apiKey: apiKeys?.openai,
     compatibility: 'strict',
   });
-  return await generateText({ model: openai(model), messages });
+  const formattedMessages = await formatMessages(messages);
+  return await generateText({ model: openai(model), messages: formattedMessages });
 }
