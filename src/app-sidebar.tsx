@@ -5,6 +5,7 @@ import {
   IconBox,
   IconLayoutGrid,
   IconPlus,
+  IconScanFace,
   IconSettings,
   MoreHorizontalIcon,
 } from '~/components/icons/ui';
@@ -102,10 +103,18 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
         </div>
         <SidebarItems class="px-2 py-2">
           <SidebarLinkItem
+            href="/models"
+            active={location.pathname === '/models'}
+            class="w-full"
+            icon={<IconBox class="mr-2 size-4" />}
+          >
+            Models
+          </SidebarLinkItem>
+          <SidebarLinkItem
             href="/assistants"
             active={location.pathname === '/assistants'}
             class="w-full"
-            icon={<IconBox class="mr-2 size-4" />}
+            icon={<IconScanFace class="mr-2 size-4" />}
           >
             Assistants
           </SidebarLinkItem>
