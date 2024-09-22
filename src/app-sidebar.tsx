@@ -159,7 +159,7 @@ function SidbarItemDropdown(props: { sessionId?: string }) {
     <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
       <DropdownMenuTrigger
         as={Button}
-        class="flex size-6 items-center justify-center rounded-md p-0 text-white opacity-0 transition-none hover:bg-background-4 group-hover:opacity-100 data-[open='true']:opacity-100"
+        class="flex size-6 items-center justify-center rounded-md p-0 opacity-0 transition-none hover:bg-background-4 group-hover:opacity-100 data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
         size="icon"
