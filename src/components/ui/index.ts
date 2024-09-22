@@ -22,6 +22,7 @@ export * from './switch';
 export * from './tabs';
 export * from './tag';
 export * from './text';
+export * from './text-editor/text-editor';
 export * from './textarea';
 export * from './textfield';
 export * from './thumbnail';

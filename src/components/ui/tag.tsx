@@ -12,6 +12,8 @@ const tagVariants = cva(
         outline: 'border border-input bg-background',
         blue: 'bg-blue-300 text-blue-900',
         green: 'bg-green-300 text-green-900',
+        red: 'bg-red-300 text-red-900',
+        warning: 'bg-yellow-300 text-yellow-900',
         purple: 'bg-purple-300 text-purple-900',
         Vision: 'bg-blue-300 text-blue-900',
         New: 'bg-green-300 text-green-900',

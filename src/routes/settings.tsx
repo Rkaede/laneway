@@ -1,7 +1,7 @@
 import type { ParentComponent } from 'solid-js';
 
 import { MultiCombobox } from '~/components/connected/multi-combobox';
-import { Card, CardContent } from '~/components/ui';
+import { Card, CardContent, Tag } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import {
   PageTitle,
@@ -37,6 +37,7 @@ export function Settings() {
           <hr class="mt-4" />
         </div>
         <General />
+        <Completions />
         <APIKeys />
         <Data />
       </div>
@@ -101,6 +102,56 @@ function General() {
             includeModels
             includePresets
             showType
+          />
+        </Setting>
+      </SectionContent>
+    </Section>
+  );
+}
+
+function Completions() {
+  return (
+    <Section>
+      <SectionHeader>
+        <SectionTitle>
+          Completions <Tag variant="warning">Experimental</Tag>
+        </SectionTitle>
+        <SectionDescription>
+          Provides completion suggestions in the chat input field. This is an experimental
+          feature. Please report any issues you encounter.
+        </SectionDescription>
+      </SectionHeader>
+      <SectionContent>
+        <Setting inline>
+          <SettingHeader>
+            <SettingTitle>Enable Completions</SettingTitle>
+            <SettingDescription>
+              Enable or disable completions in the chat input field.
+            </SettingDescription>
+          </SettingHeader>
+          <SettingControl>
+            <Switch
+              checked={store.settings.completions.enabled}
+              onChange={(value) => setStore('settings', 'completions', 'enabled', value)}
+            >
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
+            </Switch>
+          </SettingControl>
+        </Setting>
+        <Setting>
+          <SettingHeader>
+            <SettingTitle>Completion Model</SettingTitle>
+            <SettingDescription>
+              This model is used to generate completions in the chat input field.
+            </SettingDescription>
+          </SettingHeader>
+          <MultiCombobox
+            value={{ id: store.settings.completions.model, type: 'model' }}
+            onSelect={(modelId) => setStore('settings', 'completions', 'model', modelId)}
+            class="w-1/2"
+            includeModels
           />
         </Setting>
       </SectionContent>

@@ -33,6 +33,10 @@ interface State {
   settings: {
     defaultSession: DefaultSession;
     systemModel: string;
+    completions: {
+      enabled: boolean;
+      model: string;
+    };
     sidebarOpen: boolean;
     generateTitles: boolean;
     openRouterUsage: 'always' | 'fallback';
@@ -74,6 +78,10 @@ function createDefaultState(): State {
     },
     settings: {
       systemModel: 'openai/gpt-4o',
+      completions: {
+        enabled: true,
+        model: 'openai/gpt-4o',
+      },
       defaultSession: {
         type: 'preset',
         id: 'full-house',
@@ -110,6 +118,19 @@ if (store.settings.messages.showAvatars === undefined) {
 
 if (store.settings.messages.showModelTitle === undefined) {
   setStore('settings', 'messages', 'showModelTitle', false);
+}
+
+// completions
+if (store.settings.completions === undefined) {
+  setStore('settings', 'completions', {});
+}
+
+if (store.settings.completions.enabled === undefined) {
+  setStore('settings', 'completions', 'enabled', false);
+}
+
+if (store.settings.completions.model === undefined) {
+  setStore('settings', 'completions', 'model', 'openai/gpt-3.5-turbo');
 }
 
 export const deleteData = () => {

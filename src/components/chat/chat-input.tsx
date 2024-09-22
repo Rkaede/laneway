@@ -1,12 +1,11 @@
 import { useLocation } from '@solidjs/router';
-import { Component, createEffect, For, onMount, Show } from 'solid-js';
+import { Component, createEffect, For, Show } from 'solid-js';
 
 import { IconCirclePlusAlt } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
-import TextareaAutosize from '~/components/ui/text-areasize';
 import { cn } from '~/util';
 
-import { Thumbnail } from '../ui';
+import { TextEditor, Thumbnail } from '../ui';
 
 interface PromptProps {
   attachments?: File[];
@@ -25,7 +24,6 @@ interface FileSelectDetail {
 }
 
 export const ChatInput: Component<PromptProps> = (props) => {
-  let inputRef: HTMLTextAreaElement | undefined;
   let fileInputRef: HTMLInputElement | undefined;
   let ref: HTMLTextAreaElement | undefined;
   const location = useLocation();
@@ -59,22 +57,14 @@ export const ChatInput: Component<PromptProps> = (props) => {
       ?.getAsFile();
 
     if (file) {
-      handleFileSelect(
-        new CustomEvent('paste-file', {
-          detail: { target: { files: [file] } },
-        }) as unknown as Event & { currentTarget: HTMLInputElement; target: Element },
-      );
+      props.onFileSelect?.(file);
     }
   };
 
-  const handleKeyDown = (
-    event: KeyboardEvent & { currentTarget: HTMLTextAreaElement },
-  ): void => {
-    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
-      event.preventDefault();
-      submitForm();
-    }
-  };
+  function handleSubmit() {
+    submitForm();
+    console.log('Submitting form');
+  }
 
   const submitForm = () => {
     if (!props.input?.trim()) {
@@ -82,10 +72,6 @@ export const ChatInput: Component<PromptProps> = (props) => {
     }
     props.onSubmit(props.input);
   };
-
-  onMount(() => {
-    inputRef?.focus();
-  });
 
   return (
     <div class="relative mx-auto w-full max-w-[800px]">
@@ -134,20 +120,10 @@ export const ChatInput: Component<PromptProps> = (props) => {
             props.class,
           )}
         >
-          <TextareaAutosize
-            ref={(el) => {
-              inputRef = el;
-              ref = el;
-            }}
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-            value={props.input}
-            minRows={1}
-            maxRows={10}
-            onInput={(e: Event) => props.onInput((e.target as HTMLTextAreaElement).value)}
-            placeholder="Send a message."
-            spellcheck={false}
-            class="col-span-2 my-2 w-full resize-none bg-transparent focus-within:outline-none"
+          <TextEditor
+            initialValue={props.input}
+            onInput={(value) => props.onInput(value)}
+            onSubmit={handleSubmit}
             onPaste={handlePasteFile}
           />
         </form>

@@ -7,7 +7,7 @@ export const PageTitle: ParentComponent = (props) => {
 };
 
 export const SectionTitle: ParentComponent = (props) => {
-  return <h2 class="text-2xl">{props.children}</h2>;
+  return <h2 class="flex items-baseline gap-2 text-2xl">{props.children}</h2>;
 };
 
 export const SectionDescription: ParentComponent = (props) => {

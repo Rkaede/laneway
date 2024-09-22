@@ -7,13 +7,14 @@ import {
   IconLayoutGrid,
   IconListRestart,
   IconNewSession,
+  IconPencilLine,
   IconSettings,
   IconSidebar,
   IconSun,
   IconTrash,
 } from '~/components/icons/ui';
 import * as router from '~/services/router';
-import { summarizeTitle } from '~/store/prompts';
+import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,
   Actions,
@@ -248,6 +249,16 @@ export async function autonameChat(sessionId: string, title: string) {
   setStore('sessions', (s) => s.id === sessionId, 'title', formatted);
 }
 
+export async function getCompletion(input: string) {
+  const prompt = completion.replace('{{input}}', input);
+  const response = await router.getText({
+    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }] }],
+    modelId: store.settings.completions.model,
+  });
+
+  return response?.text;
+}
+
 export function showAboutDialog() {
   setStore('dialogs', 'about', 'open', true);
 }
@@ -353,6 +364,15 @@ export const actions: Actions = {
     icon: IconBox,
     fn: () => {
       setStore('settings', 'messages', 'showAvatars', (showAvatars) => !showAvatars);
+    },
+  },
+  toggleCompletions: {
+    id: 'toggle-completions',
+    name: 'Toggle Completions',
+    keywords: ['completions', 'show', 'hide'],
+    icon: IconPencilLine,
+    fn: () => {
+      setStore('settings', 'completions', 'enabled', (enabled) => !enabled);
     },
   },
 } as const;

@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
@@ -27,6 +28,10 @@ process.env.VITE_APP_LICENSE = packageJson.license;
 
 export default defineConfig({
   plugins: [solid(), VitePWA({ registerType: 'autoUpdate' })],
+  optimizeDeps: {
+    // Add both @codemirror/state and @codemirror/view to included deps to optimize
+    include: ['@codemirror/state', '@codemirror/view'],
+  },
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'src'),

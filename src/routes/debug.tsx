@@ -1,16 +1,30 @@
 import { createEffect, createSignal, For } from 'solid-js';
 
-import { CodeBlock } from '~/components/ui';
+import { CodeBlock, TextEditor } from '~/components/ui';
 import { imageCache } from '~/services/image-cache';
 import { store } from '~/store';
+
+const config = {
+  richtexteditor: true,
+  imageCache: false,
+  state: false,
+};
 
 export function Debug() {
   return (
     <div class="h-full overflow-auto p-4 text-sm">
-      <ImageCache />
-      <div class="w-full">
-        <CodeBlock language="json" code={JSON.stringify(store, null, 2)} />
-      </div>
+      {config.richtexteditor && (
+        <div>
+          <TextEditor />
+          {/* <RichTextEditorExample /> */}
+        </div>
+      )}
+      {config.imageCache && <ImageCache />}
+      {config.state && (
+        <div class="w-full">
+          <CodeBlock language="json" code={JSON.stringify(store, null, 2)} />
+        </div>
+      )}
     </div>
   );
 }
