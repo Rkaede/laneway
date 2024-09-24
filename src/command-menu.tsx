@@ -47,7 +47,8 @@ export function CommandMenu() {
         if (
           event.target instanceof HTMLInputElement ||
           event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLSelectElement
+          event.target instanceof HTMLSelectElement ||
+          (event.target instanceof HTMLElement && event.target.closest('.cm-editor'))
         ) {
           return;
         }
