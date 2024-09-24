@@ -8,6 +8,7 @@ import type {
   DefaultSession,
   PresetProps,
   SessionProps,
+  SpeedDialItem,
 } from '~/types';
 
 import { assistants } from './library/assistants';
@@ -21,6 +22,7 @@ interface State {
   draftChats: ChatProps[];
   assistants: AssistantProps[];
   presets: PresetProps[];
+  speedDial: SpeedDialItem[];
   dialogs: {
     renameSession: {
       open: boolean;
@@ -67,6 +69,26 @@ function createDefaultState(): State {
     chats: [],
     draftSession: clone(defaultPreset.session),
     draftChats: clone(defaultPreset.chats),
+    speedDial: [
+      {
+        id: 'full-house-dial',
+        type: 'preset',
+        referenceId: 'full-house',
+        title: 'Compare frontier models',
+      },
+      {
+        id: 'claude-3.5-sonnet-dial',
+        type: 'model',
+        referenceId: 'anthropic/claude-3.5-sonnet',
+        title: 'Best of the vibecheck',
+      },
+      {
+        id: 'o1-mini-dial',
+        type: 'model',
+        referenceId: 'openai/o1-mini',
+        title: 'Reasoning?',
+      },
+    ],
     dialogs: {
       renameSession: {
         open: false,
@@ -131,6 +153,23 @@ if (store.settings.completions.enabled === undefined) {
 
 if (store.settings.completions.model === undefined) {
   setStore('settings', 'completions', 'model', 'openai/gpt-3.5-turbo');
+}
+
+if (store.speedDial === undefined) {
+  setStore('speedDial', [
+    {
+      id: 'p3t7VbcnF1A3aOqMC_XOY',
+      type: 'preset',
+      referenceId: 'full-house',
+      title: 'Compare frontier models',
+    },
+    {
+      id: 'wbZ5CmV_CZnBVF3FjUsKM',
+      type: 'model',
+      referenceId: 'anthropic/claude-3.5-sonnet',
+      title: 'Best of the vibecheck',
+    },
+  ]);
 }
 
 export const deleteData = () => {

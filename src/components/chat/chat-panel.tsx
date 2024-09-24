@@ -127,7 +127,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
   return (
     <div
       classList={{
-        'group relative min-w-0 max-w-[70ch] grid-rows-[auto] flex-col': true,
+        'group relative min-w-0 max-w-[70ch] grid-rows-[auto] flex flex-col': true,
         'min-h-full flex-1': props.chat.messages.length > 0,
       }}
     >
@@ -138,36 +138,38 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         provider={provider()}
         type={props.chat.assistantId ? 'assistant' : 'model'}
       />
-      <div class="fade-out-bottom flex flex-col gap-8 pb-2 pt-8">
-        <Show when={props.chat}>
-          <For each={props.chat.messages}>
-            {(message) => <Message {...message} model={model()} />}
-          </For>
-        </Show>
+      <div class="fade-out-bottom flex min-h-full flex-1 flex-col">
+        <div class="flex min-h-full flex-1 flex-col gap-8 pb-2 pt-8">
+          <Show when={props.chat}>
+            <For each={props.chat.messages}>
+              {(message) => <Message {...message} model={model()} />}
+            </For>
+          </Show>
 
-        <Show when={chat.latest}>
-          {(message) => <Message content={message().content} role="assistant" />}
-        </Show>
+          <Show when={chat.latest}>
+            {(message) => <Message content={message().content} role="assistant" />}
+          </Show>
 
-        <Show when={chat.status === 'loading'}>
-          <div class="flex justify-center">
-            <Loader />
-          </div>
-        </Show>
+          <Show when={chat.status === 'loading'}>
+            <div class="flex justify-center">
+              <Loader />
+            </div>
+          </Show>
 
-        <Show when={props.attachments && props.attachments.length > 0 && !model()?.vision}>
-          <AlertNoVision />
-        </Show>
+          <Show when={props.attachments && props.attachments.length > 0 && !model()?.vision}>
+            <AlertNoVision />
+          </Show>
 
-        <Show when={!isApiKeyConfigured()}>
-          <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
-        </Show>
+          <Show when={!isApiKeyConfigured()}>
+            <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
+          </Show>
 
-        <Show when={props.chat.error}>
-          {(error) => (
-            <AlertError error={error()} onRetry={() => clearChatError(props.chat.id)} />
-          )}
-        </Show>
+          <Show when={props.chat.error}>
+            {(error) => (
+              <AlertError error={error()} onRetry={() => clearChatError(props.chat.id)} />
+            )}
+          </Show>
+        </div>
       </div>
     </div>
   );

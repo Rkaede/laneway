@@ -149,3 +149,12 @@ export type DefaultSession = {
 };
 
 export type SVGAttributes = Partial<JSX.SvgSVGAttributes<SVGSVGElement>>;
+
+export type SpeedDialType = 'model' | 'assistant' | 'preset' | 'voice' | 'notebook';
+
+export type SpeedDialItem = {
+  id: string;
+  type: SpeedDialType;
+  referenceId: string; // ID of the model, assistant, or preset
+  title?: string; // Display name
+};

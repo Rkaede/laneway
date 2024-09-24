@@ -14,6 +14,7 @@ import {
   IconX,
   MoreHorizontalIcon,
 } from '~/components/icons/ui';
+import { DeleteButton } from '~/components/ui';
 import { Avatar } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -561,14 +562,7 @@ const Assistant: Component<{
           {(props.assistantId ? model()?.title : 'Model') ?? 'Unknown Model'}
         </div>
       </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        class="size-6 justify-self-end rounded-full p-0 hover:bg-destructive"
-        onClick={props.onDelete}
-      >
-        <IconX class="size-4" />
-      </Button>
+      <DeleteButton onClick={props.onDelete} />
     </div>
   );
 };

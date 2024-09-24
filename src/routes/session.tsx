@@ -1,15 +1,13 @@
 import { useNavigate, useParams } from '@solidjs/router';
 import { createSignal, For, type ParentComponent, Show } from 'solid-js';
 
-import { ChatCard } from '~/components/chat/chat-card';
 import { ChatInput } from '~/components/chat/chat-input';
 import { ChatPanel } from '~/components/chat/chat-panel';
+import { SpeedDial } from '~/components/connected/speed-dial';
 import { Shortcut } from '~/components/ui/shortcut';
-import { useActionContext } from '~/hooks/use-action-context';
 import { imageCache } from '~/services/image-cache';
 import { setStore, store } from '~/store';
 import {
-  actions,
   addMessageToSessionChats,
   autonameChat,
   setAssistant,
@@ -136,8 +134,6 @@ function BlankSession(props: { attachments?: File[] }) {
     setStore('draftChats', (c) => c.id === chatId, 'assistantId', id);
   }
 
-  const context = useActionContext();
-
   return (
     <ChatPanelLayout numChats={store.draftChats.length}>
       <For each={store.draftChats}>
@@ -150,31 +146,10 @@ function BlankSession(props: { attachments?: File[] }) {
           />
         )}
       </For>
-      <div style={{ 'grid-column': '1 / -1' }} class="flex flex-col gap-4">
+      <div class="absolute inset-0 flex items-center justify-center gap-4">
         <div class="flex flex-col gap-20 self-center">
           <div class="flex flex-col gap-2 self-center">
-            <div class="flex gap-4">
-              <ChatCard
-                title="Full House"
-                tags={['Preset']}
-                subtitle="Compare frontier models"
-                onClick={() => {
-                  actions.newSession.fn(context, {
-                    template: { type: 'preset', id: 'full-house' },
-                  });
-                }}
-              />
-              <ChatCard
-                title="Claude 3.5 Sonnet"
-                tags={['Model']}
-                subtitle="Best of the vibecheck"
-                onClick={() => {
-                  actions.newSession.fn(context, {
-                    template: { type: 'model', id: 'anthropic/claude-3.5-sonnet' },
-                  });
-                }}
-              />
-            </div>
+            <SpeedDial items={store.speedDial} />
             <div class="self-center text-xs text-muted-foreground">
               <Shortcut variant="solid">$mod+K</Shortcut> for more options.
             </div>
@@ -188,7 +163,7 @@ function BlankSession(props: { attachments?: File[] }) {
 const ChatPanelLayout: ParentComponent<{ numChats: number }> = (props) => {
   return (
     <div
-      class="grid flex-1 justify-center px-4"
+      class="relative grid flex-1 justify-center px-4"
       style={{
         'grid-template-columns': `repeat(${props.numChats}, minmax(0, 70ch))`,
       }}

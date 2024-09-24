@@ -1,6 +1,9 @@
-import type { JSX, ParentComponent } from 'solid-js';
+import { nanoid } from 'nanoid';
+import type { Component, JSX, ParentComponent } from 'solid-js';
+import { For, Show } from 'solid-js';
 
 import { MultiCombobox } from '~/components/connected/multi-combobox';
+import { IconChevronDown, IconChevronUp, IconPlus, IconTrash } from '~/components/icons/ui';
 import { Card, CardContent, Tag } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import {
@@ -12,16 +15,12 @@ import {
   SettingTitle,
 } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { Select, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Switch, SwitchControl, SwitchThumb } from '~/components/ui/switch';
 import { deleteData, setStore, store } from '~/store';
 import { apiKeys, deleteKeys, setApiKeys } from '~/store/keys';
+import { models } from '~/store/models';
+import { SpeedDialItem } from '~/types';
 import { download } from '~/util';
 
 export function Settings() {
@@ -38,6 +37,7 @@ export function Settings() {
         <General />
         <Completions />
         <APIKeys />
+        <SpeedDial />
         <Data />
       </div>
     </div>
@@ -91,6 +91,123 @@ function General() {
     </Section>
   );
 }
+
+export const SpeedDial: Component = () => {
+  const addSpeedDialItem = () => {
+    if (store.speedDial.length >= 6) return; // Prevent adding more than 6 items
+    const defaultItem = models.at(0);
+    const newItem: SpeedDialItem = {
+      id: nanoid(),
+      type: 'model',
+      referenceId: defaultItem?.id ?? '',
+      title: defaultItem?.creator.name ?? '',
+    };
+    setStore('speedDial', (items) => [...items, newItem]);
+  };
+
+  const removeSpeedDialItem = (id: string) => {
+    setStore('speedDial', (items) => items.filter((item) => item.id !== id));
+  };
+
+  const updateSpeedDialItem = (id: string, field: keyof SpeedDialItem, value: string) => {
+    setStore('speedDial', (item) => item.id === id, field, value);
+  };
+
+  const moveSpeedDialItem = (id: string, direction: 'up' | 'down') => {
+    setStore('speedDial', (items) => {
+      const index = items.findIndex((item) => item.id === id);
+      if (index === -1) return items;
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= items.length) return items;
+      const newItems = [...items];
+      [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
+      return newItems;
+    });
+  };
+
+  return (
+    <Section title="Speed Dial" description="Manage your speed dial shortcuts (max 6 items).">
+      <SettingHeader>
+        <SettingTitle>Speed Dial Options</SettingTitle>
+        <SettingDescription>
+          Configure shortcuts for quick access to models, assistants, or presets.
+        </SettingDescription>
+      </SettingHeader>
+      <div class="flex flex-col gap-4">
+        <Show
+          when={store.speedDial.length > 0}
+          fallback={
+            <div class="text-center text-gray-500">No speed dial items configured.</div>
+          }
+        >
+          <For each={store.speedDial}>
+            {(item, index) => (
+              <div class="grid grid-cols-[1fr_1fr_auto] items-center gap-4">
+                {(item.type === 'model' ||
+                  item.type === 'assistant' ||
+                  item.type === 'preset') && (
+                  <MultiCombobox
+                    includeAssistants
+                    includeModels
+                    includePresets
+                    value={{ id: item.referenceId, type: item.type }}
+                    onSelect={(id, type) => {
+                      updateSpeedDialItem(item.id, 'referenceId', id);
+                      updateSpeedDialItem(item.id, 'type', type);
+                    }}
+                  />
+                )}
+                <Input
+                  value={item.title}
+                  onInput={(e) => updateSpeedDialItem(item.id, 'title', e.currentTarget.value)}
+                  placeholder="Title"
+                />
+
+                <div>
+                  <Button
+                    variant="bare"
+                    onClick={() => moveSpeedDialItem(item.id, 'up')}
+                    size="icon"
+                    disabled={index() === 0}
+                  >
+                    <IconChevronUp class="size-4" />
+                  </Button>
+                  <Button
+                    variant="bare"
+                    onClick={() => moveSpeedDialItem(item.id, 'down')}
+                    size="icon"
+                    disabled={index() === store.speedDial.length - 1}
+                  >
+                    <IconChevronDown class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => removeSpeedDialItem(item.id)}
+                    size="icon"
+                    class="hover:bg-destructive"
+                  >
+                    <IconTrash class="size-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </For>
+        </Show>
+        <div class="flex justify-start">
+          <Button
+            onClick={addSpeedDialItem}
+            size="sm"
+            variant="ghost"
+            disabled={store.speedDial.length >= 6}
+          >
+            <IconPlus class="mr-2 h-5 w-5" />
+            Add New
+          </Button>
+        </div>
+      </div>
+    </Section>
+  );
+};
 
 function Completions() {
   return (
@@ -199,7 +316,6 @@ function APIKeys() {
               {(state) => state.selectedOption().label ?? 'Select option'}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent />
         </Select>
       </Setting>
       <Setting
@@ -302,7 +418,7 @@ type SectionProps = {
 const Section: ParentComponent<SectionProps> = (props) => {
   return (
     <div class="container mx-auto flex flex-col gap-1">
-      <div class="pb-2 pl-6">
+      <div class="pb-2 pl-2">
         <SectionTitle>{props.title}</SectionTitle>
         <SectionDescription>{props.description}</SectionDescription>
       </div>
@@ -312,8 +428,8 @@ const Section: ParentComponent<SectionProps> = (props) => {
 };
 
 const SectionContent: ParentComponent = (props) => (
-  <Card class="py-6">
-    <CardContent class="flex flex-col gap-8">{props.children}</CardContent>
+  <Card class="">
+    <CardContent class="flex flex-col gap-8 pb-8 pt-6">{props.children}</CardContent>
   </Card>
 );
 

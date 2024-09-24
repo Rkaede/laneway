@@ -7,7 +7,7 @@ import { store } from '~/store';
 const config = {
   richtexteditor: true,
   imageCache: false,
-  state: false,
+  state: true,
 };
 
 export function Debug() {

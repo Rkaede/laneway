@@ -14,9 +14,9 @@ type ChatCardProps = ComponentProps<'button'> & {
 };
 
 const tagMap: Record<string, TagProps['variant']> = {
-  Preset: 'blue',
-  Model: 'green',
-  Assistant: 'purple',
+  preset: 'blue',
+  model: 'green',
+  assistant: 'purple',
 };
 
 export const ChatCard: ParentComponent<ChatCardProps> = (props) => {
@@ -32,18 +32,25 @@ export const ChatCard: ParentComponent<ChatCardProps> = (props) => {
   return (
     <button
       class={cn(
-        'flex w-56 flex-col gap-2 rounded-xl border bg-transparent p-4 text-sm text-card-foreground shadow',
+        'flex max-w-60 flex-col gap-2 rounded-xl border border-input bg-background-main p-4 text-left text-sm text-card-foreground shadow transition-colors duration-100 hover:bg-background',
         local.class,
       )}
       onClick={() => local.onClick?.()}
       {...rest}
     >
-      <div>{local.title}</div>
-      {local.subtitle && <div class="text-xs text-muted-foreground">{local.subtitle}</div>}
-      <For each={local.tags}>
-        {(tag) => <Tag variant={tagMap[tag] || 'default'}>{tag}</Tag>}
-      </For>
-      <div>{local.children}</div>
+      <div>
+        <div>{local.title}</div>
+        {local.subtitle && <div class="text-xs text-muted-foreground">{local.subtitle}</div>}
+      </div>
+      <div>
+        <For each={local.tags}>
+          {(tag) => (
+            <Tag variant={tagMap[tag] || 'default'}>
+              {tag.charAt(0).toUpperCase() + tag.slice(1)}
+            </Tag>
+          )}
+        </For>
+      </div>
     </button>
   );
 };

@@ -6,6 +6,7 @@ export * from './code-highlighter';
 export * from './codeblock';
 export * from './combobox';
 export * from './command';
+export * from './delete-button';
 export * from './dialog';
 export * from './dropdown';
 export * from './forms';
