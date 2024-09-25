@@ -158,16 +158,22 @@ if (store.settings.completions.model === undefined) {
 if (store.speedDial === undefined) {
   setStore('speedDial', [
     {
-      id: 'p3t7VbcnF1A3aOqMC_XOY',
+      id: 'full-house-dial',
       type: 'preset',
       referenceId: 'full-house',
       title: 'Compare frontier models',
     },
     {
-      id: 'wbZ5CmV_CZnBVF3FjUsKM',
+      id: 'claude-3.5-sonnet-dial',
       type: 'model',
       referenceId: 'anthropic/claude-3.5-sonnet',
       title: 'Best of the vibecheck',
+    },
+    {
+      id: 'o1-mini-dial',
+      type: 'model',
+      referenceId: 'openai/o1-mini',
+      title: 'Reasoning?',
     },
   ]);
 }
