@@ -15,6 +15,7 @@ export function createSessionFromPreset(preset: PresetProps) {
     id: nanoid(),
     title: 'Untitled',
     created: Date.now(),
+    type: 'chat',
     chats: chats.map((c) => c.id),
   };
   return { session, chats };

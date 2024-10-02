@@ -96,10 +96,13 @@ export type ChatProps = {
   fetching?: boolean;
 };
 
+export type SessionType = 'chat' | 'note';
+
 export type SessionProps = {
   id: string;
   // the title of the session shown in the sidebar
   title: string;
+  type: SessionType;
   // we keep the preset details to show in the UI even if the preset is later deleted
   presetTitle?: string;
   presetDescription?: string;
@@ -140,21 +143,23 @@ export type Actions = {
   [key: string]: Action;
 };
 
-export type DefaultSession = {
+export type SessionTemplate = {
   type: 'model' | 'assistant' | 'preset';
+  sessionType?: SessionType;
   id: string;
   // todo: check if title and modelId are needed
   title?: string;
-  modelId?: string;
+  referenceId?: string;
 };
 
 export type SVGAttributes = Partial<JSX.SvgSVGAttributes<SVGSVGElement>>;
 
-export type SpeedDialType = 'model' | 'assistant' | 'preset' | 'voice' | 'notebook';
+export type SpeedDialType = 'model' | 'assistant' | 'preset';
 
 export type SpeedDialItem = {
   id: string;
-  type: SpeedDialType;
-  referenceId: string; // ID of the model, assistant, or preset
+  type?: SpeedDialType;
+  referenceId?: string; // ID of the model, assistant, or preset
   title?: string; // Display name
+  sessionType?: 'chat' | 'note';
 };

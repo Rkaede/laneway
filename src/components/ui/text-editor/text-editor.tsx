@@ -1,3 +1,4 @@
+// Start of Selection
 import './text-editor.css';
 
 import { defaultKeymap, history, redo, undo } from '@codemirror/commands';
@@ -5,6 +6,7 @@ import { EditorState, Prec } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { inlineSuggestion } from 'codemirror-extension-inline-suggestion';
 import { createCodeMirror } from 'solid-codemirror';
+import { createEffect } from 'solid-js';
 
 import { store } from '~/store';
 import { getCompletion } from '~/store/actions';
@@ -25,6 +27,9 @@ type TextEditorProps = {
   initialValue?: string;
   onSubmit?: () => void;
   onPaste?: (event: ClipboardEvent) => void;
+  class?: string;
+  mode?: 'note' | 'chat';
+  placeholder?: string;
 };
 
 export function TextEditor(props: TextEditorProps) {
@@ -44,7 +49,9 @@ export function TextEditor(props: TextEditorProps) {
       },
     }),
   );
-  createExtension(placeholder('Write something...'));
+  createEffect(() => {
+    createExtension(placeholder(props.placeholder ?? 'Write something...'));
+  });
   createExtension(history());
   createExtension(EditorView.lineWrapping);
   createExtension(keymap.of(defaultKeymap));
@@ -60,7 +67,11 @@ export function TextEditor(props: TextEditorProps) {
         // submit
         {
           key: 'Enter',
-          run: () => {
+          run: (view) => {
+            if (props.mode === 'note') {
+              view.dispatch(view.state.replaceSelection('\n'));
+              return true;
+            }
             props.onSubmit?.();
             return true;
           },
@@ -69,6 +80,10 @@ export function TextEditor(props: TextEditorProps) {
         {
           key: 'Shift-Enter',
           run: (view) => {
+            if (props.mode === 'note') {
+              props.onSubmit?.();
+              return true;
+            }
             view.dispatch(view.state.replaceSelection('\n'));
             return true;
           },
@@ -87,5 +102,5 @@ export function TextEditor(props: TextEditorProps) {
     if (editorView()?.hasFocus) clearInterval(timer);
   }, 100);
 
-  return <div ref={ref} />;
+  return <div ref={ref} class={props.class} data-mode={props.mode} />;
 }

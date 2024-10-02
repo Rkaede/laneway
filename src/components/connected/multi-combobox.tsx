@@ -21,7 +21,10 @@ import { ModelIcon } from './model-icon';
 
 type MultiComboboxProps = {
   value?: { id?: string; type: 'assistant' | 'model' | 'preset' };
-  onSelect: (id: string, type: 'assistant' | 'model' | 'preset') => void;
+  onSelect: (selection: {
+    referenceId: string;
+    type: 'assistant' | 'model' | 'preset';
+  }) => void;
   class?: string;
   includeModels?: boolean;
   includeAssistants?: boolean;
@@ -102,7 +105,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                       value={assistant.id}
                       keywords={[assistant.title]}
                       onSelect={(currentValue) => {
-                        props.onSelect(currentValue, 'assistant');
+                        props.onSelect({ referenceId: currentValue, type: 'assistant' });
                         setOpen(false);
                       }}
                     >
@@ -135,7 +138,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                           value={model.id}
                           keywords={[model.title]}
                           onSelect={(currentValue) => {
-                            props.onSelect(currentValue, 'model');
+                            props.onSelect({ referenceId: currentValue, type: 'model' });
                             setOpen(false);
                           }}
                         >
@@ -162,7 +165,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                       value={preset.id}
                       keywords={preset.presetTitle ? [preset.presetTitle] : []}
                       onSelect={(currentValue) => {
-                        props.onSelect(currentValue, 'preset');
+                        props.onSelect({ referenceId: currentValue, type: 'preset' });
                         setOpen(false);
                       }}
                     >

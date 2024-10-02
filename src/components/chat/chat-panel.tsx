@@ -10,8 +10,9 @@ import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './comp
 type ChatPanelProps = {
   sessionId: string;
   chat: ChatProps;
-  onChangeAssistant: (id: string) => void;
+  onChangeAssistant?: (id: string) => void;
   attachments?: File[];
+  variant?: 'chat' | 'note';
 };
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
@@ -26,6 +27,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
       classList={{
         'group relative min-w-0 max-w-[70ch] grid-rows-[auto] flex flex-col': true,
         'min-h-full flex-1': props.chat.messages.length > 0,
+        'w-full': props.variant === 'note',
       }}
     >
       <Chatbar
@@ -34,6 +36,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         model={chat.model()}
         provider={chat.provider()}
         type={props.chat.assistantId ? 'assistant' : 'model'}
+        sessionType={props.variant}
       />
       <div class="fade-out-bottom flex min-h-full flex-1 flex-col">
         <div class="flex min-h-full flex-1 flex-col gap-8 pb-2 pt-8">

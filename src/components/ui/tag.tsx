@@ -1,9 +1,9 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import type { ComponentProps, ParentComponent } from 'solid-js';
-import { splitProps } from 'solid-js';
+import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
+import { Show, splitProps } from 'solid-js';
 
 const tagVariants = cva(
-  'inline-flex items-center rounded-full px-2 py-[1px] text-xs font-semibold',
+  'inline-flex items-center rounded-full px-2 py-[1px] text-xs font-semibold gap-1',
   {
     variants: {
       variant: {
@@ -16,6 +16,7 @@ const tagVariants = cva(
         model: 'bg-green-300 text-green-900',
         red: 'bg-red-300 text-red-900',
         warning: 'bg-yellow-300 text-yellow-900',
+        note: 'bg-primary text-yellow-900',
         purple: 'bg-purple-300 text-purple-900',
         assistant: 'bg-purple-300 text-purple-900',
         Vision: 'bg-blue-300 text-blue-900',
@@ -30,13 +31,17 @@ const tagVariants = cva(
   },
 );
 
-export type TagProps = ComponentProps<'span'> & VariantProps<typeof tagVariants>;
+export type TagProps = ComponentProps<'span'> &
+  VariantProps<typeof tagVariants> & {
+    icon?: JSX.Element;
+  };
 
 export const Tag: ParentComponent<TagProps> = (props) => {
-  const [local, rest] = splitProps(props, ['class', 'variant', 'children']);
+  const [local, rest] = splitProps(props, ['class', 'variant', 'children', 'icon']);
 
   return (
     <span class={tagVariants({ variant: local.variant, class: local.class })} {...rest}>
+      <Show when={local.icon}>{local.icon}</Show>
       {local.children}
     </span>
   );

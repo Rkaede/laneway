@@ -64,7 +64,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
           <MultiCombobox
             includeModels
             value={{ id: props.modelId, type: 'model' }}
-            onSelect={(id) => props.onModelChange(id)}
+            onSelect={({ referenceId }) => props.onModelChange(referenceId)}
           />
         </div>
       </SplitColumns>

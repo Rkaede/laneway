@@ -13,21 +13,20 @@ import {
   IconSun,
   IconTrash,
 } from '~/components/icons/ui';
+import { imageCache } from '~/services/image-cache';
 import * as router from '~/services/router';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,
   Actions,
-  DefaultSession,
   MessageProps,
+  PresetProps,
   SessionProps,
+  SessionType,
 } from '~/types';
 
 import { setStore, store } from '.';
 export * from './actions/assistants';
-
-import { imageCache } from '~/services/image-cache';
-
 import { models } from './models';
 import { createSessionFromPreset } from './util';
 
@@ -58,72 +57,66 @@ function createSessionFromDraft() {
   return session.id;
 }
 
-export function newDraftSessionWithModel(modelId: string) {
-  const selectedModel = models.find((model) => model.id === modelId);
+export function newDraftSession({
+  sessionType = 'chat',
+  type,
+  referenceId,
+}: {
+  sessionType?: SessionType;
+  type: 'model' | 'assistant' | 'preset';
+  referenceId?: string;
+}) {
+  const chatId = nanoid();
+  const record = () => {
+    if (type === 'model') {
+      return models.find((m) => m.id === referenceId);
+    }
+    if (type === 'assistant') {
+      return store.assistants.find((a) => a.id === referenceId);
+    }
+    if (type === 'preset') {
+      return store.presets.find((p) => p.id === referenceId);
+    }
+  };
 
-  if (selectedModel) {
-    const chatId = nanoid();
-    setStore('draftSession', {
-      id: nanoid(),
-      title: 'Untitled',
-      presetTitle: undefined,
-      presetDescription: undefined,
-      chats: [chatId],
-      created: Date.now(),
-      input: '', // Explicitly set input to empty string
-    });
+  const _record = record();
 
-    setStore('draftChats', [
-      {
-        id: chatId,
-        created: Date.now(),
-        modelId: selectedModel.id,
-        messages: [],
-      },
-    ]);
-  } else {
-    console.warn(`Model with id ${modelId} not found`);
-  }
-}
+  if (!_record) return;
 
-export function newDraftSessionWithAssistant(assistantId: string) {
-  const assistant = store.assistants.find((a) => a.id === assistantId);
-  if (assistant) {
-    const chatId = nanoid();
-    setStore('draftSession', {
-      id: nanoid(),
-      title: 'Untitled',
-      presetTitle: assistant.title,
-      chats: [chatId],
-      created: Date.now(),
-      input: '', // Explicitly set input to empty string
-    });
-
-    setStore('draftChats', [
-      {
-        id: chatId,
-        created: Date.now(),
-        assistantId: assistant.id,
-        messages: [],
-      },
-    ]);
-  } else {
-    console.warn(`Assistant with id ${assistantId} not found`);
-  }
-}
-
-export function newDraftSessionWithPreset(presetId: string) {
-  const preset = store.presets.find((p) => p.id === presetId);
-  if (preset) {
-    const draft = createSessionFromPreset(preset);
+  if (type === 'preset') {
+    const draft = createSessionFromPreset(_record as PresetProps);
     setStore('draftSession', { input: '', ...draft.session }); // Ensure input is empty
     setStore('draftChats', draft.chats);
-  } else {
-    console.warn(`Preset with id ${presetId} not found`);
+    return;
   }
+
+  setStore('draftSession', {
+    id: nanoid(),
+    title: 'Untitled Note',
+    type: sessionType,
+    // todo: add presetTitle
+    // presetTitle: undefined,
+    chats: [chatId],
+    created: Date.now(),
+    input: '',
+  });
+
+  setStore('draftChats', [
+    {
+      id: chatId,
+      created: Date.now(),
+      messages: [],
+      modelId: type === 'model' ? referenceId : undefined,
+      assistantId: type === 'assistant' ? referenceId : undefined,
+    },
+  ]);
 }
 
-export function addMessageToSessionChats(message: MessageProps, inputSessionId?: string) {
+export function addMessageToSessionChats(
+  message: MessageProps,
+  inputSessionId?: string,
+  sessionType?: 'chat' | 'note',
+) {
   const sessionId = inputSessionId ?? createSessionFromDraft();
   const session = store.sessions.find((s) => s.id === sessionId);
 
@@ -142,7 +135,7 @@ export function addMessageToSessionChats(message: MessageProps, inputSessionId?:
           'chats',
           (c) => c.id === chatId,
           'messages',
-          (messages) => [...messages, message],
+          (messages) => (sessionType === 'note' ? [message] : [...messages, message]),
         );
       }
     }
@@ -160,19 +153,6 @@ export function clearChatError(chatId: string) {
 
 export function setAssistant(id: string, chatId: string) {
   setStore('chats', (c) => c.id === chatId, 'assistantId', id);
-}
-
-export function resetDraft(template?: DefaultSession) {
-  const config = template ?? store.settings.defaultSession;
-  if (config.type === 'model') {
-    newDraftSessionWithModel(config.id);
-  } else if (config.type === 'assistant') {
-    newDraftSessionWithAssistant(config.id);
-  } else if (config.type === 'preset') {
-    newDraftSessionWithPreset(config.id);
-  } else {
-    console.warn('Unknown session type', config);
-  }
 }
 
 export function toggleSidebar() {
@@ -270,8 +250,33 @@ export const actions: Actions = {
     keywords: ['new', 'session'],
     shortcut: 'c',
     icon: IconNewSession,
-    fn: (context: ActionContext, options?: { template?: DefaultSession }) => {
-      resetDraft(options?.template);
+    fn: (
+      context: ActionContext,
+      options?: { referenceId?: string; type?: 'model' | 'assistant' | 'preset' },
+    ) => {
+      newDraftSession({
+        sessionType: 'chat',
+        referenceId: options?.referenceId ?? store.settings.defaultSession.id,
+        type: options?.type ?? store.settings.defaultSession.type,
+      });
+      context.navigate('/');
+    },
+  },
+  newNote: {
+    id: 'new-note',
+    name: 'New Note',
+    keywords: ['new', 'note'],
+    shortcut: 'n',
+    icon: IconNewSession,
+    fn: (
+      context: ActionContext,
+      options?: { referenceId?: string; type?: 'model' | 'assistant' | 'preset' },
+    ) => {
+      newDraftSession({
+        sessionType: 'note',
+        referenceId: options?.referenceId ?? store.settings.noteModel.referenceId,
+        type: options?.type ?? store.settings.noteModel.type,
+      });
       context.navigate('/');
     },
   },

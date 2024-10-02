@@ -3,6 +3,7 @@ import type { PresetProps } from '~/types';
 export const presets: PresetProps[] = [
   {
     id: 'full-house',
+    type: 'chat',
     presetTitle: 'Full House',
     presetDescription: 'Compare frontier models.',
     templateId: 'full-house',
@@ -20,6 +21,7 @@ export const presets: PresetProps[] = [
   },
   {
     id: 'top-models',
+    type: 'chat',
     presetTitle: 'Large frontier models',
     presetDescription: 'Claude 3 Opus & GPT-4',
     templateId: 'top-models',
@@ -34,6 +36,7 @@ export const presets: PresetProps[] = [
   },
   {
     id: 'ux-writer-default',
+    type: 'chat',
     presetTitle: 'UX Microcopy',
     presetDescription: 'Multiple models providing microcopy',
     templateId: 'ux-writer-default',

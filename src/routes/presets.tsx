@@ -78,6 +78,7 @@ export const Presets: Component = () => {
     const newPreset: PresetProps = {
       id: nanoid(),
       presetTitle: 'New Preset',
+      type: 'chat',
       input: '',
       chats: [],
     };
@@ -498,8 +499,6 @@ const AssistantList: Component<{
   }
 
   function handleDelete(id?: string) {
-    console.log(id);
-
     if (id) {
       props.setLocalPreset((prev) => ({
         ...prev,
@@ -516,7 +515,7 @@ const AssistantList: Component<{
         <div class="flex items-center gap-2">
           <MultiCombobox
             class="max-w-72"
-            onSelect={handleSelect}
+            onSelect={({ referenceId, type }) => handleSelect(referenceId, type)}
             includeAssistants
             includeModels
             showType

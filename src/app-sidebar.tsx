@@ -1,12 +1,14 @@
-import { useLocation, useNavigate } from '@solidjs/router';
+import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import { type Component, createEffect, createSignal, For, Show } from 'solid-js';
 
 import {
   IconBox,
+  IconChat,
   IconLayoutGrid,
   IconPlus,
   IconScanFace,
   IconSettings,
+  IconSquarePen,
   MoreHorizontalIcon,
 } from '~/components/icons/ui';
 import {
@@ -29,7 +31,7 @@ import {
 } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import { setStore, store } from '~/store';
-import { deleteSession, renameSession, resetDraft, toggleSidebar } from '~/store/actions';
+import { actions, deleteSession, renameSession, toggleSidebar } from '~/store/actions';
 import type { SessionProps } from '~/types';
 import { groupByDate } from '~/util';
 
@@ -54,16 +56,26 @@ function SessionGroup(props: {
       <SidebarGroup title={groupTitles[props.title]}>
         <SidebarItems>
           <For each={props.sessions}>
-            {(session) => (
-              <SidebarLinkItem
-                href={`/session/${session.id}`}
-                active={location.pathname === `/session/${session.id}`}
-                sessionId={session.id}
-                dropdown={<SidbarItemDropdown sessionId={session.id} />}
-              >
-                {session.title}
-              </SidebarLinkItem>
-            )}
+            {(session) => {
+              const active = () => location.pathname.endsWith(`/${session.id}`);
+              return (
+                <SidebarLinkItem
+                  href={`/session/${session.id}`}
+                  active={active()}
+                  sessionId={session.id}
+                  dropdown={<SidbarItemDropdown sessionId={session.id} />}
+                  icon={
+                    session.type === 'note' ? (
+                      <IconSquarePen class="size-4" stroke-width={1.25} />
+                    ) : (
+                      <IconChat class="size-4" stroke-width={1.25} />
+                    )
+                  }
+                >
+                  {session.title}
+                </SidebarLinkItem>
+              );
+            }}
           </For>
         </SidebarItems>
       </SidebarGroup>
@@ -74,10 +86,14 @@ function SessionGroup(props: {
 export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
 
-  function handleNew() {
-    resetDraft();
-    navigate('/');
+  function handleNewChat() {
+    actions.newSession.fn({ navigate, params });
+  }
+
+  function handleNewNote() {
+    actions.newNote.fn({ navigate, params });
   }
 
   const groups = () => groupByDate(store.sessions);
@@ -85,13 +101,14 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   return (
     <div data-component="Sidebar" class="relative flex h-full">
       <div class="flex h-full w-full flex-col overflow-hidden">
-        <div
-          class="flex w-full items-center justify-center border-b px-4 py-2"
-          inert={!props.open}
-        >
-          <Button onClick={handleNew} variant="outline">
+        <div class="flex w-full justify-center gap-1 border-b px-4 py-2" inert={!props.open}>
+          <Button onClick={handleNewChat} variant="outline" size="sm" class="justify-start">
             <IconPlus class="mr-2 h-4 w-4" />
-            New Chat
+            Chat
+          </Button>
+          <Button onClick={handleNewNote} variant="outline" size="sm" class="justify-start">
+            <IconPlus class="mr-2 h-4 w-4" />
+            Note
           </Button>
         </div>
         <div class="flex-1 overflow-auto border-b" inert={!props.open}>

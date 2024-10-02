@@ -6,6 +6,7 @@
   caret-color: var(--text-foreground);
   @apply my-2 p-0;
   font-family: inherit;
+  height: 100%;
 }
 
 .cm-editor .cm-scroller {
@@ -15,4 +16,15 @@
 .cm-editor {
   max-height: 300px;
   overflow-y: auto;
+}
+
+[data-mode='note'] {
+  & .cm-editor {
+    height: 100%;
+    max-height: none;
+  }
+
+  & .cm-editor .cm-content {
+    @apply m-0;
+  }
 }

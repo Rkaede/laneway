@@ -63,7 +63,6 @@ export const ChatInput: Component<PromptProps> = (props) => {
 
   function handleSubmit() {
     submitForm();
-    console.log('Submitting form');
   }
 
   const submitForm = () => {

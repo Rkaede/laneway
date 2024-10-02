@@ -5,9 +5,9 @@ import { imageCache } from '~/services/image-cache';
 import type {
   AssistantProps,
   ChatProps,
-  DefaultSession,
   PresetProps,
   SessionProps,
+  SessionTemplate,
   SpeedDialItem,
 } from '~/types';
 
@@ -33,8 +33,12 @@ interface State {
     };
   };
   settings: {
-    defaultSession: DefaultSession;
+    defaultSession: SessionTemplate;
     systemModel: string;
+    noteModel: {
+      referenceId: string;
+      type: 'model' | 'assistant';
+    };
     completions: {
       enabled: boolean;
       model: string;
@@ -74,19 +78,22 @@ function createDefaultState(): State {
         id: 'full-house-dial',
         type: 'preset',
         referenceId: 'full-house',
+        sessionType: 'chat',
         title: 'Compare frontier models',
       },
       {
         id: 'claude-3.5-sonnet-dial',
         type: 'model',
         referenceId: 'anthropic/claude-3.5-sonnet',
+        sessionType: 'chat',
         title: 'Best of the vibecheck',
       },
       {
         id: 'o1-mini-dial',
         type: 'model',
         referenceId: 'openai/o1-mini',
-        title: 'Reasoning?',
+        sessionType: 'note',
+        title: 'Reasoning',
       },
     ],
     dialogs: {
@@ -100,6 +107,10 @@ function createDefaultState(): State {
     },
     settings: {
       systemModel: 'openai/gpt-4o',
+      noteModel: {
+        type: 'model',
+        referenceId: 'openai/gpt-4o',
+      },
       completions: {
         enabled: true,
         model: 'openai/gpt-4o',
@@ -129,53 +140,31 @@ export const [store, setStore] = makePersisted(createStore(createDefaultState())
   name: 'chat-store',
 });
 
+const defaults = createDefaultState();
+
 // migrations
 if (store.settings.messages === undefined) {
-  setStore('settings', 'messages', {});
+  setStore('settings', 'messages', defaults.settings.messages);
 }
 
 if (store.settings.messages.showAvatars === undefined) {
-  setStore('settings', 'messages', 'showAvatars', false);
+  setStore('settings', 'messages', 'showAvatars', defaults.settings.messages.showAvatars);
 }
 
 if (store.settings.messages.showModelTitle === undefined) {
-  setStore('settings', 'messages', 'showModelTitle', false);
+  setStore('settings', 'messages', 'showModelTitle', defaults.settings.messages.showModelTitle);
 }
 
-// completions
 if (store.settings.completions === undefined) {
-  setStore('settings', 'completions', {});
-}
-
-if (store.settings.completions.enabled === undefined) {
-  setStore('settings', 'completions', 'enabled', false);
-}
-
-if (store.settings.completions.model === undefined) {
-  setStore('settings', 'completions', 'model', 'openai/gpt-3.5-turbo');
+  setStore('settings', 'completions', defaults.settings.completions);
 }
 
 if (store.speedDial === undefined) {
-  setStore('speedDial', [
-    {
-      id: 'full-house-dial',
-      type: 'preset',
-      referenceId: 'full-house',
-      title: 'Compare frontier models',
-    },
-    {
-      id: 'claude-3.5-sonnet-dial',
-      type: 'model',
-      referenceId: 'anthropic/claude-3.5-sonnet',
-      title: 'Best of the vibecheck',
-    },
-    {
-      id: 'o1-mini-dial',
-      type: 'model',
-      referenceId: 'openai/o1-mini',
-      title: 'Reasoning?',
-    },
-  ]);
+  setStore('speedDial', defaults.speedDial);
+}
+
+if (store.settings.noteModel === undefined) {
+  setStore('settings', 'noteModel', defaults.settings.noteModel);
 }
 
 export const deleteData = () => {

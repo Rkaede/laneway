@@ -15,10 +15,10 @@ import {
 import { ModelIcon } from './components/connected/model-icon';
 import { IconLayoutGrid } from './components/icons/ui';
 import { store } from './store';
-import { actions, resetDraft } from './store/actions';
+import { actions } from './store/actions';
 import { models } from './store/models';
 import { tinykeys } from './tinykeys';
-import type { DefaultSession } from './types';
+import type { SessionTemplate } from './types';
 
 export function CommandMenu() {
   const [open, setOpen] = createSignal(false);
@@ -60,31 +60,56 @@ export function CommandMenu() {
 
   const newSessionItems = (): {
     heading: string;
-    items: DefaultSession[];
+    items: SessionTemplate[];
   }[] => [
     {
-      heading: 'New session with model...',
+      heading: 'New chat with model...',
       items: models.map((model) => ({
         type: 'model',
-        id: model.id,
+        id: `c-${model.id}`,
         title: model.title,
+        sessionType: 'chat',
+        referenceId: model.id,
       })),
     },
     {
-      heading: 'New session with assistant...',
+      heading: 'New chat with assistant...',
       items: store.assistants.map((assistant) => ({
+        id: `c-${assistant.id}`,
         type: 'assistant',
-        id: assistant.id,
         title: assistant.title,
-        modelId: assistant.modelId,
+        sessionType: 'chat',
+        referenceId: assistant.id,
       })),
     },
     {
-      heading: 'New session with preset...',
+      heading: 'New chat with preset...',
       items: store.presets.map((preset) => ({
+        id: `c-${preset.id}`,
         type: 'preset',
-        id: preset.id,
         title: preset.presetTitle,
+        sessionType: 'chat',
+        referenceId: preset.id,
+      })),
+    },
+    {
+      heading: 'New note with model...',
+      items: models.map((model) => ({
+        id: `n-${model.id}`,
+        type: 'model',
+        title: model.title,
+        sessionType: 'note',
+        referenceId: model.id,
+      })),
+    },
+    {
+      heading: 'New note with assistant...',
+      items: store.assistants.map((assistant) => ({
+        id: `n-${assistant.id}`,
+        type: 'assistant',
+        title: assistant.title,
+        sessionType: 'note',
+        referenceId: assistant.id,
       })),
     },
   ];
@@ -135,9 +160,18 @@ export function CommandMenu() {
                   <CommandItem
                     value={`${item.type}-${item.id}`}
                     onSelect={() => {
-                      resetDraft(item);
+                      if (item.sessionType === 'note') {
+                        actions.newNote.fn(
+                          { navigate, params },
+                          { referenceId: item.referenceId, type: item.type },
+                        );
+                      } else {
+                        actions.newSession.fn(
+                          { navigate, params },
+                          { referenceId: item.referenceId, type: item.type },
+                        );
+                      }
                       setOpen(false);
-                      navigate('/');
                     }}
                   >
                     <span>
@@ -146,7 +180,7 @@ export function CommandMenu() {
                           <IconLayoutGrid class="mr-2 size-4" />
                         </Match>
                         <Match when={item.type === 'assistant'}>
-                          <Show when={item.modelId}>
+                          <Show when={item.referenceId}>
                             {(modelId) => <ModelIcon modelId={modelId()} class="mr-2 size-4" />}
                           </Show>
                         </Match>
