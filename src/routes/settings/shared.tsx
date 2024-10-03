@@ -17,13 +17,13 @@ type SectionProps = {
 
 export const Section: ParentComponent<SectionProps> = (props) => {
   return (
-    <div class="container mx-auto flex flex-col gap-1">
+    <form class="container mx-auto flex flex-col gap-1">
       <div class="pb-2 pl-2">
         <SectionTitle>{props.title}</SectionTitle>
         <SectionDescription>{props.description}</SectionDescription>
       </div>
       <SectionContent>{props.children}</SectionContent>
-    </div>
+    </form>
   );
 };
 

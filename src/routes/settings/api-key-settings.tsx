@@ -51,7 +51,8 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          placeholder="Enter your OpenRouter API key..."
+          autocomplete="off"
           type="password"
           value={apiKeys?.openrouter ?? ''}
           onChange={(e) => setApiKeys('openrouter', e.target.value)}
@@ -98,7 +99,8 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          placeholder="Enter your OpenAI API key..."
+          autocomplete="off"
           type="password"
           value={apiKeys?.openai ?? ''}
           onChange={(e) => setApiKeys('openai', e.target.value)}
@@ -123,7 +125,8 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          placeholder="Enter your Google API key..."
+          autocomplete="off"
           type="password"
           value={apiKeys?.google ?? ''}
           onChange={(e) => setApiKeys('google', e.target.value)}
