@@ -104,7 +104,7 @@ const MessageContainer: ParentComponent<MessageProps> = (props) => {
       class="mx-1.5 rounded-xl p-2"
       classList={{
         'gap-2 flex items-start': store.settings.messages.showAvatars,
-        'bg-assistant text-assistant-foreground': props.role === 'assistant',
+        'self-start bg-assistant text-assistant-foreground': props.role === 'assistant',
         'self-end bg-user text-user-foreground': props.role === 'user',
       }}
     >
