@@ -52,6 +52,6 @@ export const CodeHighlighter = (props: CodeHighlighterProps) => {
 
   return (
     // eslint-disable-next-line solid/no-innerhtml
-    <div class="not-prose overflow-x-auto" innerHTML={html()} data-language={props.language} />
+    <div class="not-prose" innerHTML={html()} data-language={props.language} />
   );
 };

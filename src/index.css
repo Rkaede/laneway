@@ -168,6 +168,13 @@
 .shiki {
   @apply p-3;
   overflow-x: auto;
+  width: 100%;
+}
+
+code,
+pre {
+  width: 100%;
+  display: block;
 }
 
 /* Fix spacing of back to back code blocks. */

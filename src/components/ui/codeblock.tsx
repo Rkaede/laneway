@@ -90,10 +90,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
   }
 
   return (
-    <div
-      class="codeblock group/toolbar relative w-full overflow-hidden rounded font-sans"
-      ref={ref}
-    >
+    <div class="codeblock group/toolbar w-full rounded font-sans" ref={ref}>
       <div class="flex w-full items-center justify-between px-4 py-0.5 pr-4 text-zinc-100">
         <span class="text-xs font-medium lowercase">{props.language}</span>
         <div class="invisible flex items-center space-x-1 group-hover/toolbar:visible">

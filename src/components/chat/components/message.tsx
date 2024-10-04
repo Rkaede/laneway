@@ -36,11 +36,13 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
                 />
               }
             >
-              <span class="mx-[0.2em] inline-block rounded border border-background-4 bg-background-2 px-1 font-mono text-sm">
-                {
-                  /* @ts-ignore: this is a depencency bug */
-                  codeProps.node.children[0]?.value ?? ''
-                }
+              <span class="inline-block max-w-full overflow-x-auto align-bottom">
+                <span class="mx-[0.2em] inline-block rounded border bg-background/80 px-1 align-baseline font-mono text-sm">
+                  {
+                    /* @ts-ignore: this is a depencency bug */
+                    codeProps.node.children[0]?.value ?? ''
+                  }
+                </span>
               </span>
             </Show>
           );
@@ -77,7 +79,7 @@ export const Message: Component<MessageProps> = (props) => {
           </Show>
         </Avatar>
       </Show>
-      <div class="flex-1 space-y-2 overflow-hidden px-1">
+      <div class="flex-1 space-y-2 px-1">
         {Array.isArray(props.content) ? (
           props.content
             .sort((a, b) => (a.type === 'image' ? 1 : b.type === 'image' ? -1 : 0))
@@ -101,7 +103,7 @@ export const Message: Component<MessageProps> = (props) => {
 const MessageContainer: ParentComponent<MessageProps> = (props) => {
   return (
     <div
-      class="mx-1.5 rounded-xl p-2"
+      class="max-w-full rounded-xl p-2"
       classList={{
         'gap-2 flex items-start': store.settings.messages.showAvatars,
         'self-start bg-assistant text-assistant-foreground': props.role === 'assistant',
