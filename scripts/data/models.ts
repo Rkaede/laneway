@@ -1,7 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-import type { Architecture, ModelProps, ModelTags } from '../src/types';
+import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
 async function fetchModels() {
   try {
@@ -199,7 +196,7 @@ export const modelsBase: Partial<ModelProps>[] = [
   ...perplexity,
 ];
 
-const compileModels = async () => {
+export const generateModels = async () => {
   const base = await fetchModels();
   const results = modelsBase.map((model) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -256,21 +253,3 @@ const compileModels = async () => {
   });
   return results;
 };
-
-async function main() {
-  const models = await compileModels();
-  const publicDir = path.join(process.cwd(), 'public');
-  const filePath = path.join(publicDir, 'models.json');
-
-  try {
-    await fs.mkdir(publicDir, { recursive: true });
-    await fs.writeFile(filePath, JSON.stringify(models, null, 2));
-    console.log(`Models written to ${filePath}`);
-  } catch (err) {
-    console.error('Error writing models to file:', err);
-  }
-}
-
-main().catch((err) => {
-  console.error('Error generating models:', err);
-});

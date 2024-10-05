@@ -11,9 +11,20 @@ import type {
   SpeedDialItem,
 } from '~/types';
 
-import { assistants } from './library/assistants';
-import { presets } from './library/presets';
 import { createSessionFromPreset } from './util';
+
+const defaultPreset: PresetProps = {
+  id: 'full-house',
+  type: 'chat',
+  presetTitle: 'Full House',
+  presetDescription: 'Compare frontier models.',
+  templateId: 'full-house',
+  chats: [
+    { modelId: 'openai/gpt-4o' },
+    { modelId: 'anthropic/claude-3.5-sonnet' },
+    { modelId: 'google/gemini-pro-1.5' },
+  ],
+};
 
 interface State {
   sessions: SessionProps[];
@@ -62,17 +73,13 @@ function clone<T>(obj: T): T {
 // This needs to be a factory function. If we were to use just a variable it would be mutated by
 // the store and resetStore would not work.
 function createDefaultState(): State {
-  const defaultPresets = ['full-house'];
-  const defaultAssistants = ['gpt-4o-general-purpose', 'flashcards-gpt-4o'];
-  const defaultPreset = createSessionFromPreset(
-    presets.find((p) => p.id === 'full-house') ?? presets[0],
-  );
+  const defaultPresetSession = createSessionFromPreset(defaultPreset);
 
   return {
     sessions: [],
     chats: [],
-    draftSession: clone(defaultPreset.session),
-    draftChats: clone(defaultPreset.chats),
+    draftSession: clone(defaultPresetSession.session),
+    draftChats: clone(defaultPresetSession.chats),
     speedDial: [
       {
         id: 'full-house-dial',
@@ -129,8 +136,8 @@ function createDefaultState(): State {
         showModelTitle: false,
       },
     },
-    presets: [...clone(presets.filter((p) => defaultPresets.includes(p.id)))],
-    assistants: [...clone(assistants.filter((a) => defaultAssistants.includes(a.id)))],
+    presets: [...clone([defaultPreset])],
+    assistants: [],
   };
 }
 

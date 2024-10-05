@@ -2,11 +2,10 @@ import { nanoid } from 'nanoid';
 
 import { setStore, store } from '~/store';
 import { addAssistant } from '~/store/actions/assistants';
-import { assistants } from '~/store/library/assistants';
-import type { PresetProps } from '~/types';
+import type { AssistantProps, PresetProps } from '~/types';
 import { clone } from '~/util';
 
-export function addPreset(preset: PresetProps) {
+export function addPreset(preset: PresetProps, assistants: AssistantProps[]) {
   const newPreset = clone(preset);
   newPreset.id = nanoid();
   newPreset.templateId = preset.id;
@@ -29,8 +28,14 @@ export function addPreset(preset: PresetProps) {
   return newPreset.id;
 }
 
-export function deletePreset(presetId: string) {
-  setStore('presets', (p) => p.filter((p) => p.id !== presetId));
+export function deletePreset(id: string) {
+  // Remove the preset from the presets list
+  setStore('presets', (presets) => presets.filter((preset) => preset.id !== id));
+
+  // Remove the preset from the speed dial if it exists
+  setStore('speedDial', (items) =>
+    items.filter((item) => !(item.type === 'preset' && item.referenceId === id)),
+  );
 }
 
 export function setPresetName(presetId: string, name: string) {

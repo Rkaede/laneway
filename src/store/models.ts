@@ -1,3 +1,5 @@
+import { createStore } from 'solid-js/store';
+
 import type { ModelProps } from '~/types';
 
 // NOTE: we're moving data to be external from the application code
@@ -7,17 +9,34 @@ import type { ModelProps } from '~/types';
 // - It also moves us in the direction of managing a config of
 //   models/providers/assistant/presets external of the app itself.
 // - The data, such as prices will still not be "live". We'll address this later.
-export const models = (await fetch('/models.json').then((res) => res.json())) as ModelProps[];
+// export const models = (await fetch('/models.json').then((res) => res.json())) as ModelProps[];
 
-export const modelsByCreator = models.reduce(
-  (acc, model) => {
-    const group = acc.find((g) => g.title === model.creator?.name);
-    if (!group) {
-      acc.push({ title: model.creator.name, models: [model] });
-    } else {
-      group.models.push(model);
-    }
-    return acc;
-  },
-  [] as { title: string; models: ModelProps[] }[],
-);
+function fetchModels() {
+  return fetch('/models.json').then((res) => res.json());
+}
+
+export const [models, setModels] = createStore<ModelProps[]>([]);
+
+fetchModels().then((models) => {
+  setModels(models);
+});
+
+export const providers = {
+  openai: 'OpenAI',
+  google: 'Google',
+  openrouter: 'OpenRouter',
+};
+
+export const modelsByCreator = () =>
+  models.reduce(
+    (acc, model) => {
+      const group = acc.find((g) => g.title === model.creator?.name);
+      if (!group) {
+        acc.push({ title: model.creator.name, models: [model] });
+      } else {
+        group.models.push(model);
+      }
+      return acc;
+    },
+    [] as { title: string; models: ModelProps[] }[],
+  );

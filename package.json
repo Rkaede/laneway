@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun scripts/generate-models.ts && bunx --bun vite",
-    "build": "bun scripts/generate-models.ts && tsc && vite build",
+    "dev": "bun scripts/generate-data.ts && bunx --bun vite",
+    "build": "bun scripts/generate-data.ts && tsc && vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
     "lint": "eslint src",

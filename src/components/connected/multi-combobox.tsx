@@ -123,7 +123,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
               </CommandGroup>
             </Show>
             <Show when={props.includeModels}>
-              <For each={modelsByCreator}>
+              <For each={modelsByCreator()}>
                 {(group) => (
                   <CommandGroup
                     heading={

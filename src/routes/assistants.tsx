@@ -1,5 +1,5 @@
 import { dequal } from 'dequal/lite';
-import { type Component, createSignal, For, Show } from 'solid-js';
+import { type Component, createResource, createSignal, For, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { ChatSettings } from '~/components/connected/chat-settings';
@@ -33,10 +33,14 @@ import { PageTitle, SectionDescription } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
 import { setStore, store } from '~/store';
 import { addAssistant, deleteAssistant } from '~/store/actions';
-import { assistants as galleryAssistants } from '~/store/library/assistants';
 import { models } from '~/store/models';
 import type { AssistantProps } from '~/types';
 import { clone } from '~/util';
+
+const fetchGalleryAssistants = async () => {
+  const response = await fetch('/assistants.json');
+  return response.json();
+};
 
 export function Assistants() {
   const [selectedAssistant, setSelectedAssistant] = createSignal<AssistantProps | null>(null);
@@ -46,6 +50,7 @@ export function Assistants() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = createSignal(false);
   const [assistantToDelete, setAssistantToDelete] = createSignal<string | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = createSignal(false);
+  const [galleryAssistants] = createResource(fetchGalleryAssistants);
 
   function handleAdd() {
     const newAssistant: AssistantProps = {
@@ -155,6 +160,7 @@ export function Assistants() {
         isOpen={isGalleryOpen()}
         onOpenChange={setIsGalleryOpen}
         onAddFromGallery={handleAddFromGallery}
+        galleryAssistants={galleryAssistants()}
       />
     </div>
   );
@@ -224,6 +230,7 @@ const AssistantGalleryDialog: Component<{
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onAddFromGallery: (assistant: AssistantProps) => void;
+  galleryAssistants: AssistantProps[] | undefined;
 }> = (props) => {
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
@@ -236,7 +243,7 @@ const AssistantGalleryDialog: Component<{
           </Button>
         </DialogHeader>
         <div class="grid grid-cols-3 gap-4 py-4">
-          <For each={galleryAssistants}>
+          <For each={props.galleryAssistants}>
             {(assistant) => {
               const isAdded = () => store.assistants.some((a) => a.templateId === assistant.id);
               return (

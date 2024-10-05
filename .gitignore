@@ -1,5 +1,7 @@
 # laneway
 public/models.json
+public/presets.json
+public/assistants.json
 
 # Logs
 logs

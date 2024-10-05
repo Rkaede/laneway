@@ -24,4 +24,9 @@ export function addAssistant(assistant: AssistantProps = defaultAssistant) {
 
 export function deleteAssistant(assistantId: string) {
   setStore('assistants', (a) => a.filter((a) => a.id !== assistantId));
+
+  // Remove the assistant from the speed dial if it exists
+  setStore('speedDial', (sd) =>
+    sd.filter((item) => !(item.type === 'assistant' && item.referenceId === assistantId)),
+  );
 }

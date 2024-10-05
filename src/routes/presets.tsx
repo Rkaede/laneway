@@ -1,7 +1,7 @@
 import { TextField } from '@kobalte/core/text-field';
 import { dequal } from 'dequal/lite';
 import { nanoid } from 'nanoid';
-import { type Component, createSignal, For, Show } from 'solid-js';
+import { type Component, createResource, createSignal, For, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { ModelIcon } from '~/components/connected/model-icon';
@@ -44,12 +44,17 @@ import { Input } from '~/components/ui/input';
 import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
-import { presets as galleryPresets } from '~/store/library/presets';
 import { models } from '~/store/models';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';
 
+const fetchPresets = async () => {
+  const response = await fetch('/presets.json');
+  return response.json();
+};
+
 export const Presets: Component = () => {
+  const [presets] = createResource(fetchPresets);
   const [selectedPreset, setSelectedPreset] = createSignal<PresetProps | null>(null);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [searchTerm, setSearchTerm] = createSignal('');
@@ -88,7 +93,7 @@ export const Presets: Component = () => {
   }
 
   function handleAddFromGallery(preset: PresetProps) {
-    addPreset(preset);
+    addPreset(preset, presets());
     setIsGalleryOpen(false);
   }
 
@@ -166,6 +171,7 @@ export const Presets: Component = () => {
         isOpen={isGalleryOpen()}
         onOpenChange={setIsGalleryOpen}
         onAddFromGallery={handleAddFromGallery}
+        presets={presets()}
       />
     </div>
   );
@@ -322,6 +328,7 @@ const PresetGalleryDialog: Component<{
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onAddFromGallery: (preset: PresetProps) => void;
+  presets: PresetProps[] | undefined;
 }> = (props) => {
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
@@ -335,7 +342,7 @@ const PresetGalleryDialog: Component<{
         </DialogHeader>
         <p>Assistants used in presets will be added to the assistant list.</p>
         <div class="grid grid-cols-3 gap-4 py-4">
-          <For each={galleryPresets}>
+          <For each={props.presets}>
             {(preset) => {
               const isAdded = () => store.presets.some((p) => p.templateId === preset.id);
               return (
@@ -396,10 +403,11 @@ const PresetDetails: Component<{
   isNewPreset: boolean;
 }> = (props) => {
   const [localPreset, setLocalPreset] = createStore<PresetProps>(clone(props.initialPreset));
+  const [presets] = createResource(fetchPresets);
 
   function handleSave() {
     if (props.isNewPreset) {
-      addPreset(localPreset);
+      addPreset(localPreset, presets());
     } else {
       setStore('presets', (p) => p.id === props.initialPreset.id, localPreset);
     }
