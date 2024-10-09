@@ -1,3 +1,4 @@
+import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import type { ModelProps } from '~/types';
@@ -15,7 +16,11 @@ function fetchModels() {
   return fetch('/models.json').then((res) => res.json());
 }
 
-export const [models, setModels] = createStore<ModelProps[]>([]);
+// the warning given by the rule here is not helpful in this case
+// eslint-disable-next-line solid/reactivity
+export const [models, setModels] = makePersisted(createStore<ModelProps[]>([]), {
+  name: 'laneway-models',
+});
 
 fetchModels().then((models) => {
   setModels(models);
