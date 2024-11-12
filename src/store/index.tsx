@@ -43,6 +43,9 @@ interface State {
       open: boolean;
     };
   };
+  featureFlags: {
+    completions: boolean;
+  };
   settings: {
     defaultSession: SessionTemplate;
     systemModel: string;
@@ -112,6 +115,9 @@ function createDefaultState(): State {
         open: false,
       },
     },
+    featureFlags: {
+      completions: false,
+    },
     settings: {
       systemModel: 'openai/gpt-4o',
       noteModel: {
@@ -119,7 +125,7 @@ function createDefaultState(): State {
         referenceId: 'openai/gpt-4o',
       },
       completions: {
-        enabled: true,
+        enabled: false,
         model: 'openai/gpt-4o',
       },
       defaultSession: {
@@ -164,6 +170,10 @@ if (store.settings.messages.showModelTitle === undefined) {
 
 if (store.settings.completions === undefined) {
   setStore('settings', 'completions', defaults.settings.completions);
+}
+
+if (store.featureFlags === undefined) {
+  setStore('featureFlags', defaults.featureFlags);
 }
 
 if (store.speedDial === undefined) {

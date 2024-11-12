@@ -1,4 +1,5 @@
 import { PageTitle, SectionDescription } from '~/components/ui/forms';
+import { store } from '~/store';
 
 import { APIKeySetting } from './api-key-settings';
 import { Completions } from './completion-settings';
@@ -18,7 +19,7 @@ export function Settings() {
           <hr class="mt-4" />
         </div>
         <GeneralSettings />
-        <Completions />
+        {store.featureFlags.completions && <Completions />}
         <APIKeySetting />
         <SpeedDial />
         <Data />

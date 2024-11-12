@@ -55,7 +55,9 @@ export function TextEditor(props: TextEditorProps) {
   createExtension(history());
   createExtension(EditorView.lineWrapping);
   createExtension(keymap.of(defaultKeymap));
-  createExtension(inlineSuggestion({ fetchFn: fetchSuggestion, delay: 1000 }));
+  if (store.featureFlags.completions) {
+    createExtension(inlineSuggestion({ fetchFn: fetchSuggestion, delay: 1000 }));
+  }
   createExtension(
     // this doesn't work without the Prec.highest
     Prec.highest(
