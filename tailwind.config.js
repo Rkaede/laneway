@@ -55,6 +55,10 @@ export default {
           foreground: 'hsl(var(--chat-user-foreground))',
         },
       },
+      backgroundImage: {
+        // used for the fade-out effect in the scroll panel
+        'fade-out': 'linear-gradient(rgba(19, 19, 20, 0), rgb(19, 19, 20, 0.8))',
+      },
     },
   },
   plugins: [typography],

@@ -736,28 +736,6 @@ export function IconPencilLine(props: SVGAttributes) {
   );
 }
 
-export function IconReply(props: SVGAttributes) {
-  const [localProps, rest] = splitProps(props, ['class']);
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class={cn(localProps.class)}
-      {...rest}
-    >
-      <polyline points="9 17 4 12 9 7" />
-      <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
-    </svg>
-  );
-}
-
 export function IconChat(props: SVGAttributes) {
   const [localProps, rest] = splitProps(props, ['class']);
   return (
@@ -797,6 +775,28 @@ export function IconSquarePen(props: SVGAttributes) {
     >
       <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
       <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+    </svg>
+  );
+}
+
+export function IconSendHorizontal(props: SVGAttributes) {
+  const [localProps, rest] = splitProps(props, ['class']);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={cn(localProps.class)}
+      {...rest}
+    >
+      <path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" />
+      <path d="M6 12h16" />
     </svg>
   );
 }

@@ -14,6 +14,7 @@ export * from './input';
 export * from './loader';
 export * from './mini-slider';
 export * from './popover';
+export * from './scrollpanel';
 export * from './select';
 export * from './separator';
 export * from './shortcut';
