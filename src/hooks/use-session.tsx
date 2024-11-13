@@ -55,7 +55,9 @@ export function createSession(sessionId?: Accessor<string>) {
     const _input = session().input;
     if (_input === '' || _input === undefined) return;
 
-    setSessionInput('', sessionId?.());
+    if (session().type !== 'note') {
+      setSessionInput('', sessionId?.());
+    }
 
     // if attachments are present, add them to the session
     const imageCacheFiles: { filename: string; storageId: string }[] = [];
