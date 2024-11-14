@@ -156,7 +156,7 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
       <div class="absolute bottom-0 right-0 top-0 z-10 flex translate-x-full items-center">
         <button
           type="button"
-          class="flex items-center justify-center bg-transparent p-0 text-white hover:outline-none"
+          class="flex items-center justify-center bg-transparent p-0 hover:outline-none"
           onClick={toggleSidebar}
         >
           <SidebarIcon open={props.open} />
