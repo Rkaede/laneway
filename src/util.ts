@@ -90,3 +90,9 @@ export async function base64EncodeFile(file: File): Promise<string> {
     reader.onerror = (error) => reject(error);
   });
 }
+
+export function sanitizeMessage(message: string) {
+  return message
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}

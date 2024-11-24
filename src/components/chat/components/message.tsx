@@ -7,7 +7,7 @@ import { Avatar, CodeBlock } from '~/components/ui';
 import { LocalImage } from '~/components/ui/local-image';
 import { store } from '~/store/index';
 import type { MessageProps } from '~/types';
-import { cn } from '~/util';
+import { cn, sanitizeMessage } from '~/util';
 
 const ModelTitle: ParentComponent = (props) => {
   return (
@@ -53,7 +53,7 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
         store.settings.theme === 'dark' && 'prose-invert',
       )}
     >
-      {props.text}
+      {sanitizeMessage(props.text)}
     </SolidMarkdown>
   );
 };
