@@ -158,7 +158,7 @@ export function CommandMenu() {
               <For each={group.items}>
                 {(item) => (
                   <CommandItem
-                    value={`${item.type}-${item.id}`}
+                    value={`${item.type}-${item.id}-${item.title}`}
                     onSelect={() => {
                       if (item.sessionType === 'note') {
                         actions.newNote.fn(
