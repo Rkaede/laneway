@@ -40,6 +40,21 @@ export function TextEditor(props: TextEditorProps) {
     value: props.initialValue ?? '',
   });
 
+
+  createEffect(() => {
+    // Value was reset after user sent a message. We update the editor value to the initialValue
+    // which should be an empty string
+    if (props.initialValue === '') {
+      editorView()?.dispatch({
+        changes: {
+          from: 0,
+          to: editorView()?.state.doc.length,
+          insert: props.initialValue,
+        },
+      });
+    }
+  });
+
   // Add paste event handler
   createExtension(
     EditorView.domEventHandlers({
