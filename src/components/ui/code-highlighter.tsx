@@ -1,4 +1,4 @@
-import { getHighlighter } from 'shiki';
+import { createHighlighter } from 'shiki';
 import { createEffect, createSignal } from 'solid-js';
 
 type CodeHighlighterProps = {
@@ -6,34 +6,54 @@ type CodeHighlighterProps = {
   language: string;
 };
 
-const highlighter = getHighlighter({
+const languages = [
+  'c',
+  'cpp',
+  'csharp',
+  'css',
+  'csv',
+  'go',
+  'haskell',
+  'html',
+  'java',
+  'javascript',
+  'jsx',
+  'kotlin',
+  'lua',
+  'objective-c',
+  'php',
+  'python',
+  'ruby',
+  'rs',
+  'scala',
+  'shellscript',
+  'sh',
+  'sql',
+  'swift',
+  'typescript',
+];
+
+const languagesWithAliases = languages.concat([
+  'c++', // cpp
+  'cs', // csharp
+  'c#', // csharp
+  'hs', // haskell
+  'js', // javascript
+  'kt', // kotlin
+  'kts', // kotlin
+  'objc', // objective-c
+  'py', // python
+  'rb', // ruby
+  'bash', // shellscript
+  'sh', // shellscript
+  'shell', // shellscript
+  'zsh', // shellscript
+  'ts', // typescript
+]);
+
+const highlighter = createHighlighter({
   themes: ['poimandres'],
-  langs: [
-    'js',
-    'jsx',
-    'py',
-    'java',
-    'c',
-    'cpp',
-    'csv',
-    'cpp',
-    'cs',
-    'rb',
-    'php',
-    'swift',
-    'objc',
-    'kt',
-    'ts',
-    'go',
-    'rs',
-    'scala',
-    'hs',
-    'lua',
-    'sh',
-    'sql',
-    'html',
-    'css',
-  ],
+  langs: languages,
 });
 
 export const CodeHighlighter = (props: CodeHighlighterProps) => {
@@ -43,7 +63,7 @@ export const CodeHighlighter = (props: CodeHighlighterProps) => {
     // eslint-disable-next-line solid/reactivity
     highlighter.then((h) => {
       const highlightedCode = h.codeToHtml(props.code, {
-        lang: props.language,
+        lang: languagesWithAliases.includes(props.language) ? props.language : 'text',
         theme: 'poimandres',
       });
       setHtml(highlightedCode);
