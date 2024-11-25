@@ -19,7 +19,7 @@
     "@codemirror/view": "^6.33.0",
     "@kobalte/core": "^0.13.3",
     "@solid-primitives/platform": "^0.1.2",
-    "@solid-primitives/storage": "^3.5.0",
+    "@solid-primitives/storage": "^4.2.1",
     "@solidjs/router": "^0.13.5",
     "ai": "^3.3.41",
     "class-variance-authority": "^0.7.0",
