@@ -9,7 +9,7 @@ import { SpeedDial } from './speed-dial-settings';
 
 export function Settings() {
   return (
-    <div class="h-full overflow-auto py-6">
+    <div class="h-full overflow-auto px-10 py-6">
       <div class="container mx-auto grid max-w-screen-md gap-16 pb-24">
         <div>
           <PageTitle>Settings</PageTitle>

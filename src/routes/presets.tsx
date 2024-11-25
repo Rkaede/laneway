@@ -105,7 +105,7 @@ export const Presets: Component = () => {
   };
 
   return (
-    <div class="mx-auto flex h-full max-w-5xl flex-col gap-8 py-6">
+    <div class="mx-auto flex h-full max-w-5xl flex-col gap-8 px-10 py-6">
       <div>
         <PageTitle>Presets</PageTitle>
         <SectionDescription>

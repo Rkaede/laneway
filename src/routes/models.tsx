@@ -79,7 +79,7 @@ export function ModelList() {
   };
 
   return (
-    <div class="flex h-full w-full flex-col gap-8 overflow-auto p-4 px-10">
+    <div class="flex h-full w-full flex-col gap-8 overflow-auto px-10 py-6">
       <div>
         <PageTitle>Models</PageTitle>
         <SectionDescription>

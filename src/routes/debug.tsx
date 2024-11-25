@@ -12,7 +12,7 @@ const config = {
 
 export function Debug() {
   return (
-    <div class="h-full overflow-auto p-4 text-sm">
+    <div class="h-full overflow-auto px-10 py-4 text-sm">
       {config.richtexteditor && (
         <div>
           <TextEditor />
