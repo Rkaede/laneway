@@ -20,7 +20,7 @@
     "@kobalte/core": "^0.13.3",
     "@solid-primitives/platform": "^0.1.2",
     "@solid-primitives/storage": "^4.2.1",
-    "@solidjs/router": "^0.13.5",
+    "@solidjs/router": "^0.15.1",
     "ai": "^3.3.41",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
