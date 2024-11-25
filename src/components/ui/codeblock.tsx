@@ -50,6 +50,8 @@ const filter = (node: HTMLElement) => {
 export const CodeBlock: Component<CodeblockProps> = (props) => {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
 
+  const unsanitizedCode = () => props.code.replaceAll('&lt;', '<').replaceAll('&gt;', '>');
+
   function downloadAsFile() {
     if (typeof window === 'undefined') {
       return;
@@ -57,7 +59,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
     const fileExtension = programmingLanguages[props.language] || '.txt';
     const filename = filenameDate() + fileExtension;
 
-    const blob = new Blob([props.code], { type: 'text/plain' });
+    const blob = new Blob([unsanitizedCode()], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     downloadFile(url, filename);
     URL.revokeObjectURL(url);
@@ -65,7 +67,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
 
   function onCopy() {
     if (isCopied()) return;
-    copyToClipboard(props.code);
+    copyToClipboard(unsanitizedCode());
   }
 
   let ref: HTMLDivElement | undefined;
@@ -108,7 +110,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
           </CodeActionButton>
         </div>
       </div>
-      <CodeHighlighter code={props.code} language={props.language} />
+      <CodeHighlighter code={unsanitizedCode()} language={props.language} />
     </div>
   );
 };
