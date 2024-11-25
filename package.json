@@ -21,7 +21,7 @@
     "@solid-primitives/platform": "^0.1.2",
     "@solid-primitives/storage": "^3.5.0",
     "@solidjs/router": "^0.13.5",
-    "ai": "^3.3.41",
+    "ai": "^4.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk-solid": "^1.0.1",
