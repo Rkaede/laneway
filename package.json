@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^0.0.20",
-    "@ai-sdk/openai": "^0.0.21",
+    "@ai-sdk/openai": "^1.0.4",
     "@codemirror/commands": "^6.6.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.33.0",
