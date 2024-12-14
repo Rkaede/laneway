@@ -172,6 +172,13 @@ const google: Partial<ModelProps>[] = [
     ],
     icon: 'Gemini',
   },
+  {
+    ...defaults.google,
+    id: 'google/gemini-2.0-flash-exp:free',
+    title: 'Gemini 2.0 Flash Experimental (free)',
+    provider: [{ id: 'openrouter', modelId: 'google/gemini-flash-1.5', primary: true }],
+    icon: 'Gemini',
+  },
 ];
 
 const perplexity: Partial<ModelProps>[] = [
