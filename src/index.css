@@ -59,11 +59,14 @@ html {
 
     --radius: 0.5rem;
 
+    --accent: 237 100% 70%;
+    --accent-foreground: 0 0% 100%;
+
     --background-main: 0 0% 100%;
     --background: 0 0% 98%;
     --background-2: 0 0% 96%;
     --background-3: 0 0% 94%;
-    --background-4: 0 0% 92%;
+    --background-4: 0 0% 60%;
 
     --chat-assistant: 201, 94%, 86%;
     --chat-assistant-foreground: 0 0% 100%;

@@ -2,6 +2,7 @@ import { JSX } from 'solid-js';
 
 import * as AudioButtonStories from './audio-button.stories';
 import * as MessageStories from './message.stories';
+import * as SwitchStories from './switch-stories';
 
 export function Sandbox() {
   return (
@@ -10,6 +11,11 @@ export function Sandbox() {
         UI Sandbox
       </h1>
       <div class="flex flex-col gap-16">
+        <Section title="Switch">
+          <Story title="States">
+            <SwitchStories.States />
+          </Story>
+        </Section>
         <Section title="Messages">
           <Story title="Basic">
             <MessageStories.Basic />
@@ -24,6 +30,7 @@ export function Sandbox() {
             <AudioButtonStories.States />
           </Story>
         </Section>
+        <hr />
       </div>
     </div>
   );

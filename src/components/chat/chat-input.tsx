@@ -115,7 +115,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             submitForm();
           }}
           class={cn(
-            'grid flex-1 rounded-[22px] border border-background-4 bg-background-2 px-4 pt-0',
+            'grid flex-1 rounded-[22px] border border-input bg-background-2 px-4 pt-0',
             props.class,
           )}
         >
