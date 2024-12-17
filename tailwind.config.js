@@ -5,6 +5,24 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      keyframes: {
+        'wave-1': {
+          '0%': { opacity: '0' },
+          '33%': { opacity: '1' },
+          '83%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'wave-2': {
+          '0%': { opacity: '0' },
+          '33%': { opacity: '1' },
+          '50%': { opacity: '1' },
+          '66%': { opacity: '0' },
+        },
+      },
+      animation: {
+        'wave-1': 'wave-1 3s ease-in-out infinite',
+        'wave-2': 'wave-2 3s ease-in-out infinite 1s',
+      },
       colors: {
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

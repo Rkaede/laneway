@@ -1,4 +1,5 @@
 import { useNavigate } from '@solidjs/router';
+import { nanoid } from 'nanoid';
 import { createSignal, For, ParentComponent, Show } from 'solid-js';
 
 import { imageCache } from '~/services/image-cache';
@@ -74,6 +75,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
     }
 
     const message = {
+      id: nanoid(),
       role: 'user',
       content:
         imageCacheFiles.length > 0

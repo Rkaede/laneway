@@ -57,6 +57,13 @@ interface State {
       enabled: boolean;
       model: string;
     };
+    tts: {
+      enabled: boolean;
+      service: string;
+      openai: {
+        voice: string;
+      };
+    };
     sidebarOpen: boolean;
     generateTitles: boolean;
     openRouterUsage: 'always' | 'fallback';
@@ -132,6 +139,13 @@ function createDefaultState(): State {
         type: 'preset',
         id: 'full-house',
       },
+      tts: {
+        enabled: true,
+        service: 'openai',
+        openai: {
+          voice: 'alloy',
+        },
+      },
       openRouterUsage: 'fallback',
       sidebarOpen: true,
       generateTitles: true,
@@ -148,7 +162,7 @@ function createDefaultState(): State {
 }
 
 // the warning given by the rule here is not helpful in this case
-// eslint-disable-next-line solid/reactivity
+
 export const [store, setStore] = makePersisted(createStore(createDefaultState()), {
   name: 'chat-store',
 });
@@ -182,6 +196,16 @@ if (store.speedDial === undefined) {
 
 if (store.settings.noteModel === undefined) {
   setStore('settings', 'noteModel', defaults.settings.noteModel);
+}
+
+if (store.settings.tts === undefined) {
+  setStore('settings', 'tts', {
+    enabled: true,
+    service: 'openai',
+    openai: {
+      voice: 'alloy',
+    },
+  });
 }
 
 export const deleteData = () => {

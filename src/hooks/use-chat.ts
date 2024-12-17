@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { createEffect, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
@@ -73,7 +74,7 @@ export function useChat({ chat }: UseChat) {
   const streamFn = () => {
     const systemPrompt = assistant()?.systemPrompt;
     const messagesWithSystem = systemPrompt
-      ? [{ role: 'system' as const, content: systemPrompt }, ...chat.messages]
+      ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
       : chat.messages;
     return providerService()?.getStream(messagesWithSystem, provider()?.modelId);
   };
@@ -95,7 +96,7 @@ export function useChat({ chat }: UseChat) {
         }
 
         setChatStore({ status: 'idle', latest: undefined });
-        addMessage(chat.id, { role: 'assistant', content: latestContent });
+        addMessage(chat.id, { id: nanoid(), role: 'assistant', content: latestContent });
       } catch (error: unknown) {
         if (error instanceof Error) {
           setChatStore({ status: 'error', latest: undefined });
@@ -126,7 +127,7 @@ export function useChat({ chat }: UseChat) {
       if (_provider) {
         const systemPrompt = assistant()?.systemPrompt;
         const messagesWithSystem = systemPrompt
-          ? [{ role: 'system' as const, content: systemPrompt }, ...chat.messages]
+          ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
           : chat.messages;
         chatStore.append(messagesWithSystem);
       }

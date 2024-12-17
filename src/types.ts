@@ -5,6 +5,7 @@ export type TextPart = { type: 'text'; text: string };
 export type ImagePart = { type: 'image'; image: { filename: string; storageId: string } };
 
 export type MessageProps = {
+  id: string;
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: Array<ImagePart | TextPart> | string;
   model?: ModelProps;
@@ -163,3 +164,5 @@ export type SpeedDialItem = {
   title?: string; // Display name
   sessionType?: 'chat' | 'note';
 };
+
+export type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';

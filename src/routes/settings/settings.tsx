@@ -6,6 +6,7 @@ import { Completions } from './completion-settings';
 import { Data } from './data-settings';
 import { GeneralSettings } from './general-settings';
 import { SpeedDial } from './speed-dial-settings';
+import { TTSSettings } from './tts-settings';
 
 export function Settings() {
   return (
@@ -20,6 +21,7 @@ export function Settings() {
         </div>
         <GeneralSettings />
         {store.featureFlags.completions && <Completions />}
+        <TTSSettings />
         <APIKeySetting />
         <SpeedDial />
         <Data />

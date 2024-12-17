@@ -3,6 +3,7 @@ import { type Component, For, Show } from 'solid-js';
 
 import { Loader } from '~/components/ui';
 import { useChat } from '~/hooks/use-chat';
+import { store } from '~/store';
 import type { ChatProps } from '~/types';
 
 import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './components';
@@ -18,7 +19,6 @@ type ChatPanelProps = {
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
   const navigate = useNavigate();
   const chat = useChat({
-    // eslint-disable-next-line solid/reactivity
     chat: props.chat,
   });
 
@@ -42,12 +42,20 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         <div class="flex min-h-full flex-1 flex-col gap-8 pb-2 pt-8">
           <Show when={props.chat}>
             <For each={props.chat.messages}>
-              {(message) => <Message {...message} model={chat.model()} />}
+              {(message) => (
+                <Message
+                  {...message}
+                  model={chat.model()}
+                  tts={store.settings.tts.enabled && message.role === 'assistant'}
+                />
+              )}
             </For>
           </Show>
 
           <Show when={chat.latest}>
-            {(message) => <Message content={message().content} role="assistant" />}
+            {(message) => (
+              <Message content={message().content} role="assistant" id={message().id} />
+            )}
           </Show>
 
           <Show when={chat.status === 'loading'}>

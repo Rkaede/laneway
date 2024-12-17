@@ -1,4 +1,5 @@
 import { useNavigate } from '@solidjs/router';
+import { nanoid } from 'nanoid';
 import { Accessor, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
@@ -71,11 +72,12 @@ export function createSession(sessionId?: Accessor<string>) {
     }
 
     const message = {
+      id: nanoid(),
       role: 'user',
       content:
         imageCacheFiles.length > 0
           ? [
-              ...imageCacheFiles.map((f) => ({ type: 'image', image: f }) as ImagePart),
+              ...imageCacheFiles.map((file) => ({ type: 'image', image: file }) as ImagePart),
               { type: 'text', text: _input },
             ]
           : _input,

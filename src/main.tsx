@@ -12,6 +12,7 @@ import { Assistants } from './routes/assistants';
 import { Debug } from './routes/debug';
 import { ModelList } from './routes/models';
 import { Presets } from './routes/presets';
+import { Sandbox } from './routes/sandbox';
 import { Session } from './routes/session';
 import { Settings } from './routes/settings';
 
@@ -28,6 +29,7 @@ if (root) {
           <Route path="/models" component={ModelList} />
           <Route path="/presets" component={Presets} />
           <Route path="/assistants" component={Assistants} />
+          <Route path="/sandbox" component={Sandbox} />
           <Route path="/" component={Session} />
         </Router>
       </ErrorBoundary>

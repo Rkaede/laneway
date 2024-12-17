@@ -4,9 +4,13 @@ import { SolidMarkdown } from 'solid-markdown';
 import { ModelIcon } from '~/components/connected';
 import { IconUser } from '~/components/icons/ui';
 import { Avatar, CodeBlock } from '~/components/ui';
+import { AudioButton } from '~/components/ui/audio-button';
 import { LocalImage } from '~/components/ui/local-image';
+import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
+import { createAudio } from '~/hooks/use-audio';
 import { store } from '~/store/index';
-import type { MessageProps } from '~/types';
+import { apiKeys } from '~/store/keys';
+import type { MessageProps, TextPart } from '~/types';
 import { cn, sanitizeMessage } from '~/util';
 
 const ModelTitle: ParentComponent = (props) => {
@@ -58,9 +62,29 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
   );
 };
 
-export const Message: Component<MessageProps> = (props) => {
+export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
+  const audio = createAudio({
+    id: props.id,
+    text:
+      typeof props.content === 'string'
+        ? props.content
+        : props.content
+            .filter((p) => p.type === 'text')
+            .map((p) => (p as TextPart).text)
+            .join('\n'),
+  });
+
+  function handleClickTTS() {
+    if (audio.status() === 'playing') {
+      audio.stop();
+    }
+    if (audio.status() === 'idle') {
+      audio.play();
+    }
+  }
+
   return (
-    <MessageContainer role={props.role} content={props.content}>
+    <MessageContainer role={props.role} content={props.content} id={props.id}>
       <Show
         when={store.settings.messages.showAvatars}
         fallback={
@@ -96,6 +120,23 @@ export const Message: Component<MessageProps> = (props) => {
           <MarkdownContent text={props.content} />
         )}
       </div>
+      <Show when={props.tts}>
+        <div class="mt-2">
+          <Show
+            when={apiKeys.openai === '' || apiKeys.openai === undefined}
+            fallback={<AudioButton status={audio.status()} onClick={() => handleClickTTS()} />}
+          >
+            <Tooltip>
+              <TooltipTrigger class="cursor-default">
+                <AudioButton status="unavailable" onClick={() => handleClickTTS()} />
+              </TooltipTrigger>
+              <TooltipContent>
+                {apiKeys.openai ? '' : 'OpenAI API key is required'}
+              </TooltipContent>
+            </Tooltip>
+          </Show>
+        </div>
+      </Show>
     </MessageContainer>
   );
 };
@@ -103,7 +144,7 @@ export const Message: Component<MessageProps> = (props) => {
 const MessageContainer: ParentComponent<MessageProps> = (props) => {
   return (
     <div
-      class="max-w-full rounded-xl p-2"
+      class="max-w-full rounded-xl px-4 py-2.5"
       classList={{
         'gap-2 flex items-start': store.settings.messages.showAvatars,
         'self-start bg-assistant text-assistant-foreground': props.role === 'assistant',

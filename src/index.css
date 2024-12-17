@@ -18,6 +18,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  /* Without this, a double scrollbar will sometimes appear on the settings page */
+  overflow: hidden;
+}
+
 #root {
   @apply flex h-full w-full;
 }

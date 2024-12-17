@@ -27,6 +27,7 @@ import type {
 
 import { setStore, store } from '.';
 export * from './actions/assistants';
+
 import { models } from './models';
 import { createSessionFromPreset } from './util';
 
@@ -217,7 +218,7 @@ export async function autonameChat(sessionId: string, title: string) {
 
   const prompt = summarizeTitle.replace('{{messages}}', title);
   const response = await router.getText({
-    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }] }],
+    messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
     modelId: store.settings.systemModel,
   });
 
@@ -232,7 +233,7 @@ export async function autonameChat(sessionId: string, title: string) {
 export async function getCompletion(input: string) {
   const prompt = completion.replace('{{input}}', input);
   const response = await router.getText({
-    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }] }],
+    messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
     modelId: store.settings.completions.model,
   });
 

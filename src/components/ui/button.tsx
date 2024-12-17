@@ -26,12 +26,14 @@ const buttonVariants = cva(
           'border border-input shadow-sm hover:text-accent-foreground bg-transparent text-left w-full items-center justify-between',
         close:
           'hover:bg-muted/90 rounded-full text-white flex items-center justify-center size-10',
+        toolbar: 'text-foreground hover:bg-muted/50',
       },
       size: {
         default: 'h-9 px-4 py-2',
         sm: 'h-8 rounded-md px-3 text-xs',
         lg: 'h-10 rounded-md px-8',
         icon: 'h-9 w-9',
+        toolbar: 'h-7 w-7 rounded-full',
       },
     },
     compoundVariants: [
