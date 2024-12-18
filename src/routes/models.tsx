@@ -160,7 +160,7 @@ export default function ModelList() {
                 <tr class="border-b">
                   <td class="px-2 py-1.5">
                     <div class="flex items-center gap-2">
-                      <Avatar>
+                      <Avatar variant="flat">
                         <ModelIcon modelId={model.id} class="size-5" />
                       </Avatar>
                       <a href={model.creator.website} target="_blank" rel="noopener noreferrer">
