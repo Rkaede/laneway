@@ -34,14 +34,13 @@ const SortableHeader: ParentComponent<SortableHeaderProps> = (props) => (
   </th>
 );
 
-export function ModelList() {
+export default function ModelList() {
   const [sortColumn, setSortColumn] = createSignal<string>('created');
   const [sortDirection, setSortDirection] = createSignal<'ASC' | 'DESC' | undefined>('DESC');
 
   const sortedModels = createMemo(() => {
     const _sortColumn = sortColumn();
-    // todo: fix this?
-    // eslint-disable-next-line solid/reactivity
+
     return [...models].sort((a, b) => {
       if (_sortColumn === '') return 0;
 

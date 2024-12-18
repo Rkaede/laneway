@@ -12,7 +12,7 @@ const stories = [
   { title: 'Switch', stories: SwitchStories },
 ];
 
-export function Sandbox() {
+export default function Sandbox() {
   return (
     <div class="h-full overflow-auto px-10 py-6">
       <h1 class="mb-4 border-b border-b-background-2 pb-0.5 text-4xl font-medium">

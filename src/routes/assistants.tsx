@@ -42,7 +42,7 @@ const fetchGalleryAssistants = async () => {
   return response.json();
 };
 
-export function Assistants() {
+export default function Assistants() {
   const [selectedAssistant, setSelectedAssistant] = createSignal<AssistantProps | null>(null);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [searchTerm, setSearchTerm] = createSignal('');

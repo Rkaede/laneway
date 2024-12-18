@@ -1,20 +1,21 @@
 import './index.css';
 
 import { Route, Router } from '@solidjs/router';
-import { ErrorBoundary } from 'solid-js';
+import { ErrorBoundary, lazy } from 'solid-js';
 /* @refresh reload */
 import { render } from 'solid-js/web';
 
 // routes
 import { AppLayout } from './app-layout';
 import { AppError } from './components/connected/app-error';
-import { Assistants } from './routes/assistants';
-import { Debug } from './routes/debug';
-import { ModelList } from './routes/models';
-import { Presets } from './routes/presets';
-import { Sandbox } from './routes/sandbox';
 import { Session } from './routes/session';
-import { Settings } from './routes/settings';
+
+const Sandbox = lazy(() => import('./routes/sandbox/sandbox'));
+const Debug = lazy(() => import('./routes/debug'));
+const Settings = lazy(() => import('./routes/settings/settings'));
+const Assistants = lazy(() => import('./routes/assistants'));
+const Presets = lazy(() => import('./routes/presets'));
+const ModelList = lazy(() => import('./routes/models'));
 
 const root = document.getElementById('root');
 

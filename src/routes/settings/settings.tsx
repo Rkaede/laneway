@@ -8,7 +8,7 @@ import { GeneralSettings } from './general-settings';
 import { SpeedDial } from './speed-dial-settings';
 import { TTSSettings } from './tts-settings';
 
-export function Settings() {
+export default function Settings() {
   return (
     <div class="h-full overflow-auto px-10 py-6">
       <div class="container mx-auto grid max-w-screen-md gap-16 pb-24">

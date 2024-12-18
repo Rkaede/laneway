@@ -10,7 +10,7 @@ const config = {
   state: true,
 };
 
-export function Debug() {
+export default function Debug() {
   return (
     <div class="h-full overflow-auto px-10 py-4 text-sm">
       {config.richtexteditor && (

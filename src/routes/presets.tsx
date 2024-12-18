@@ -53,7 +53,7 @@ const fetchPresets = async () => {
   return response.json();
 };
 
-export const Presets: Component = () => {
+export default function Presets() {
   const [presets] = createResource(fetchPresets);
   const [selectedPreset, setSelectedPreset] = createSignal<PresetProps | null>(null);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
@@ -175,7 +175,7 @@ export const Presets: Component = () => {
       />
     </div>
   );
-};
+}
 
 const PresetCard: Component<{
   preset: PresetProps;
