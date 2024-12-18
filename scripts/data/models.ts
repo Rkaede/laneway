@@ -1,12 +1,16 @@
 import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
 async function fetchModels() {
+  console.info('Fetching model data from OpenRouter.');
+
   try {
     const response = await fetch('https://openrouter.ai/api/v1/models');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    console.log('Fetched model data from OpenRouter.');
+
     return data;
   } catch (error) {
     console.error('Error fetching models:', error);
@@ -117,6 +121,16 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openrouter', modelId: 'openai/o1-preview' },
     ],
     contextWindow: 128000,
+  },
+  {
+    ...defaults.openai,
+    id: 'openai/o1',
+    title: 'o1',
+    provider: [
+      { id: 'openai', modelId: 'o1', primary: true },
+      { id: 'openrouter', modelId: 'openai/o1-preview' },
+    ],
+    contextWindow: 200000,
   },
 ];
 
