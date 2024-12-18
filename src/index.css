@@ -47,7 +47,7 @@ html {
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5.3% 44.7%;
 
-    --accent: 60 4.8% 95.9%;
+    --accent: 237 100% 70%;
     --accent-foreground: 24 9.8% 10%;
 
     --destructive: 0 84.2% 60.2%;
@@ -58,9 +58,6 @@ html {
     --ring: 20 14.3% 4.1%;
 
     --radius: 0.5rem;
-
-    --accent: 237 100% 70%;
-    --accent-foreground: 0 0% 100%;
 
     --background-main: 0 0% 100%;
     --background: 0 0% 98%;

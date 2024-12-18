@@ -53,8 +53,7 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
         },
       }}
       class={cn(
-        'prose prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
-        store.settings.theme === 'dark' && 'prose-invert',
+        'prose dark:prose-invert prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
       )}
     >
       {sanitizeMessage(props.text)}

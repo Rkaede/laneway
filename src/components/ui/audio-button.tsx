@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import { IconLoaderCircle, IconSpeaker, IconVolumeX } from '../icons/ui';
+import { IconLoaderCircle, IconSpeaker, IconVolumeOff, IconVolumeX } from '../icons/ui';
 import { Button } from './button';
 
 interface AudioButtonProps {
@@ -41,6 +41,9 @@ export function AudioButton(props: AudioButtonProps) {
             <path class="animate-wave-1 opacity-0" d="M16 9a5 5 0 0 1 0 6" />
             <path class="animate-wave-2 opacity-0" d="M19.364 18.364a9 9 0 0 0 0-12.728" />
           </svg>
+        </Match>
+        <Match when={props.status === 'unavailable'}>
+          <IconVolumeOff class="size-4" />
         </Match>
         <Match when={props.status === 'loading'}>
           <IconLoaderCircle class="size-4 animate-spin" />
