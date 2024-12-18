@@ -4,8 +4,9 @@ import { SolidMarkdown } from 'solid-markdown';
 import { ModelIcon } from '~/components/connected';
 import { IconUser } from '~/components/icons/ui';
 import { Avatar, CodeBlock } from '~/components/ui';
-import { AudioButton } from '~/components/ui/audio-button';
 import { LocalImage } from '~/components/ui/local-image';
+import { AudioButton } from '~/components/ui/message/audio-button';
+import { CopyButton } from '~/components/ui/message/copy-button';
 import { StatsPopover } from '~/components/ui/stats-popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import { createAudio } from '~/hooks/use-audio';
@@ -62,16 +63,18 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
   );
 };
 
-export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
+export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }> = (props) => {
+  const content = () =>
+    typeof props.content === 'string'
+      ? props.content
+      : props.content
+          .filter((p) => p.type === 'text')
+          .map((p) => (p as TextPart).text)
+          .join('\n');
+
   const audio = createAudio({
     id: props.id,
-    text:
-      typeof props.content === 'string'
-        ? props.content
-        : props.content
-            .filter((p) => p.type === 'text')
-            .map((p) => (p as TextPart).text)
-            .join('\n'),
+    text: content(),
   });
 
   function handleClickTTS() {
@@ -139,6 +142,7 @@ export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
               </Tooltip>
             </Show>
           </Show>
+          <CopyButton text={content()} />
           <StatsPopover stats={props.usage} />
         </div>
       </Show>

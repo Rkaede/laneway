@@ -1,4 +1,4 @@
-import { AudioButton } from '~/components/ui/audio-button';
+import { AudioButton } from '~/components/ui/message/audio-button';
 
 import { Cell, CellHeader, Cells } from './story-components';
 

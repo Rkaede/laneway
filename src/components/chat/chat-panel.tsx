@@ -41,11 +41,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           <Show when={props.chat}>
             <For each={props.chat.messages}>
               {(message) => (
-                <Message
-                  {...message}
-                  model={chat.model()}
-                  tts={store.settings.tts.enabled && message.role === 'assistant'}
-                />
+                <Message {...message} model={chat.model()} tts={store.settings.tts.enabled} />
               )}
             </For>
           </Show>

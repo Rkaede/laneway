@@ -1,7 +1,12 @@
 import { Match, Switch } from 'solid-js';
 
-import { IconLoaderCircle, IconSpeaker, IconVolumeOff, IconVolumeX } from '../icons/ui';
-import { Button } from './button';
+import {
+  IconLoaderCircle,
+  IconSpeaker,
+  IconVolumeOff,
+  IconVolumeX,
+} from '~/components/icons/ui';
+import { Button } from '~/components/ui/button';
 
 interface AudioButtonProps {
   text?: string;
