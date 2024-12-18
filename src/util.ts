@@ -111,3 +111,24 @@ export function hash(str: string, seed = 0) {
 
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
+
+export function formatDateLong(date: Date) {
+  return date.toLocaleString(undefined, {
+    year: '2-digit',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  });
+}
+
+export function formatResponseTime(timeTaken: number) {
+  if (timeTaken < 2000) {
+    return `${timeTaken}ms`;
+  }
+  if (timeTaken < 60000) {
+    return `${(timeTaken / 1000).toFixed(1)}s`;
+  }
+  return `${(timeTaken / 1000 / 60).toFixed(1)}m`;
+}

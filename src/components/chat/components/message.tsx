@@ -6,6 +6,7 @@ import { IconUser } from '~/components/icons/ui';
 import { Avatar, CodeBlock } from '~/components/ui';
 import { AudioButton } from '~/components/ui/audio-button';
 import { LocalImage } from '~/components/ui/local-image';
+import { StatsPopover } from '~/components/ui/stats-popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import { createAudio } from '~/hooks/use-audio';
 import { store } from '~/store/index';
@@ -119,21 +120,26 @@ export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
           <MarkdownContent text={props.content} />
         )}
       </div>
-      <Show when={props.tts}>
-        <div class="mt-2">
-          <Show
-            when={apiKeys.openai === '' || apiKeys.openai === undefined}
-            fallback={<AudioButton status={audio.status()} onClick={() => handleClickTTS()} />}
-          >
-            <Tooltip>
-              <TooltipTrigger class="cursor-default">
-                <AudioButton status="unavailable" onClick={() => handleClickTTS()} />
-              </TooltipTrigger>
-              <TooltipContent>
-                {apiKeys.openai ? '' : 'OpenAI API key is required'}
-              </TooltipContent>
-            </Tooltip>
+      <Show when={props.role === 'assistant'}>
+        <div class="mt-2 flex items-center gap-[1px]">
+          <Show when={props.tts}>
+            <Show
+              when={apiKeys.openai === '' || apiKeys.openai === undefined}
+              fallback={
+                <AudioButton status={audio.status()} onClick={() => handleClickTTS()} />
+              }
+            >
+              <Tooltip>
+                <TooltipTrigger class="cursor-default">
+                  <AudioButton status="unavailable" onClick={() => handleClickTTS()} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  {apiKeys.openai ? '' : 'OpenAI API key is required'}
+                </TooltipContent>
+              </Tooltip>
+            </Show>
           </Show>
+          <StatsPopover stats={props.usage} />
         </div>
       </Show>
     </MessageContainer>

@@ -85,6 +85,7 @@ export function useChat({ chat }: UseChat) {
     append: async () => {
       try {
         setChatStore('status', 'loading');
+        const startTime = Date.now();
 
         const stream = await streamFn();
         if (!stream) return;
@@ -95,8 +96,22 @@ export function useChat({ chat }: UseChat) {
           setChatStore('latest', { role: 'assistant', content: latestContent });
         }
 
+        const usage = await stream.usage;
+        const timeTaken = Date.now() - startTime;
+
         setChatStore({ status: 'idle', latest: undefined });
-        addMessage(chat.id, { id: nanoid(), role: 'assistant', content: latestContent });
+        addMessage(chat.id, {
+          id: nanoid(),
+          role: 'assistant',
+          content: latestContent,
+          usage: {
+            promptTokens: usage.promptTokens,
+            completionTokens: usage.completionTokens,
+            totalTokens: usage.totalTokens,
+            created: Date.now(),
+            timeTaken,
+          },
+        });
       } catch (error: unknown) {
         if (error instanceof Error) {
           setChatStore({ status: 'error', latest: undefined });

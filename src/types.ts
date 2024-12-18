@@ -9,6 +9,13 @@ export type MessageProps = {
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: Array<ImagePart | TextPart> | string;
   model?: ModelProps;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    created: number;
+    timeTaken?: number;
+  };
 };
 
 export type ProviderId = 'openai' | 'google' | 'openrouter';

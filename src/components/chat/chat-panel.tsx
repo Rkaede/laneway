@@ -18,9 +18,7 @@ type ChatPanelProps = {
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
   const navigate = useNavigate();
-  const chat = useChat({
-    chat: props.chat,
-  });
+  const chat = useChat({ chat: props.chat });
 
   return (
     <div

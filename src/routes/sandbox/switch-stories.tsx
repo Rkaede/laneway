@@ -1,29 +1,38 @@
 import { Switch, SwitchControl, SwitchLabel, SwitchThumb } from '~/components/ui/switch';
 
-import { CellHeader } from './story-components';
+import { Cell, CellHeader, Cells } from './story-components';
 
 export function States() {
   return (
-    <div class="grid max-w-md grid-flow-col gap-8 text-sm">
-      <div>
+    <Cells>
+      <Cell>
         <CellHeader>Default</CellHeader>
         <Switch>
           <SwitchControl>
             <SwitchThumb />
           </SwitchControl>
         </Switch>
-      </div>
+      </Cell>
 
-      <div>
+      <Cell>
         <CellHeader>Checked</CellHeader>
         <Switch defaultChecked>
           <SwitchControl>
             <SwitchThumb />
           </SwitchControl>
         </Switch>
-      </div>
+      </Cell>
 
-      <div>
+      <Cell>
+        <CellHeader>Disabled</CellHeader>
+        <Switch disabled>
+          <SwitchControl>
+            <SwitchThumb />
+          </SwitchControl>
+        </Switch>
+      </Cell>
+
+      <Cell>
         <CellHeader>With Label</CellHeader>
         <Switch class="flex items-center">
           <SwitchLabel class="mr-2">Airplane Mode</SwitchLabel>
@@ -31,16 +40,7 @@ export function States() {
             <SwitchThumb />
           </SwitchControl>
         </Switch>
-      </div>
-
-      <div>
-        <CellHeader>Disabled</CellHeader>
-        <Switch disabled>
-          <SwitchControl>
-            <SwitchThumb />
-          </SwitchControl>
-        </Switch>
-      </div>
-    </div>
+      </Cell>
+    </Cells>
   );
 }

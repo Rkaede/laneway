@@ -1,28 +1,30 @@
 import { AudioButton } from '~/components/ui/audio-button';
 
+import { Cell, CellHeader, Cells } from './story-components';
+
 export function States() {
   return (
-    <div class="grid max-w-md grid-flow-col gap-8 text-sm">
-      <div>
-        <div>Idle</div>
+    <Cells>
+      <Cell>
+        <CellHeader>Idle</CellHeader>
         <AudioButton status="idle" />
-      </div>
-      <div>
-        <div>Loading</div>
+      </Cell>
+      <Cell>
+        <CellHeader>Loading</CellHeader>
         <AudioButton status="loading" />
-      </div>
-      <div>
-        <div>Playing</div>
+      </Cell>
+      <Cell>
+        <CellHeader>Playing</CellHeader>
         <AudioButton status="playing" />
-      </div>
-      <div>
-        <div>Error</div>
+      </Cell>
+      <Cell>
+        <CellHeader>Error</CellHeader>
         <AudioButton status="error" />
-      </div>
-      <div>
-        <div>Unavailable</div>
+      </Cell>
+      <Cell>
+        <CellHeader>Unavailable</CellHeader>
         <AudioButton status="unavailable" />
-      </div>
-    </div>
+      </Cell>
+    </Cells>
   );
 }
