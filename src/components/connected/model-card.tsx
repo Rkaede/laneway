@@ -16,7 +16,7 @@ export const ModelCard: ParentComponent<ModelIconProps> = (props) => {
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <div class="rounded-full border border-transparent p-1 hover:bg-muted">
+        <div class="rounded-full border border-transparent p-1 text-foreground hover:bg-muted">
           {props.children}
         </div>
       </HoverCardTrigger>

@@ -3,11 +3,13 @@ import { For, JSX } from 'solid-js';
 import { cn } from '~/util';
 
 import * as AudioButtonStories from './audio-button.stories';
+import * as ButtonStories from './button.stories';
 import * as MessageStories from './message.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
 
 const stories = [
+  { title: 'Button', stories: ButtonStories },
   { title: 'StatsPopover', stories: StatsPopoverStories },
   { title: 'AudioButton', stories: AudioButtonStories },
   { title: 'Message', stories: MessageStories },

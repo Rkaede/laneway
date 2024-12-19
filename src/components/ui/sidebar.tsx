@@ -1,4 +1,4 @@
-import { cva,type VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { type JSX, type ParentComponent, Show } from 'solid-js';
 
 import { cn } from '~/util';
@@ -21,7 +21,7 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
     <a
       href={props.href}
       class={cn(
-        'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 hover:bg-background-2',
+        'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 text-foreground hover:bg-background-2',
         props.active && 'bg-background-2 hover:bg-background-3',
         props.class,
       )}

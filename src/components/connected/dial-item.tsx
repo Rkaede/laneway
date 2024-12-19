@@ -32,7 +32,7 @@ export const ChatCard: ParentComponent<ChatCardProps> = (props) => {
   return (
     <button
       class={cn(
-        'flex max-w-60 flex-col gap-3 rounded-xl border border-input bg-background-main p-4 text-left text-sm text-card-foreground shadow transition-colors duration-100 hover:bg-background',
+        'flex max-w-60 flex-col gap-3 rounded-xl border border-input bg-background-main p-4 text-left text-sm text-card-foreground shadow-sm transition-colors duration-100 hover:bg-background',
         local.class,
       )}
       onClick={() => local.onClick?.()}
