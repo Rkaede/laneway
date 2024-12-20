@@ -132,3 +132,5 @@ export function formatResponseTime(timeTaken: number) {
   }
   return `${(timeTaken / 1000 / 60).toFixed(1)}m`;
 }
+
+export function noop() {}

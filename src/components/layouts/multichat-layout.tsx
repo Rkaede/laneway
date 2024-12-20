@@ -15,6 +15,7 @@ import { ImagePart, MessageProps } from '~/types';
 
 import { ChatInput } from '../chat/chat-input';
 import { ChatPanel } from '../chat/chat-panel';
+import { useSession } from '../connected/session-context';
 import { SpeedDial } from '../connected/speed-dial';
 
 type MultiChatLayoutProps = {
@@ -25,6 +26,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   const navigate = useNavigate();
   const session = () => store.sessions.find((s) => s.id === props.sessionId);
   const [attachments, setAttachments] = createSignal<File[] | undefined>();
+  const sessionContext = useSession();
 
   function handleInput(value: string) {
     setSessionInput(value, props.sessionId);
@@ -98,7 +100,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   return (
     <div class="relative flex h-full w-full flex-col">
       {/* this column reverse container is needed to keep the scrollbar at the bottom */}
-      <div class="flex h-full w-full flex-col-reverse overflow-auto">
+      <div class="flex h-full w-full flex-col-reverse overflow-auto pb-10">
         <Show when={session()} fallback={<BlankSession attachments={attachments()} />}>
           {(s) => (
             <ChatPanelLayout numChats={s().chats.length}>
@@ -123,11 +125,12 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
       <ChatInput
         hasVision
         input={session()?.input ?? store.draftSession.input ?? ''}
-        isLoading={false}
+        isLoading={sessionContext.isLoading()}
         onInput={handleInput}
         onSubmit={handleSubmit}
         onFileSelect={handleFileSelect}
         onRemoveFile={handleRemoveFile}
+        onCancel={sessionContext.cancelChats}
         attachments={attachments()}
       />
     </div>

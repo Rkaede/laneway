@@ -9,7 +9,11 @@ import { createThrottle, formatMessages } from './util';
 const defaultModel = 'gpt-3.5-turbo-instruct';
 const throttle = createThrottle();
 
-export async function getStream(messages: MessageProps[], model: string = defaultModel) {
+export async function getStream(
+  messages: MessageProps[],
+  model: string = defaultModel,
+  options?: { abortSignal?: AbortSignal },
+) {
   throttle();
   const openai = createOpenAI({
     apiKey: apiKeys?.openai,
@@ -17,7 +21,11 @@ export async function getStream(messages: MessageProps[], model: string = defaul
   });
 
   const formattedMessages = await formatMessages(messages);
-  return await streamText({ model: openai(model), messages: formattedMessages });
+  return await streamText({
+    model: openai(model),
+    messages: formattedMessages,
+    abortSignal: options?.abortSignal,
+  });
 }
 
 export async function getText(messages: MessageProps[], model: string = defaultModel) {

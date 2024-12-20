@@ -915,3 +915,68 @@ export function IconChartNoAxesColumn(props: SVGAttributes) {
     </svg>
   );
 }
+
+export function IconBan(props: SVGAttributes) {
+  const [localProps, rest] = splitProps(props, ['class']);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={cn(localProps.class, 'lucide lucide-ban')}
+      {...rest}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="m4.9 4.9 14.2 14.2" />
+    </svg>
+  );
+}
+
+export function IconSquare(props: SVGAttributes) {
+  const [localProps, rest] = splitProps(props, ['class']);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={cn(localProps.class, 'lucide lucide-square')}
+      {...rest}
+    >
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+    </svg>
+  );
+}
+
+export function IconPaperclip(props: SVGAttributes) {
+  const [localProps, rest] = splitProps(props, ['class']);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={cn(localProps.class, 'lucide lucide-paperclip')}
+      {...rest}
+    >
+      <path d="M13.234 20.252 21 12.3" />
+      <path d="m16 6-8.414 8.586a2 2 0 0 0 0 2.828 2 2 0 0 0 2.828 0l8.414-8.586a4 4 0 0 0 0-5.656 4 4 0 0 0-5.656 0l-8.415 8.585a6 6 0 1 0 8.486 8.486" />
+    </svg>
+  );
+}

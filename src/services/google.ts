@@ -9,14 +9,22 @@ import { createThrottle, formatMessages } from './util';
 const defaultModel = 'models/gemini-1.5-pro-latest';
 const throttle = createThrottle();
 
-export async function getStream(messages: MessageProps[], model: string = defaultModel) {
+export async function getStream(
+  messages: MessageProps[],
+  model: string = defaultModel,
+  options?: { abortSignal?: AbortSignal },
+) {
   throttle();
   const google = createGoogleGenerativeAI({
     apiKey: apiKeys?.google,
   });
 
   const formattedMessages = await formatMessages(messages);
-  return await streamText({ model: google(model), messages: formattedMessages });
+  return await streamText({
+    model: google(model),
+    messages: formattedMessages,
+    abortSignal: options?.abortSignal,
+  });
 }
 
 export async function getText(messages: MessageProps[], model: string = defaultModel) {

@@ -2,8 +2,8 @@ import { type Component, type ParentComponent, Show } from 'solid-js';
 import { SolidMarkdown } from 'solid-markdown';
 
 import { ModelIcon } from '~/components/connected';
-import { IconUser } from '~/components/icons/ui';
-import { Avatar, CodeBlock } from '~/components/ui';
+import { IconBan, IconUser } from '~/components/icons/ui';
+import { Avatar, CodeBlock, Tag } from '~/components/ui';
 import { LocalImage } from '~/components/ui/local-image';
 import { AudioButton } from '~/components/ui/message/audio-button';
 import { CopyButton } from '~/components/ui/message/copy-button';
@@ -123,6 +123,12 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
           <MarkdownContent text={props.content} />
         )}
       </div>
+      <Show when={props.cancelled}>
+        <Tag variant="secondary" class="my-2">
+          <IconBan class="size-3" />
+          Full response cancelled by user
+        </Tag>
+      </Show>
       <Show when={props.role === 'assistant'}>
         <div class="mt-2 flex items-center gap-[1px]">
           <Show when={props.tts}>

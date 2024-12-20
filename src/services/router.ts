@@ -17,7 +17,8 @@ export async function getStream(messages: MessageProps[], modelId: string = defa
   if (!provider) return;
 
   const service = providerServices[provider.id];
-  return await service.getStream(messages, modelId);
+  const stream = await service.getStream(messages, modelId);
+  return stream;
 }
 
 export async function getText(config: { messages: MessageProps[]; modelId?: string }) {

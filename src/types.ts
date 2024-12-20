@@ -8,12 +8,13 @@ export type MessageProps = {
   id: string;
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: Array<ImagePart | TextPart> | string;
+  cancelled?: boolean;
   model?: ModelProps;
   usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-    created: number;
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+    created?: number;
     timeTaken?: number;
   };
 };

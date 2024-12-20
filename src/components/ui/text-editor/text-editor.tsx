@@ -5,7 +5,7 @@ import { defaultKeymap, history, redo, undo } from '@codemirror/commands';
 import { EditorState, Prec } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { inlineSuggestion } from 'codemirror-extension-inline-suggestion';
-import { createCodeMirror } from 'solid-codemirror';
+import { createCodeMirror, createEditorReadonly } from 'solid-codemirror';
 import { createEffect } from 'solid-js';
 
 import { store } from '~/store';
@@ -30,6 +30,7 @@ type TextEditorProps = {
   class?: string;
   mode?: 'note' | 'chat';
   placeholder?: string;
+  disabled?: boolean;
 };
 
 export function TextEditor(props: TextEditorProps) {
@@ -39,7 +40,6 @@ export function TextEditor(props: TextEditorProps) {
     },
     value: props.initialValue ?? '',
   });
-
 
   createEffect(() => {
     // Value was reset after user sent a message. We update the editor value to the initialValue
@@ -64,9 +64,15 @@ export function TextEditor(props: TextEditorProps) {
       },
     }),
   );
+
   createEffect(() => {
     createExtension(placeholder(props.placeholder ?? 'Write something...'));
   });
+
+  createEditorReadonly(editorView, () =>
+    props.disabled === undefined ? false : props.disabled,
+  );
+
   createExtension(history());
   createExtension(EditorView.lineWrapping);
   createExtension(keymap.of(defaultKeymap));

@@ -1,7 +1,7 @@
 import { useLocation } from '@solidjs/router';
 import { Component, createEffect, For, Show } from 'solid-js';
 
-import { IconCirclePlusAlt } from '~/components/icons/ui';
+import { IconPaperclip, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/util';
 
@@ -15,6 +15,7 @@ interface PromptProps {
   input: string;
   isLoading: boolean;
   onFileSelect?: (file: File) => void;
+  onCancel?: () => void;
   onInput: (value: string) => void;
   onSubmit: (value: string) => void;
 }
@@ -62,6 +63,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
   };
 
   function handleSubmit() {
+    if (props.isLoading) return;
     submitForm();
   }
 
@@ -97,7 +99,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
               class="my-0.5 rounded-full transition-transform hover:scale-110"
               onClick={() => fileInputRef?.click()}
             >
-              <IconCirclePlusAlt class="size-5" />
+              <IconPaperclip class="size-5 -rotate-45" />
               <span class="sr-only">Attach file</span>
             </Button>
             <input
@@ -115,7 +117,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             submitForm();
           }}
           class={cn(
-            'grid flex-1 rounded-[22px] border border-input bg-background-2 px-4 pt-0',
+            'relative grid flex-1 rounded-[22px] border border-input bg-background-2 px-4 pt-0',
             props.class,
           )}
         >
@@ -125,6 +127,18 @@ export const ChatInput: Component<PromptProps> = (props) => {
             onSubmit={handleSubmit}
             onPaste={handlePasteFile}
           />
+
+          <Show when={props.isLoading}>
+            <Button
+              variant="default"
+              size="icon"
+              class="absolute bottom-0 right-0 m-1.5 mb-[5px] size-7 rounded-full bg-foreground text-background transition-transform hover:scale-110"
+              onClick={props.onCancel}
+            >
+              <IconSquare class="size-4" fill="currentColor" />
+              <span class="sr-only">Stop</span>
+            </Button>
+          </Show>
         </form>
       </div>
     </div>

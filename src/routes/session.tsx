@@ -1,6 +1,7 @@
 import { useParams } from '@solidjs/router';
 import { Show } from 'solid-js';
 
+import { SessionProvider } from '~/components/connected/session-context';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
 import { store } from '~/store';
@@ -13,12 +14,14 @@ export function Session() {
 
   return (
     <Show when={activeSession()}>
-      <Show
-        when={activeSession()?.type === 'note'}
-        fallback={<MultiChatLayout sessionId={params.id} />}
-      >
-        <NoteLayout sessionId={params.id} />
-      </Show>
+      <SessionProvider sessionId={params.id}>
+        <Show
+          when={activeSession()?.type === 'note'}
+          fallback={<MultiChatLayout sessionId={params.id} />}
+        >
+          <NoteLayout sessionId={params.id} />
+        </Show>
+      </SessionProvider>
     </Show>
   );
 }

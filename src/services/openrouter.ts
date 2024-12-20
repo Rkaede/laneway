@@ -13,7 +13,11 @@ const headers = {
   'X-Title': `Laneway`,
 };
 
-export async function getStream(messages: MessageProps[], model: string = defaultModel) {
+export async function getStream(
+  messages: MessageProps[],
+  model: string = defaultModel,
+  options?: { abortSignal?: AbortSignal },
+) {
   throttle();
 
   const openrouter = createOpenAI({
@@ -27,6 +31,7 @@ export async function getStream(messages: MessageProps[], model: string = defaul
     model: openrouter(model),
     messages: formattedMessages,
     headers,
+    abortSignal: options?.abortSignal,
   });
 
   return result;

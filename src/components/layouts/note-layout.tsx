@@ -10,7 +10,6 @@ import { setSessionInput } from '~/store/actions';
 
 export function NoteLayout(props: { sessionId: string }) {
   const session = createSession(() => props.sessionId);
-  console.log(session.input);
 
   return (
     <div class="grid size-full min-h-0 grid-cols-2">

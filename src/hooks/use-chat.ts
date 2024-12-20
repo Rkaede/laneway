@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid';
-import { createEffect, mergeProps } from 'solid-js';
+import { createEffect, mergeProps, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
+import { useSession } from '~/components/connected/session-context';
 import providers from '~/services';
 import { store } from '~/store';
 import { addMessage, chatError, clearChatError } from '~/store/actions';
@@ -16,11 +17,15 @@ type UseChat = {
 
 type ChatStore = {
   latest: MessageProps | undefined;
-  status: 'idle' | 'loading' | 'error';
+  status: 'idle' | 'loading' | 'error' | 'canceled';
   append: (messages: MessageProps[]) => Promise<void>;
+  abortController: AbortController | undefined;
+  cancel: () => void;
 };
 
 export function useChat({ chat }: UseChat) {
+  const session = useSession();
+
   const assistant = () => store.assistants.find((a) => a.id === chat.assistantId);
   const model = () =>
     models.find((m) => m.id === assistant()?.modelId) ??
@@ -71,23 +76,53 @@ export function useChat({ chat }: UseChat) {
     return !!apiKeys?.[providerId];
   };
 
-  const streamFn = () => {
+  const streamFn = (abortSignal: AbortSignal) => {
     const systemPrompt = assistant()?.systemPrompt;
     const messagesWithSystem = systemPrompt
-      ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
+      ? [
+          {
+            id: nanoid(),
+            role: 'system' as const,
+            content: systemPrompt,
+          },
+          ...chat.messages,
+        ]
       : chat.messages;
-    return providerService()?.getStream(messagesWithSystem, provider()?.modelId);
+
+    return providerService()?.getStream(messagesWithSystem, provider()?.modelId, {
+      abortSignal,
+    });
   };
 
   const [chatStore, setChatStore] = createStore<ChatStore>({
     latest: undefined as MessageProps | undefined,
     status: 'idle',
+    abortController: undefined,
+    cancel: () => {
+      chatStore.abortController?.abort();
+      addMessage(chat.id, {
+        id: nanoid(),
+        role: 'assistant',
+        content: chatStore.latest?.content ?? '',
+        cancelled: true,
+        usage: {
+          created: Date.now(),
+          timeTaken: 0,
+        },
+      });
+      setChatStore('latest', undefined);
+      setChatStore('status', 'canceled');
+    },
     append: async () => {
       try {
         setChatStore('status', 'loading');
+        session.addLoadingChat(chat.id);
         const startTime = Date.now();
 
-        const stream = await streamFn();
+        const controller = new AbortController();
+        setChatStore('abortController', controller);
+
+        const stream = await streamFn(controller.signal);
         if (!stream) return;
         let latestContent = '';
 
@@ -113,14 +148,35 @@ export function useChat({ chat }: UseChat) {
           },
         });
       } catch (error: unknown) {
-        if (error instanceof Error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
           setChatStore({ status: 'error', latest: undefined });
           chatError(chat.id, { name: error.name, message: error.message });
+        } else {
+          setChatStore({ status: 'idle', latest: undefined });
         }
+      } finally {
+        setChatStore('abortController', undefined);
       }
     },
   });
 
+  createEffect(() => {
+    session.registerChatCancel(chat.id, chatStore.cancel);
+    onCleanup(() => {
+      session.removeLoadingChat(chat.id);
+    });
+  });
+
+  createEffect(() => {
+    if (chatStore.status === 'loading') {
+      session.addLoadingChat(chat.id);
+    } else {
+      session.removeLoadingChat(chat.id);
+    }
+  });
+
+  // Automatically sends new user messages to the AI model, checking for vision capabilities if
+  // images are present and prepending any system prompt from the assistant
   createEffect(() => {
     if (chat.error || model()?.provider === undefined) {
       return;
@@ -131,15 +187,15 @@ export function useChat({ chat }: UseChat) {
     const hasImage =
       Array.isArray(latestMessage?.content) &&
       latestMessage?.content.some((part) => part.type === 'image');
+
     const shouldSend = hasImage ? hasVision : true;
 
     if (!shouldSend) {
       return;
     }
 
-    if (chat.messages.at(-1)?.role === 'user') {
-      const _provider = model()?.provider;
-      if (_provider) {
+    if (latestMessage?.role === 'user') {
+      if (model()?.provider) {
         const systemPrompt = assistant()?.systemPrompt;
         const messagesWithSystem = systemPrompt
           ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
