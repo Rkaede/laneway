@@ -37,7 +37,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         sessionType={props.variant}
       />
       <div class="fade-out-bottom flex min-h-full flex-1 flex-col px-1.5">
-        <div class="flex min-h-full flex-1 flex-col gap-8 pb-2 pt-8">
+        <div class="flex min-h-full flex-1 flex-col gap-8 pb-8 pt-8">
           <Show when={props.chat}>
             <For each={props.chat.messages}>
               {(message) => (

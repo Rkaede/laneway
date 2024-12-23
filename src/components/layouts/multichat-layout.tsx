@@ -100,7 +100,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   return (
     <div class="relative flex h-full w-full flex-col">
       {/* this column reverse container is needed to keep the scrollbar at the bottom */}
-      <div class="flex h-full w-full flex-col-reverse overflow-auto pb-10">
+      <div class="flex h-full w-full flex-col-reverse overflow-auto">
         <Show when={session()} fallback={<BlankSession attachments={attachments()} />}>
           {(s) => (
             <ChatPanelLayout numChats={s().chats.length}>
