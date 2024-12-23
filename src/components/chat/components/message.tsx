@@ -27,6 +27,9 @@ const MarkdownContent: Component<{ text: string }> = (props) => {
   return (
     <SolidMarkdown
       components={{
+        pre(preProps) {
+          return <pre class="not-prose overflow-hidden rounded" {...preProps} />;
+        },
         code(codeProps) {
           return (
             <Show

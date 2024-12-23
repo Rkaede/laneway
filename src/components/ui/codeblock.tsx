@@ -1,12 +1,25 @@
 import { toBlob, toPng } from 'html-to-image';
-import type { Component, ParentComponent } from 'solid-js';
+import { type Component, createSignal } from 'solid-js';
 
 import { useCopyToClipboard } from '~/hooks/use-copy';
 import { downloadFile, filenameDate } from '~/util';
 
-import { IconCopy, IconDownload, IconImageDownload, IconImages } from '../icons/ui';
+import {
+  IconCopy,
+  IconDownload,
+  IconImageDownload,
+  IconImages,
+  MoreHorizontalIcon,
+} from '../icons/ui';
 import { Button } from './button';
 import { CodeHighlighter } from './code-highlighter';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './dropdown';
 
 interface CodeblockProps {
   language: string;
@@ -92,22 +105,16 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
   }
 
   return (
-    <div class="codeblock group/toolbar w-full rounded font-sans" ref={ref}>
-      <div class="flex w-full items-center justify-between px-4 py-0.5 pr-4 text-zinc-100">
+    <div class="codeblock group/toolbar w-full rounded bg-gray-700/80 font-sans" ref={ref}>
+      <div class="flex w-full items-center justify-between px-4 py-0.5 pr-2 text-gray-100">
         <span class="text-xs font-medium lowercase">{props.language}</span>
-        <div class="invisible flex items-center space-x-1 group-hover/toolbar:visible">
-          <CodeActionButton onClick={onDownloadScreenshot} label="Download screenshot">
-            <IconImageDownload class="size-4" />
-          </CodeActionButton>
-          <CodeActionButton onClick={downloadAsFile} label="Download">
-            <IconDownload class="size-4" />
-          </CodeActionButton>
-          <CodeActionButton onClick={onCopyScreenshot} label="Copy screenshot">
-            <IconImages class="size-4 scale-x-[-1]" />
-          </CodeActionButton>
-          <CodeActionButton onClick={onCopy} label="Copy code">
-            <IconCopy class="size-4 scale-x-[-1] scale-y-[-1]" />
-          </CodeActionButton>
+        <div class="flex items-center gap-1">
+          <CodeActionDropdown
+            onCopy={onCopy}
+            onDownload={downloadAsFile}
+            onCopyScreenshot={onCopyScreenshot}
+            onDownloadScreenshot={onDownloadScreenshot}
+          />
         </div>
       </div>
       <CodeHighlighter code={unsanitizedCode()} language={props.language} />
@@ -115,27 +122,45 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
   );
 };
 
-interface CodeActionButtonProps {
-  onClick: () => void;
-  label: string;
-  isCopied?: boolean;
-}
-
-const CodeActionButton: ParentComponent<CodeActionButtonProps> = (props) => {
+function CodeActionDropdown(props: {
+  sessionId?: string;
+  onCopy: () => void;
+  onDownload: () => void;
+  onCopyScreenshot: () => void;
+  onDownloadScreenshot: () => void;
+}) {
+  const [open, setOpen] = createSignal(false);
   return (
-    <Button
-      variant="secondary"
-      size="icon"
-      class={[
-        'flex size-7 items-center justify-center p-0.5 text-xs',
-        // 'focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0',
-        'screenshot-hide active:scale-90',
-        'hover:bg-background-3',
-      ].join(' ')}
-      onClick={props.onClick}
-    >
-      {props.children}
-      <span class="sr-only">{props.label}</span>
-    </Button>
+    <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
+      <DropdownMenuTrigger
+        as={Button}
+        class="flex size-6 items-center justify-center rounded-md p-0 transition-none hover:bg-background-4 data-[open='true']:opacity-100"
+        data-open={open()}
+        variant="ghost"
+        size="icon"
+      >
+        <MoreHorizontalIcon class="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={props.onDownloadScreenshot}>
+            <IconImageDownload class="mr-2 size-4" />
+            Download Screenshot
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={props.onDownload}>
+            <IconDownload class="mr-2 size-4" />
+            Download File
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={props.onCopyScreenshot}>
+            <IconImages class="mr-2 size-4 scale-x-[-1]" />
+            Copy Screenshot
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={props.onCopy}>
+            <IconCopy class="mr-2 size-4 scale-x-[-1] scale-y-[-1]" />
+            Copy Code
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-};
+}

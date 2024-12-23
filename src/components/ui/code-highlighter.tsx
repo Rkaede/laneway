@@ -1,5 +1,5 @@
 import { createHighlighter } from 'shiki';
-import { createEffect, createSignal } from 'solid-js';
+import { createEffect, createSignal, ParentComponent } from 'solid-js';
 
 type CodeHighlighterProps = {
   code: string;
@@ -56,11 +56,11 @@ const highlighter = createHighlighter({
   langs: languages,
 });
 
-export const CodeHighlighter = (props: CodeHighlighterProps) => {
+export const CodeHighlighter: ParentComponent<CodeHighlighterProps> = (props) => {
   const [html, setHtml] = createSignal('<div></div>');
   createEffect(() => {
     // todo: find what the best way to do this
-    // eslint-disable-next-line solid/reactivity
+
     highlighter.then((h) => {
       const highlightedCode = h.codeToHtml(props.code, {
         lang: languagesWithAliases.includes(props.language) ? props.language : 'text',
@@ -71,7 +71,10 @@ export const CodeHighlighter = (props: CodeHighlighterProps) => {
   });
 
   return (
-    // eslint-disable-next-line solid/no-innerhtml
-    <div class="not-prose" innerHTML={html()} data-language={props.language} />
+    <div class="not-prose">
+      {/* eslint-disable-next-line solid/no-innerhtml */}
+      <div innerHTML={html()} data-language={props.language} />
+      <div>{props.children}</div>
+    </div>
   );
 };

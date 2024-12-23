@@ -5,11 +5,13 @@ import { cn } from '~/util';
 import * as AudioButtonStories from './audio-button.stories';
 import * as ButtonStories from './button.stories';
 import * as ChatInputStories from './chat-input.stories';
+import * as CodeblockStories from './codeblock.stories';
 import * as MessageStories from './message.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
 
 const stories = [
+  { title: 'CodeBlock', stories: CodeblockStories },
   { title: 'ChatInput', stories: ChatInputStories },
   { title: 'Button', stories: ButtonStories },
   { title: 'StatsPopover', stories: StatsPopoverStories },
