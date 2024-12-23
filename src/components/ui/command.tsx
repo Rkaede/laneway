@@ -123,7 +123,7 @@ const CommandItem: Component<ParentProps<CommandPrimitive.CommandItemProps>> = (
     <CommandPrimitive.CommandItem
       cmdk-item=""
       class={cn(
-        'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
         local.class,
       )}
       {...others}
@@ -137,7 +137,7 @@ const CommandShortcut: Component<ComponentProps<'span'>> = (props) => {
   return (
     <span
       class={cn(
-        'ml-auto rounded bg-background-2 px-1 py-0.5 text-xs font-semibold tracking-widest',
+        'ml-auto rounded bg-foreground/80 px-1.5 py-0.5 text-center text-xs font-semibold tracking-widest text-background-3',
         local.class,
       )}
       {...others}
