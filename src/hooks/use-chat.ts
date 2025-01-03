@@ -3,7 +3,7 @@ import { createEffect, mergeProps, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { useSession } from '~/components/connected/session-context';
-import providers from '~/services';
+import * as router from '~/services/llm';
 import { store } from '~/store';
 import { addMessage, chatError, clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
@@ -62,13 +62,6 @@ export function useChat({ chat }: UseChat) {
     clearChatError(chat.id);
   }
 
-  const providerService = () => {
-    const _provider = provider();
-
-    if (!_provider) return undefined;
-    return providers[_provider.id];
-  };
-
   const isApiKeyConfigured = () => {
     const providerId = provider()?.id;
 
@@ -79,17 +72,10 @@ export function useChat({ chat }: UseChat) {
   const streamFn = (abortSignal: AbortSignal) => {
     const systemPrompt = assistant()?.systemPrompt;
     const messagesWithSystem = systemPrompt
-      ? [
-          {
-            id: nanoid(),
-            role: 'system' as const,
-            content: systemPrompt,
-          },
-          ...chat.messages,
-        ]
+      ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
       : chat.messages;
 
-    return providerService()?.getStream(messagesWithSystem, provider()?.modelId, {
+    return router.getStream(messagesWithSystem, provider()?.modelId, provider()?.id, {
       abortSignal,
     });
   };
@@ -207,7 +193,6 @@ export function useChat({ chat }: UseChat) {
 
   const chatHook = mergeProps(chatStore, {
     isApiKeyConfigured,
-    providerService,
     clearError,
     assistant,
     provider,

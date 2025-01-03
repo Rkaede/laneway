@@ -14,7 +14,7 @@ import {
   IconTrash,
 } from '~/components/icons/ui';
 import { imageCache } from '~/services/image-cache';
-import * as router from '~/services/router';
+import * as router from '~/services/llm';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,

@@ -72,7 +72,7 @@ export function groupByDate(sessions: SessionProps[]) {
 
 export function createLog(obj: unknown) {
   return createEffect(() => {
-    console.log(JSON.stringify(obj, null, 2));
+    console.info(JSON.stringify(obj, null, 2));
   });
 }
 
