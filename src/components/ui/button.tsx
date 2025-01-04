@@ -23,7 +23,7 @@ const buttonVariants = cva(
         bare: 'hover:bg-transparent',
         link: 'text-primary underline-offset-4 hover:underline',
         combobox:
-          'border border-input shadow-sm hover:text-accent-foreground bg-transparent text-left w-full items-center justify-between',
+          'border border-input shadow-sm hover:text-foreground bg-transparent text-left w-full items-center justify-between min-w-72',
         close:
           'hover:bg-muted/90 rounded-full text-white flex items-center justify-center size-10',
         toolbar: 'text-foreground hover:bg-muted/50',

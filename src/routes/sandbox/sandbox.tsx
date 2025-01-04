@@ -7,10 +7,12 @@ import * as ButtonStories from './button.stories';
 import * as ChatInputStories from './chat-input.stories';
 import * as CodeblockStories from './codeblock.stories';
 import * as MessageStories from './message.stories';
+import * as MultiComboboxStories from './multi-combobox.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
 
 const stories = [
+  { title: 'MultiCombobox', stories: MultiComboboxStories },
   { title: 'CodeBlock', stories: CodeblockStories },
   { title: 'ChatInput', stories: ChatInputStories },
   { title: 'Button', stories: ButtonStories },

@@ -58,14 +58,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
 
   return (
     <Popover open={open()} onOpenChange={setOpen}>
-      <Button
-        as={PopoverTrigger}
-        variant="outline"
-        class={cn(
-          'w-full items-center justify-between bg-transparent text-left hover:bg-transparent',
-          props.class,
-        )}
-      >
+      <Button as={PopoverTrigger} variant="combobox" class={cn(props.class)}>
         <Show
           when={selectedItem()?.type === 'preset'}
           fallback={<ModelIcon modelId={modelId()} class="mr-2 size-4" />}
