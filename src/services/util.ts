@@ -1,4 +1,4 @@
-import { CoreMessage, CoreUserMessage } from 'ai';
+import type { CoreMessage, CoreUserMessage } from 'ai';
 
 import { store } from '~/store';
 import { apiKeys } from '~/store/keys';

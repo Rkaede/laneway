@@ -1,12 +1,13 @@
-import { Component, For, Show } from 'solid-js';
+import { Component, For, lazy, Show } from 'solid-js';
 
 import { ChatPanel } from '~/components/chat/chat-panel';
 import { SpeedDial } from '~/components/connected/speed-dial';
 import { IconSendHorizontal } from '~/components/icons/ui';
-import { Button, ScrollPanel, TextEditor } from '~/components/ui';
+import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
+const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 export function NoteLayout(props: { sessionId: string }) {
   const session = createSession(() => props.sessionId);

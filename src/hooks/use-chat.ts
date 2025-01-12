@@ -3,12 +3,12 @@ import { createEffect, mergeProps, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { useSession } from '~/components/connected/session-context';
-import * as router from '~/services/llm';
 import { store } from '~/store';
 import { addMessage, chatError, clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
 import { models } from '~/store/models';
 import type { ChatProps, MessageProps } from '~/types';
+const router = import('~/services/llm');
 
 type UseChat = {
   // todo: fix this type
@@ -69,13 +69,14 @@ export function useChat({ chat }: UseChat) {
     return !!apiKeys?.[providerId];
   };
 
-  const streamFn = (abortSignal: AbortSignal) => {
+  const streamFn = async (abortSignal: AbortSignal) => {
     const systemPrompt = assistant()?.systemPrompt;
     const messagesWithSystem = systemPrompt
       ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
       : chat.messages;
 
-    return router.getStream(messagesWithSystem, provider()?.modelId, provider()?.id, {
+    const llm = await router;
+    return llm.getStream(messagesWithSystem, provider()?.modelId, provider()?.id, {
       abortSignal,
     });
   };

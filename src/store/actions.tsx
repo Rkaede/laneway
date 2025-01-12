@@ -14,7 +14,6 @@ import {
   IconTrash,
 } from '~/components/icons/ui';
 import { imageCache } from '~/services/image-cache';
-import * as router from '~/services/llm';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,
@@ -24,6 +23,8 @@ import type {
   SessionProps,
   SessionType,
 } from '~/types';
+
+const router = import('~/services/llm');
 
 import { setStore, store } from '.';
 export * from './actions/assistants';
@@ -217,7 +218,8 @@ export async function autonameChat(sessionId: string, title: string) {
   if (!session) return;
 
   const prompt = summarizeTitle.replace('{{messages}}', title);
-  const response = await router.getText({
+  const llm = await router;
+  const response = await llm.getText({
     messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
     modelId: store.settings.systemModel,
   });
@@ -232,7 +234,8 @@ export async function autonameChat(sessionId: string, title: string) {
 
 export async function getCompletion(input: string) {
   const prompt = completion.replace('{{input}}', input);
-  const response = await router.getText({
+  const llm = await router;
+  const response = await llm.getText({
     messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
     modelId: store.settings.completions.model,
   });

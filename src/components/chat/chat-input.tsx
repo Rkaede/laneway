@@ -1,11 +1,12 @@
 import { useLocation } from '@solidjs/router';
-import { Component, createEffect, For, Show } from 'solid-js';
+import { Component, createEffect, For, lazy, Show } from 'solid-js';
 
 import { IconPaperclip, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/util';
 
-import { TextEditor, Thumbnail } from '../ui';
+import { Thumbnail } from '../ui';
+const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 interface PromptProps {
   attachments?: File[];

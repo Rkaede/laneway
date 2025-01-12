@@ -1,6 +1,7 @@
-import { createEffect, createSignal, For } from 'solid-js';
+import { createEffect, createSignal, For, lazy } from 'solid-js';
 
-import { CodeBlock, TextEditor } from '~/components/ui';
+import { CodeBlock } from '~/components/ui';
+const TextEditor = lazy(() => import('../components/ui/text-editor/text-editor'));
 import { imageCache } from '~/services/image-cache';
 import { store } from '~/store';
 

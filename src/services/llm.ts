@@ -59,3 +59,5 @@ export async function getText({
     messages: formattedMessages,
   });
 }
+
+export default { getStream, getText };

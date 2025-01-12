@@ -1,9 +1,8 @@
-import { type Component, type ParentComponent, Show } from 'solid-js';
-import { SolidMarkdown } from 'solid-markdown';
+import { type Component, lazy, type ParentComponent, Show } from 'solid-js';
 
 import { ModelIcon } from '~/components/connected';
 import { IconBan, IconUser } from '~/components/icons/ui';
-import { Avatar, CodeBlock, Tag } from '~/components/ui';
+import { Avatar, Tag } from '~/components/ui';
 import { LocalImage } from '~/components/ui/local-image';
 import { AudioButton } from '~/components/ui/message/audio-button';
 import { CopyButton } from '~/components/ui/message/copy-button';
@@ -13,56 +12,14 @@ import { createAudio } from '~/hooks/use-audio';
 import { store } from '~/store/index';
 import { apiKeys } from '~/store/keys';
 import type { MessageProps, TextPart } from '~/types';
-import { cn, sanitizeMessage } from '~/util';
+
+const Markdown = lazy(() => import('~/components/ui/markdown'));
 
 const ModelTitle: ParentComponent = (props) => {
   return (
     <div class="mb-1 flex items-center gap-1 px-1 text-assistant-foreground/80">
       <span class="text-xs font-semibold">{props.children}</span>
     </div>
-  );
-};
-
-const MarkdownContent: Component<{ text: string }> = (props) => {
-  return (
-    <SolidMarkdown
-      components={{
-        pre(preProps) {
-          return <pre class="not-prose overflow-hidden rounded" {...preProps} />;
-        },
-        code(codeProps) {
-          return (
-            <Show
-              when={codeProps.inline === true}
-              fallback={
-                <CodeBlock
-                  code={
-                    /* @ts-ignore: this is a depencency bug */
-                    codeProps.node.children[0]?.value ?? ''
-                  }
-                  language={codeProps.class?.split('-')[1] ?? 'plaintext'}
-                  {...codeProps}
-                />
-              }
-            >
-              <span class="inline-block max-w-full overflow-x-auto align-bottom">
-                <span class="mx-[0.2em] inline-block rounded border bg-background/80 px-1 align-baseline font-mono text-sm">
-                  {
-                    /* @ts-ignore: this is a depencency bug */
-                    codeProps.node.children[0]?.value ?? ''
-                  }
-                </span>
-              </span>
-            </Show>
-          );
-        },
-      }}
-      class={cn(
-        'prose dark:prose-invert prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
-      )}
-    >
-      {sanitizeMessage(props.text)}
-    </SolidMarkdown>
   );
 };
 
@@ -115,7 +72,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
             .sort((a, b) => (a.type === 'image' ? 1 : b.type === 'image' ? -1 : 0))
             .map((part) => {
               if (part.type === 'text') {
-                return <MarkdownContent text={part.text} />;
+                return <Markdown text={part.text} />;
               }
               if (part.type === 'image') {
                 return <LocalImage src={part.image.storageId} />;
@@ -123,7 +80,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
               return `Unknown part type: ${JSON.stringify(part)}`;
             })
         ) : (
-          <MarkdownContent text={props.content} />
+          <Markdown text={props.content} />
         )}
       </div>
       <Show when={props.cancelled}>

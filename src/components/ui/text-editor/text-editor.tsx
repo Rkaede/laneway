@@ -136,3 +136,5 @@ export function TextEditor(props: TextEditorProps) {
     <div data-component="TextEditor" ref={ref} class={props.class} data-mode={props.mode} />
   );
 }
+
+export default TextEditor;
