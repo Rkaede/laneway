@@ -10,7 +10,7 @@ export function GeneralSettings() {
       <Setting
         inline
         title="Generate Titles"
-        description="On the first message, automatically generate a title. This requires an OpenAI API key to be set below. The GPT-3.5 Turbo model is used."
+        description="On the first message, automatically generate a title. The system model specified below is used."
       >
         <SettingControl>
           <Switch
