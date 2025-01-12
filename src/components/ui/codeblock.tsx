@@ -138,6 +138,7 @@ function CodeActionDropdown(props: {
         data-open={open()}
         variant="ghost"
         size="icon"
+        aria-label="Code actions"
       >
         <MoreHorizontalIcon class="size-4" />
       </DropdownMenuTrigger>

@@ -52,7 +52,13 @@ export function StatsPopover(props: StatsPopoverProps) {
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <Button variant="toolbar" size="toolbar" class="cursor-default" as="div">
+        <Button
+          variant="toolbar"
+          size="toolbar"
+          class="cursor-default"
+          as="div"
+          aria-label="View message statistics"
+        >
           <IconChartNoAxesColumn class="size-4" />
         </Button>
       </HoverCardTrigger>

@@ -156,6 +156,7 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
       <div class="absolute bottom-0 right-0 top-0 z-10 flex translate-x-full items-center">
         <button
           type="button"
+          aria-label="Toggle sidebar"
           class="flex items-center justify-center bg-transparent p-0 hover:outline-none"
           onClick={toggleSidebar}
         >
@@ -176,6 +177,7 @@ function SidbarItemDropdown(props: { sessionId?: string }) {
     <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
       <DropdownMenuTrigger
         as={Button}
+        aria-label="Session actions"
         class="flex size-6 items-center justify-center rounded-md p-0 opacity-0 transition-none hover:bg-background-4 group-hover:opacity-100 data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"

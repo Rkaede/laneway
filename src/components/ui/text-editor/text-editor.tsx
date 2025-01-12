@@ -125,5 +125,14 @@ export function TextEditor(props: TextEditorProps) {
     if (editorView()?.hasFocus) clearInterval(timer);
   }, 100);
 
-  return <div ref={ref} class={props.class} data-mode={props.mode} />;
+  // Add this extension for accessibility
+  createExtension(
+    EditorView.contentAttributes.of({
+      'aria-label': 'Chat message input',
+    }),
+  );
+
+  return (
+    <div data-component="TextEditor" ref={ref} class={props.class} data-mode={props.mode} />
+  );
 }

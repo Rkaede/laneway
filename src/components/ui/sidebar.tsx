@@ -6,7 +6,7 @@ import { cn } from '~/util';
 export const SidebarGroup: ParentComponent<SidebarGroupProps> = (props) => {
   return (
     <div class="pb-4">
-      <div class="px-4 py-1 pb-4 text-sm font-semibold text-stone-500">{props.title}</div>
+      <div class="px-4 py-1 pb-4 text-sm font-semibold">{props.title}</div>
       {props.children}
     </div>
   );
@@ -18,22 +18,24 @@ export const SidebarItems: ParentComponent<{ class?: string }> = (props) => {
 
 export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) => {
   return (
-    <a
-      href={props.href}
-      class={cn(
-        'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 text-foreground hover:bg-background-2',
-        props.active && 'bg-background-2 hover:bg-background-3',
-        props.class,
-      )}
-    >
-      <div class="flex flex-1 items-center gap-1 text-sm">
-        <span>{props.icon}</span>
-        <span class="truncate">{props.children}</span>
-      </div>
-      <Show when={props.dropdown}>
-        <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
-      </Show>
-    </a>
+    <li>
+      <a
+        href={props.href}
+        class={cn(
+          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 text-foreground hover:bg-background-2',
+          props.active && 'bg-background-2 hover:bg-background-3',
+          props.class,
+        )}
+      >
+        <div class="flex flex-1 items-center gap-1 text-sm">
+          <span>{props.icon}</span>
+          <span class="truncate">{props.children}</span>
+        </div>
+        <Show when={props.dropdown}>
+          <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
+        </Show>
+      </a>
+    </li>
   );
 };
 
