@@ -15,7 +15,7 @@ type ModelIconProps = {
 export const ModelCard: ParentComponent<ModelIconProps> = (props) => {
   return (
     <HoverCard>
-      <HoverCardTrigger>
+      <HoverCardTrigger href="#">
         <div class="rounded-full border border-transparent p-1 text-foreground hover:bg-muted">
           {props.children}
         </div>

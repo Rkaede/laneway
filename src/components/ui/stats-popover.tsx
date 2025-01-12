@@ -51,7 +51,7 @@ export function StatsPopoverContent(props: StatsPopoverProps) {
 export function StatsPopover(props: StatsPopoverProps) {
   return (
     <HoverCard>
-      <HoverCardTrigger>
+      <HoverCardTrigger href="#">
         <Button
           variant="toolbar"
           size="toolbar"
