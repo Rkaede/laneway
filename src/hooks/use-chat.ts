@@ -3,6 +3,7 @@ import { createEffect, mergeProps, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { useSession } from '~/components/connected/session-context';
+import { getProvider } from '~/services/util';
 import { store } from '~/store';
 import { addMessage, chatError, clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
@@ -32,30 +33,9 @@ export function useChat({ chat }: UseChat) {
     models.find((m) => m.id === chat.modelId);
 
   const provider = () => {
-    const openRouterUsage = store.settings.openRouterUsage;
-    const modelProviders = model()?.provider;
-
-    const primaryProvider = modelProviders?.find((h) => h.primary);
-    const openrouterProvider = modelProviders?.find((h) => h.id === 'openrouter');
-    const isOpenRouterConfigured = !!apiKeys?.openrouter;
-
-    if (openRouterUsage === 'always' && openrouterProvider && isOpenRouterConfigured) {
-      return openrouterProvider;
-    }
-
-    if (openRouterUsage === 'fallback' && primaryProvider) {
-      const primaryProviderId = primaryProvider.id;
-      const isPrimaryApiKeySet = !!apiKeys?.[primaryProviderId];
-
-      if (isPrimaryApiKeySet) {
-        return primaryProvider;
-      }
-      if (openrouterProvider) {
-        return openrouterProvider;
-      }
-    }
-
-    return primaryProvider;
+    const modelId = model()?.id;
+    if (!modelId) return undefined;
+    return getProvider(modelId);
   };
 
   function clearError() {

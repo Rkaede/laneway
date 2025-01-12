@@ -1,6 +1,5 @@
 export const summarizeTitle = `Describe the following conversation snippet in 3 words or less.
 >>>
-Hello
 {{messages}}
 >>>
 `;

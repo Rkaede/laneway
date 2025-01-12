@@ -29,6 +29,8 @@ const router = import('~/services/llm');
 import { setStore, store } from '.';
 export * from './actions/assistants';
 
+import { getProvider } from '~/services/util';
+
 import { models } from './models';
 import { createSessionFromPreset } from './util';
 
@@ -213,15 +215,21 @@ export function renameSession(sessionId: string, title: string) {
 }
 
 export async function autonameChat(sessionId: string, title: string) {
+  console.log('autonameChat', sessionId, title);
+
   // get the session
   const session = store.sessions.find((s) => s.id === sessionId);
   if (!session) return;
 
   const prompt = summarizeTitle.replace('{{messages}}', title);
+
+  const provider = getProvider(store.settings.systemModel);
+
   const llm = await router;
   const response = await llm.getText({
     messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
-    modelId: store.settings.systemModel,
+    modelId: provider?.modelId,
+    provider: provider?.id,
   });
 
   if (!response) return;
