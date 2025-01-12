@@ -8,9 +8,9 @@ import type { MessageProps } from '~/types';
 
 import { createThrottle, formatMessages } from './util';
 
-const openai = createOpenAI({ apiKey: apiKeys?.openai, compatibility: 'strict' });
-const openrouter = createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
-const google = createGoogleGenerativeAI({ apiKey: apiKeys?.google });
+const openai = () => createOpenAI({ apiKey: apiKeys?.openai, compatibility: 'strict' });
+const openrouter = () => createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
+const google = () => createGoogleGenerativeAI({ apiKey: apiKeys?.google });
 
 const services = { openai, openrouter, google };
 
@@ -28,7 +28,10 @@ export async function getStream(
 
   throttle();
 
-  const service = services[provider];
+  // We need to create a new service each time because the API key may change there is probably
+  // a slightly better way to do this but this works for now.
+  const createService = services[provider];
+  const service = createService();
   const formattedMessages = await formatMessages(messages);
 
   return await streamText({
@@ -51,7 +54,8 @@ export async function getText({
 
   throttle();
 
-  const service = services[provider];
+  const createService = services[provider];
+  const service = createService();
   const formattedMessages = await formatMessages(messages);
 
   return await generateText({

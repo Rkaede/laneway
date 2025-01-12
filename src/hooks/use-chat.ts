@@ -12,7 +12,6 @@ import type { ChatProps, MessageProps } from '~/types';
 const router = import('~/services/llm');
 
 type UseChat = {
-  // todo: fix this type
   chat: ChatProps;
 };
 
