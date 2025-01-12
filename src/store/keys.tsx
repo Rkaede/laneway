@@ -10,13 +10,13 @@ type APIKeys = {
 };
 
 const defaultState = {
-  openai: undefined,
-  google: undefined,
-  openrouter: undefined,
+  openai: '',
+  google: '',
+  openrouter: '',
 };
 
 // the warning given by the rule here is not helpful in this case
-// eslint-disable-next-line solid/reactivity
+
 export const [apiKeys, setApiKeys] = makePersisted(createStore<APIKeys>(clone(defaultState)), {
   name: 'laneway-api-keys',
 });
