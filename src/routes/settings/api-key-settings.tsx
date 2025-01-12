@@ -1,6 +1,7 @@
 import {
   Input,
   Select,
+  SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -79,6 +80,7 @@ export function APIKeySetting() {
               {(state) => state.selectedOption().label ?? 'Select option'}
             </SelectValue>
           </SelectTrigger>
+          <SelectContent />
         </Select>
       </Setting>
       <Setting
