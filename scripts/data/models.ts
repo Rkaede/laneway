@@ -104,6 +104,17 @@ const openai: Partial<ModelProps>[] = [
   },
   {
     ...defaults.openai,
+    id: 'openai/gpt-4o-mini',
+    title: 'GPT-4o-mini',
+    provider: [
+      { id: 'openai', modelId: 'gpt-4o-mini', primary: true },
+      { id: 'openrouter', modelId: 'openai/gpt-4o-mini' },
+    ],
+    vision: true,
+    contextWindow: 128000,
+  },
+  {
+    ...defaults.openai,
     id: 'openai/o1-mini',
     title: 'o1-mini',
     provider: [
@@ -204,6 +215,18 @@ const perplexity: Partial<ModelProps>[] = [
       {
         id: 'openrouter',
         modelId: 'perplexity/llama-3.1-sonar-huge-128k-online',
+        primary: true,
+      },
+    ],
+  },
+  {
+    ...defaults.perplexity,
+    id: 'perplexity/llama-3.1-sonar-large-128k-online',
+    title: 'Llama 3.1 Sonar 70B Online',
+    provider: [
+      {
+        id: 'openrouter',
+        modelId: 'perplexity/llama-3.1-sonar-large-128k-online',
         primary: true,
       },
     ],
