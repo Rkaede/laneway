@@ -38,11 +38,11 @@ export const ChatCard: ParentComponent<ChatCardProps> = (props) => {
       onClick={() => local.onClick?.()}
       {...rest}
     >
-      <div>
+      <div class="w-full">
         <div class="flex items-center gap-1">
           {props.sessionType === 'note' && <IconSquarePen class="size-3" stroke-width={2} />}
           {props.sessionType === 'chat' && <IconChat class="size-3" stroke-width={2} />}
-          <div>{local.title}</div>
+          <div class="truncate overflow-hidden flex-1">{local.title}</div>
         </div>
         {local.subtitle && <div class="text-xs text-muted-foreground">{local.subtitle}</div>}
       </div>
