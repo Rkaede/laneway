@@ -14,11 +14,7 @@ export const AppLayout: ParentComponent = (props) => {
   return (
     <main class="flex size-full h-screen">
       <div
-        class="border-border-200 w-[240px] flex-shrink-0 border-r bg-background transition-[margin] duration-300"
-        classList={{
-          'ease-out': store.settings.sidebarOpen,
-          'ease-in': !store.settings.sidebarOpen,
-        }}
+        class="border-border-200 w-[240px] flex-shrink-0 border-r bg-background"
         style={{
           'margin-left': store.settings.sidebarOpen ? 0 : '-240px',
         }}
