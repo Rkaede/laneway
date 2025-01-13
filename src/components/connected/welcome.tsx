@@ -55,7 +55,7 @@ export const WelcomeDialog: Component = () => {
               <div class="mb-4 flex w-full gap-2">
                 <div>
                   <p class="text-left text-sm leading-relaxed text-foreground/90">
-                    Laneway is a full client-side AI chat app.
+                    Laneway is a client-side AI chat app.
                   </p>
                   <ul class="list-inside list-disc text-left text-sm">
                     <li>No middleman - connect directly to AI providers with your API keys.</li>

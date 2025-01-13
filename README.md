@@ -2,18 +2,24 @@
 
 Just another AI chat app 🤷‍♂️
 
+- No middleman - connect directly to AI providers with your API keys.
+- All data is stored locally in your browser for both speed and privacy.
+- Chat with multiple frontier AI models without individual subscriptions, even at the same time!
+
 Head over the [https://laneway.app](https://laneway.app) to use the app directly.
 
-![Laneway Example](https://files.laneway.app/laneway-example.png)
+![Laneway Example](https://files.laneway.app/laneway-main.png)
 
 ## Features
 
 - 💬 Chat with multiple AI models in a single session
+- 🔊 Text-to-speech support for messages
 - 🤖 Create custom assistants
 - 🎭 Chat with multiple assistants at once via a "preset"
-- 🌐 Supports multiple providers (OpenAI, Google, and OpenRouter)
+- 🔌 Supports multiple providers (OpenAI, Google, and OpenRouter)
 - ⌨️ Command palette
 - 🔒 Data stored locally in your browser for privacy & speed
+- 📔 Note sessions for iterating on a single prompt
 
 ## Building and Running Locally
 
