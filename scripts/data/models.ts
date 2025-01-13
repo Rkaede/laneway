@@ -1,5 +1,7 @@
 import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
+// https://openrouter.ai/api/v1/models
+
 async function fetchModels() {
   console.info('Fetching model data from OpenRouter.');
 
@@ -53,6 +55,15 @@ const defaults = {
       id: 'perplexity',
     },
     icon: 'Perplexity',
+  },
+  microsoft: {
+    creator: {
+      name: 'Microsoft',
+      website: 'https://www.microsoft.com/research/',
+      icon: 'Microsoft',
+      id: 'microsoft',
+    },
+    icon: 'Microsoft',
   },
 } as const;
 
@@ -206,6 +217,16 @@ const google: Partial<ModelProps>[] = [
   },
 ];
 
+const microsoft: Partial<ModelProps>[] = [
+  {
+    ...defaults.microsoft,
+    id: 'microsoft/phi-4',
+    title: 'Phi 4',
+    provider: [{ id: 'openrouter', modelId: 'microsoft/phi-4', primary: true }],
+    contextWindow: 16384,
+  },
+];
+
 const perplexity: Partial<ModelProps>[] = [
   {
     ...defaults.perplexity,
@@ -237,6 +258,7 @@ export const modelsBase: Partial<ModelProps>[] = [
   ...openai,
   ...anthropic,
   ...google,
+  ...microsoft,
   ...perplexity,
 ];
 

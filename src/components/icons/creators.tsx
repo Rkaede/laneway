@@ -1,5 +1,7 @@
 import type { SVGAttributes } from '~/types';
 
+// https://github.com/gilbarbara/logos
+
 export function Perplexity(props: SVGAttributes) {
   return (
     <svg
@@ -295,6 +297,29 @@ export function Google(props: SVGAttributes) {
         <path
           d="M130.55,50.479 C155.064,50.479 171.6,61.068 181.029,69.917 L217.873,33.943 C195.245,12.91 165.798,0 130.55,0 C79.49,0 35.393,29.301 13.925,71.947 L56.136,104.73 C66.726,73.253 96.027,50.479 130.55,50.479"
           fill="#EB4335"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function Microsoft(props: SVGAttributes) {
+  return (
+    <svg viewBox="0 0 256 256" version="1.1" {...props}>
+      <title>Microsoft</title>
+      <g>
+        <polygon fill="#F1511B" points="121.666095 121.666095 0 121.666095 0 0 121.666095 0" />
+        <polygon
+          fill="#80CC28"
+          points="256 121.666095 134.335356 121.666095 134.335356 0 256 0"
+        />
+        <polygon
+          fill="#00ADEF"
+          points="121.663194 256.002188 0 256.002188 0 134.336095 121.663194 134.336095"
+        />
+        <polygon
+          fill="#FBBC09"
+          points="256 256.002188 134.335356 256.002188 134.335356 134.336095 256 134.336095"
         />
       </g>
     </svg>
