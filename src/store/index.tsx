@@ -26,6 +26,22 @@ const defaultPreset: PresetProps = {
   ],
 };
 
+const reasoningDuet: PresetProps =  {
+  id: 'reasoning-duet',
+  type: 'chat',
+  presetTitle: 'Duet',
+  presetDescription: 'The small reasoning models',
+  templateId: 'reasoning-duet',
+  chats: [
+    {
+      modelId: 'openai/o1-mini',
+    },
+    {
+      modelId: 'google/gemini-2.0-flash-exp:free',
+    },
+  ],
+};
+
 interface State {
   sessions: SessionProps[];
   chats: ChatProps[];
@@ -99,6 +115,13 @@ function createDefaultState(): State {
         title: 'Compare frontier models',
       },
       {
+        id: 'reasoning-duet-dial',
+        type: 'preset',
+        referenceId: 'reasoning-duet',
+        sessionType: 'chat',
+        title: 'Small reasoning models',
+      },
+      {
         id: 'claude-3.5-sonnet-dial',
         type: 'model',
         referenceId: 'anthropic/claude-3.5-sonnet',
@@ -106,11 +129,25 @@ function createDefaultState(): State {
         title: 'Best of the vibecheck',
       },
       {
-        id: 'o1-mini-dial',
+        id: 'gpt-4o-mini-dial',
         type: 'model',
-        referenceId: 'openai/o1-mini',
-        sessionType: 'note',
-        title: 'Reasoning',
+        referenceId: 'openai/gpt-4o-mini',
+        sessionType: 'chat',
+        title: 'Small & fast',
+      },
+      {
+        id: 'sonar-70b-dial',
+        type: 'model',
+        referenceId: 'perplexity/llama-3.1-sonar-large-128k-online',
+        sessionType: 'chat',
+        title: 'Online model from perplexity',
+      },
+      {
+        id: 'o1-preview-dial',
+        type: 'model',
+        referenceId: 'openai/o1-preview',
+        sessionType: 'chat',
+        title: 'Preview model from openai',
       },
     ],
     dialogs: {
@@ -156,7 +193,7 @@ function createDefaultState(): State {
         showModelTitle: false,
       },
     },
-    presets: [...clone([defaultPreset])],
+    presets: [...clone([defaultPreset, reasoningDuet])],
     assistants: [],
   };
 }

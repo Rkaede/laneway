@@ -20,6 +20,21 @@ export const presets: PresetProps[] = [
     ],
   },
   {
+    id: 'reasoning-duet',
+    type: 'chat',
+    presetTitle: 'Duet',
+    presetDescription: 'The small reasoning models',
+    templateId: 'reasoning-duet',
+    chats: [
+      {
+        modelId: 'openai/o1-mini',
+      },
+      {
+        modelId: 'google/gemini-2.0-flash-exp:free',
+      },
+    ],
+  },
+  {
     id: 'top-models',
     type: 'chat',
     presetTitle: 'Large frontier models',
