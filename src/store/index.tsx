@@ -11,8 +11,6 @@ import type {
   SpeedDialItem,
 } from '~/types';
 
-import { createSessionFromPreset } from './util';
-
 const defaultPreset: PresetProps = {
   id: 'full-house',
   type: 'chat',
@@ -26,7 +24,7 @@ const defaultPreset: PresetProps = {
   ],
 };
 
-const reasoningDuet: PresetProps =  {
+const reasoningDuet: PresetProps = {
   id: 'reasoning-duet',
   type: 'chat',
   presetTitle: 'Duet',
@@ -99,13 +97,23 @@ function clone<T>(obj: T): T {
 // This needs to be a factory function. If we were to use just a variable it would be mutated by
 // the store and resetStore would not work.
 function createDefaultState(): State {
-  const defaultPresetSession = createSessionFromPreset(defaultPreset);
-
   return {
     sessions: [],
     chats: [],
-    draftSession: clone(defaultPresetSession.session),
-    draftChats: clone(defaultPresetSession.chats),
+    draftSession: {
+      id: 'draft',
+      title: 'New Chat',
+      type: 'chat',
+      chats: ['draft-chat'],
+      created: Date.now(),
+    },
+    draftChats: [
+      {
+        id: 'draft-chat',
+        modelId: 'openai/gpt-4o',
+        messages: [],
+      },
+    ],
     speedDial: [
       {
         id: 'full-house-dial',
@@ -173,8 +181,8 @@ function createDefaultState(): State {
         model: 'openai/gpt-4o',
       },
       defaultSession: {
-        type: 'preset',
-        id: 'full-house',
+        type: 'model',
+        id: 'openai/gpt-4o',
       },
       tts: {
         enabled: true,
