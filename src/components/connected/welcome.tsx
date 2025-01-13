@@ -55,7 +55,7 @@ export const WelcomeDialog: Component = () => {
               <div class="mb-4 flex w-full gap-2">
                 <div>
                   <p class="text-left text-sm leading-relaxed text-foreground/90">
-                    Laneway is a client-only AI chat app.
+                    Laneway is a full client-side AI chat app.
                   </p>
                   <ul class="list-inside list-disc text-left text-sm">
                     <li>No middleman - connect directly to AI providers with your API keys.</li>
@@ -71,13 +71,12 @@ export const WelcomeDialog: Component = () => {
               </div>
               <hr class="mb-4" />
               <p class="mb-4 text-lg font-medium text-primary">Configure your API keys</p>
-
-              <div class="mb-4 rounded-xl border-2 border-primary/20 bg-primary/5 p-4 shadow-lg transition-colors hover:border-primary/40">
+              <div class="s mb-4 rounded-xl border-primary/20 bg-primary/5 p-4">
                 <div class="mb-2 flex items-center gap-2">
                   <div class="flex size-8 items-center justify-center rounded-full bg-primary/10">
                     <OpenRouter class="size-5 text-primary" />
                   </div>
-                  <p class="text-base font-semibold">Recommended: OpenRouter API Key</p>
+                  <p class="text-base font-semibold">OpenRouter</p>
                 </div>
                 <p class="mb-2 text-sm text-foreground/80">
                   Access all AI models through a single key. Get one from their{' '}
@@ -107,12 +106,12 @@ export const WelcomeDialog: Component = () => {
                 </p>
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div class="rounded-lg border bg-card p-3 shadow-sm">
+                  <div class="rounded-lg border bg-primary/5 p-3 shadow-sm">
                     <div class="mb-2 flex items-center gap-2">
                       <div class="flex size-6 items-center justify-center rounded-full bg-[#74AA9C]/10">
                         <OpenAI class="size-4 text-[#74AA9C]" />
                       </div>
-                      <p class="text-sm font-medium">OpenAI API Key</p>
+                      <p class="text-sm font-medium">OpenAI</p>
                     </div>
                     <p class="mb-2 text-xs text-muted-foreground">
                       For ChatGPT models. Get a key from{' '}
@@ -136,12 +135,12 @@ export const WelcomeDialog: Component = () => {
                     />
                   </div>
 
-                  <div class="rounded-lg border bg-card p-3 shadow-sm">
+                  <div class="rounded-lg border bg-primary/5 p-3 shadow-sm">
                     <div class="mb-2 flex items-center gap-2">
                       <div class="flex size-6 items-center justify-center rounded-full bg-[#4285F4]/10">
                         <Google class="size-4 text-[#4285F4]" />
                       </div>
-                      <p class="text-sm font-medium">Google API Key</p>
+                      <p class="text-sm font-medium">Google</p>
                     </div>
                     <p class="mb-2 text-xs text-muted-foreground">
                       For Gemini models. Get a key from{' '}
