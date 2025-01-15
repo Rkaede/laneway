@@ -491,7 +491,10 @@ const AssistantList: Component<{
       if (selected) {
         props.setLocalPreset((prev) => ({
           ...prev,
-          chats: [...(prev.chats || []), { assistantId: selected.id, messages: [] }],
+          chats: [
+            ...(prev.chats || []),
+            { assistantId: selected.id, messages: [], status: 'idle' },
+          ],
         }));
       }
     }
@@ -500,7 +503,10 @@ const AssistantList: Component<{
       if (selected) {
         props.setLocalPreset((prev) => ({
           ...prev,
-          chats: [...(prev.chats || []), { modelId: selected.id, messages: [] }],
+          chats: [
+            ...(prev.chats || []),
+            { modelId: selected.id, messages: [], status: 'idle' },
+          ],
         }));
       }
     }

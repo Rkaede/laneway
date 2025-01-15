@@ -15,7 +15,7 @@ import { ImagePart, MessageProps } from '~/types';
 
 import { ChatInput } from '../chat/chat-input';
 import { ChatPanel } from '../chat/chat-panel';
-import { useSession } from '../connected/session-context';
+import { useSession } from '../connected/session-provider';
 import { SpeedDial } from '../connected/speed-dial';
 
 type MultiChatLayoutProps = {

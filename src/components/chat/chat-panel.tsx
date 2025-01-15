@@ -46,13 +46,13 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             </For>
           </Show>
 
-          <Show when={chat.latest}>
+          <Show when={props.chat.latest}>
             {(message) => (
               <Message content={message().content} role="assistant" id={message().id} />
             )}
           </Show>
 
-          <Show when={chat.status === 'loading'}>
+          <Show when={props.chat.status === 'loading'}>
             <div class="flex justify-center">
               <Loader />
             </div>

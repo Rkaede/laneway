@@ -108,6 +108,7 @@ export function newDraftSession({
   setStore('draftChats', [
     {
       id: chatId,
+      status: 'idle',
       created: Date.now(),
       messages: [],
       modelId: type === 'model' ? referenceId : undefined,

@@ -8,6 +8,7 @@ export type MessageProps = {
   id: string;
   role: 'user' | 'assistant' | 'system' | 'tool';
   content: Array<ImagePart | TextPart> | string;
+  status?: 'idle' | 'loading' | 'error' | 'canceled';
   cancelled?: boolean;
   model?: ModelProps;
   usage?: {
@@ -95,6 +96,10 @@ export type AssistantProps = {
 export type ChatProps = {
   id: string;
   messages: MessageProps[];
+  latest?: MessageProps | undefined;
+  status: 'idle' | 'loading' | 'error' | 'canceled';
+  sessionId?: string;
+  controller?: AbortController;
   created?: number;
   assistantId?: string;
   modelId?: string;
@@ -102,7 +107,6 @@ export type ChatProps = {
     name: string;
     message: string;
   };
-  fetching?: boolean;
 };
 
 export type SessionType = 'chat' | 'note';

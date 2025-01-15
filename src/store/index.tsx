@@ -18,9 +18,9 @@ const defaultPreset: PresetProps = {
   presetDescription: 'Compare frontier models.',
   templateId: 'full-house',
   chats: [
-    { modelId: 'openai/gpt-4o' },
-    { modelId: 'anthropic/claude-3.5-sonnet' },
-    { modelId: 'google/gemini-pro-1.5' },
+    { modelId: 'openai/gpt-4o', status: 'idle' },
+    { modelId: 'anthropic/claude-3.5-sonnet', status: 'idle' },
+    { modelId: 'google/gemini-pro-1.5', status: 'idle' },
   ],
 };
 
@@ -33,9 +33,11 @@ const reasoningDuet: PresetProps = {
   chats: [
     {
       modelId: 'openai/o1-mini',
+      status: 'idle',
     },
     {
       modelId: 'google/gemini-2.0-flash-exp:free',
+      status: 'idle',
     },
   ],
 };
@@ -111,6 +113,7 @@ function createDefaultState(): State {
       {
         id: 'draft-chat',
         modelId: 'openai/gpt-4o',
+        status: 'idle',
         messages: [],
       },
     ],

@@ -136,7 +136,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
               class="absolute bottom-0 right-0 m-1.5 mb-[5px] size-7 rounded-full bg-foreground text-background transition-transform hover:scale-110"
               onClick={props.onCancel}
             >
-              <IconSquare class="size-4" fill="currentColor" />
+              <IconSquare class="size-3" fill="currentColor" />
               <span class="sr-only">Stop</span>
             </Button>
           </Show>

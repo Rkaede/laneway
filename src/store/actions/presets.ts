@@ -51,7 +51,7 @@ export function addAssistantToPreset(presetId: string, assistantId: string) {
     'presets',
     (p) => p.id === presetId,
     'chats',
-    (chats) => [...chats, { assistantId }],
+    (chats) => [...chats, { assistantId, status: 'idle' as const }],
   );
 }
 

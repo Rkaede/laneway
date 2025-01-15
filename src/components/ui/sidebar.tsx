@@ -1,7 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { type JSX, type ParentComponent, Show } from 'solid-js';
 
+import { store } from '~/store';
 import { cn } from '~/util';
+
+import { IconLoaderCircle } from '../icons/ui';
 
 export const SidebarGroup: ParentComponent<SidebarGroupProps> = (props) => {
   return (
@@ -17,6 +20,14 @@ export const SidebarItems: ParentComponent<{ class?: string }> = (props) => {
 };
 
 export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) => {
+  const session = () => store.sessions.find((s) => s.id === props.sessionId);
+
+  // todo: there is a more efficient way to do this
+  const isLoading = () =>
+    store.chats
+      .filter((c) => session()?.chats.includes(c.id))
+      .some((c) => c.status === 'loading');
+
   return (
     <li>
       <a
@@ -32,7 +43,12 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
           <span>{props.icon}</span>
           <span class="truncate">{props.children}</span>
         </div>
-        <Show when={props.dropdown}>
+        <Show when={isLoading()}>
+          <div class="flex h-6 flex-shrink-0 items-center">
+            <IconLoaderCircle class="size-4 animate-spin" />
+          </div>
+        </Show>
+        <Show when={props.dropdown && !isLoading()}>
           <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
         </Show>
       </a>
