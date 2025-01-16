@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun scripts/generate-data.ts && bunx --bun vite",
+    "dev": "NODE_ENV=development bun scripts/generate-data.ts && bunx --bun vite",
     "build": "bun scripts/generate-data.ts && tsc && vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
@@ -28,6 +28,7 @@
     "codemirror-extension-inline-suggestion": "^0.0.3",
     "dequal": "^2.0.3",
     "html-to-image": "^1.11.11",
+    "motion": "^11.18.0",
     "nanoid": "^5.0.7",
     "solid-codemirror": "^2.3.1",
     "solid-js": "^1.8.15",

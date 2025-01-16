@@ -10,8 +10,10 @@ import * as MessageStories from './message.stories';
 import * as MultiComboboxStories from './multi-combobox.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
+import * as UseAnimatedText from './use-animated-text.stories';
 
 const stories = [
+  { title: 'useAnimatedText', stories: UseAnimatedText, noTheme: true },
   { title: 'MultiCombobox', stories: MultiComboboxStories },
   { title: 'CodeBlock', stories: CodeblockStories },
   { title: 'ChatInput', stories: ChatInputStories },
@@ -39,20 +41,28 @@ export default function Sandbox() {
                       <div>
                         <h3 class="text-lg font-semibold">{name}</h3>
                         <div class="flex flex-wrap gap-4">
-                          <div>
-                            <ThemeProvider theme="light">
-                              <Story>
-                                <Component />
-                              </Story>
-                            </ThemeProvider>
-                          </div>
-                          <div>
-                            <ThemeProvider theme="dark">
-                              <Story>
-                                <Component />
-                              </Story>
-                            </ThemeProvider>
-                          </div>
+                          {story.noTheme ? (
+                            <Story>
+                              <Component />
+                            </Story>
+                          ) : (
+                            <>
+                              <div>
+                                <ThemeProvider theme="light">
+                                  <Story>
+                                    <Component />
+                                  </Story>
+                                </ThemeProvider>
+                              </div>
+                              <div>
+                                <ThemeProvider theme="dark">
+                                  <Story>
+                                    <Component />
+                                  </Story>
+                                </ThemeProvider>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

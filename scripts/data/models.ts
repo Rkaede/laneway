@@ -1,5 +1,6 @@
 import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
 // https://openrouter.ai/api/v1/models
 
 async function fetchModels() {
@@ -11,7 +12,6 @@ async function fetchModels() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log('Fetched model data from OpenRouter.');
 
     return data;
   } catch (error) {
@@ -262,9 +262,41 @@ export const modelsBase: Partial<ModelProps>[] = [
   ...perplexity,
 ];
 
+if (isDevelopment) {
+  modelsBase.push({
+    ...defaults.openai,
+    id: 'aperture/glados',
+    title: 'GLaDOS',
+    provider: [{ id: 'openrouter', modelId: 'aperture/glados', primary: true }],
+  });
+}
+
 export const generateModels = async () => {
   const base = await fetchModels();
   const results = modelsBase.map((model) => {
+    if (model.id === 'aperture/glados') {
+      return {
+        ...model,
+        architecture: {
+          modality: 'text->text',
+          tokenizer: 'standard-tokenizer',
+          instruct_type: null,
+        },
+        created: 1011079824, // Feb 1, 2024
+        description: 'A sarcastic and passive-aggressive AI assistant from Aperture Science.',
+        contextLength: 16384,
+        maxCompletionTokens: 4096,
+        tags: ['New', 'Free'],
+        pricing: {
+          prompt: 0,
+          completion: 0,
+          image: 0,
+          request: 0,
+        },
+        vision: false,
+      };
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
     if (!routerModel) return model;

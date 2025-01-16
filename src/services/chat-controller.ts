@@ -43,6 +43,7 @@ export async function append({
     setStore('chats', (c) => c.id === chatId, 'controller', controller);
 
     const stream = await streamFn(controller.signal);
+
     if (!stream) return;
     let latestContent = '';
 

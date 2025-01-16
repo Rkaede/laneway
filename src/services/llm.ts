@@ -6,6 +6,7 @@ import { OPENROUTER_URL } from '~/constants';
 import { apiKeys } from '~/store/keys';
 import type { MessageProps } from '~/types';
 
+import { mockStream } from './llm-mock';
 import { createThrottle, formatMessages } from './util';
 
 const openai = () => createOpenAI({ apiKey: apiKeys?.openai, compatibility: 'strict' });
@@ -27,6 +28,10 @@ export async function getStream(
   if (!provider || !modelId) return;
 
   throttle();
+
+  if (modelId === 'aperture/glados') {
+    return mockStream({ abortSignal: options?.abortSignal });
+  }
 
   // We need to create a new service each time because the API key may change there is probably
   // a slightly better way to do this but this works for now.

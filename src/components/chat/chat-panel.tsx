@@ -2,9 +2,10 @@ import { useNavigate } from '@solidjs/router';
 import { type Component, For, Show } from 'solid-js';
 
 import { Loader } from '~/components/ui';
+import { createAnimatedText } from '~/hooks/create-animated-text';
 import { useChat } from '~/hooks/use-chat';
 import { store } from '~/store';
-import type { ChatProps } from '~/types';
+import type { ChatProps, MessageProps } from '~/types';
 
 import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './components';
 
@@ -48,7 +49,9 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
 
           <Show when={props.chat.latest}>
             {(message) => (
-              <Message content={message().content} role="assistant" id={message().id} />
+              <IncomingMessage message={message()} />
+
+              // <Message content={message().content} role="assistant" id={message().id} />
             )}
           </Show>
 
@@ -76,3 +79,10 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
     </div>
   );
 };
+
+function IncomingMessage(props: { message: MessageProps }) {
+  const text = createAnimatedText(() => props.message.content as string, {
+    type: 'character',
+  });
+  return <Message content={text.animatedText()} role="assistant" id={props.message.id} />;
+}
