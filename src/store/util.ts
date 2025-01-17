@@ -9,6 +9,7 @@ export function createSessionFromPreset(preset: PresetProps) {
     id: nanoid(),
     created: Date.now(),
     messages: [],
+    status: 'idle',
   }));
   const session: SessionProps = {
     ...clone(preset),

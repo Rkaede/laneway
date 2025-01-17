@@ -45,6 +45,7 @@ function createSessionFromDraft() {
     ...chat,
     id: nanoid(),
     created: Date.now(),
+    status: chat.status as 'idle' | 'error' | 'loading' | 'canceled',
   }));
 
   const session: SessionProps = {
@@ -216,8 +217,6 @@ export function renameSession(sessionId: string, title: string) {
 }
 
 export async function autonameChat(sessionId: string, title: string) {
-  console.log('autonameChat', sessionId, title);
-
   // get the session
   const session = store.sessions.find((s) => s.id === sessionId);
   if (!session) return;
