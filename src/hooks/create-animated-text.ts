@@ -1,4 +1,4 @@
-import { animate } from 'motion'; // Assuming you're using popmotion for animation
+import { animate } from 'motion';
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 
 interface UseAnimatedTextOptions {
@@ -24,6 +24,8 @@ export function createAnimatedText(text: () => string, options: UseAnimatedTextO
 
   const splitTextByMode = (text: string, mode: 'character' | 'word'): string[] => {
     if (mode === 'word') {
+      // split(/(\s+)/) captures all whitespace (\s = space/tab/newline) as groups
+      // vs split(' ') which only splits on single spaces and discards them
       return text.split(/(\s+)/).filter(Boolean);
     }
     return text.split('');

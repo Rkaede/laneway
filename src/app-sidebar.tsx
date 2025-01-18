@@ -50,6 +50,7 @@ function SessionGroup(props: {
   activeSession?: string;
 }) {
   const location = useLocation();
+  const loadingSessions = () => store.chats.filter((c) => c.controller).map((c) => c.sessionId);
 
   return (
     <Show when={!(props.sessions.length === 0)}>
@@ -60,6 +61,7 @@ function SessionGroup(props: {
               const active = () => location.pathname.endsWith(`/${session.id}`);
               return (
                 <SidebarLinkItem
+                  isLoading={loadingSessions().includes(session.id)}
                   href={`/session/${session.id}`}
                   active={active()}
                   sessionId={session.id}

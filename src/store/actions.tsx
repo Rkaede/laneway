@@ -41,16 +41,18 @@ export function addMessage(chatId: string, message: MessageProps) {
 }
 
 function createSessionFromDraft() {
+  const sessionId = nanoid();
   const chats = store.draftChats.map((chat) => ({
     ...chat,
     id: nanoid(),
     created: Date.now(),
+    sessionId,
     status: chat.status as 'idle' | 'error' | 'loading' | 'canceled',
   }));
 
   const session: SessionProps = {
     ...store.draftSession,
-    id: nanoid(),
+    id: sessionId,
     created: Date.now(),
     chats: chats.map((c) => c.id),
   };

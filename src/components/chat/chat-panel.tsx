@@ -82,7 +82,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
 
 function IncomingMessage(props: { message: MessageProps }) {
   const text = createAnimatedText(() => props.message.content as string, {
-    type: 'character',
+    type: 'word',
   });
   return <Message content={text.animatedText()} role="assistant" id={props.message.id} />;
 }
