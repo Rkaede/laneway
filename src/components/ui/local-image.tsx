@@ -7,6 +7,7 @@ interface ImageProps {
   src: string;
   alt?: string;
   class?: string;
+  sourceType?: 'store' | 'path';
 }
 
 export function LocalImage(props: ImageProps) {
@@ -14,6 +15,10 @@ export function LocalImage(props: ImageProps) {
   const [available, setAvailable] = createSignal(true);
 
   onMount(async () => {
+    if (props.sourceType === 'path') {
+      setImageSrc(props.src);
+      return;
+    }
     const cachedImage = await imageCache.get('/' + props.src);
 
     if (cachedImage) {
@@ -40,7 +45,7 @@ export function LocalImage(props: ImageProps) {
       <img
         src={imageSrc() || ''}
         alt={props.alt}
-        class={cn('w-full max-w-64 rounded-lg shadow-sm', props.class)}
+        class={cn('mt-4 w-full max-w-64 rounded-lg shadow-sm', props.class)}
       />
     </Show>
   );

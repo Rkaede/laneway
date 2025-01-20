@@ -52,18 +52,23 @@ export function groupByDate(sessions: SessionProps[]) {
     yesterday: [],
     last7Days: [],
     older: [],
+    examples: [],
   };
 
   for (const session of sessions) {
-    const objDate = new Date(session.created);
-    if (objDate.toDateString() === today.toDateString()) {
-      groupedObjects.today.push(session);
-    } else if (objDate.toDateString() === yesterday.toDateString()) {
-      groupedObjects.yesterday.push(session);
-    } else if (objDate > lastWeek) {
-      groupedObjects.last7Days.push(session);
+    if (session.created === -1) {
+      groupedObjects.examples.push(session);
     } else {
-      groupedObjects.older.push(session);
+      const objDate = new Date(session.created);
+      if (objDate.toDateString() === today.toDateString()) {
+        groupedObjects.today.push(session);
+      } else if (objDate.toDateString() === yesterday.toDateString()) {
+        groupedObjects.yesterday.push(session);
+      } else if (objDate > lastWeek) {
+        groupedObjects.last7Days.push(session);
+      } else {
+        groupedObjects.older.push(session);
+      }
     }
   }
 

@@ -75,7 +75,9 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
                 return <Markdown text={part.text} />;
               }
               if (part.type === 'image') {
-                return <LocalImage src={part.image.storageId} />;
+                return (
+                  <LocalImage src={part.image.storageId} sourceType={part.image.sourceType} />
+                );
               }
               return `Unknown part type: ${JSON.stringify(part)}`;
             })

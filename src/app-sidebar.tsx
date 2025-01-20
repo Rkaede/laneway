@@ -40,6 +40,7 @@ const groupTitles = {
   yesterday: 'Yesterday',
   last7Days: 'Last 7 Days',
   older: 'Older',
+  examples: 'Examples',
 };
 
 type GroupTitle = keyof typeof groupTitles;

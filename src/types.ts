@@ -2,7 +2,14 @@ import type { Navigator, Params } from '@solidjs/router';
 import type { Component, JSX } from 'solid-js';
 
 export type TextPart = { type: 'text'; text: string };
-export type ImagePart = { type: 'image'; image: { filename: string; storageId: string } };
+export type ImagePart = {
+  type: 'image';
+  image: {
+    sourceType?: 'store' | 'path';
+    filename: string;
+    storageId: string;
+  };
+};
 
 export type MessageProps = {
   id: string;

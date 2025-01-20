@@ -36,7 +36,7 @@ export function Session() {
 
   return (
     <Show
-      when={anyKeysSet() && apiKeys.hasCompletedWelcome}
+      when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || activeSession().created === -1}
       fallback={
         <WelcomeContent
           openRouterKey={() => ''}
@@ -49,7 +49,7 @@ export function Session() {
       }
     >
       <Show when={activeSession()}>
-        <SessionProvider sessionId={params.id}>
+        <SessionProvider sessionId={params.id} session={activeSession()}>
           <Show
             when={activeSession()?.type === 'note'}
             fallback={<MultiChatLayout sessionId={params.id} />}

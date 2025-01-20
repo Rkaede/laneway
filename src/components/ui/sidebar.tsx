@@ -8,7 +8,7 @@ import { IconLoaderCircle } from '../icons/ui';
 export const SidebarGroup: ParentComponent<SidebarGroupProps> = (props) => {
   return (
     <div class="pb-4">
-      <div class="px-4 py-1 pb-4 text-sm font-semibold">{props.title}</div>
+      <div class="px-4 py-1 pb-1 text-sm font-semibold">{props.title}</div>
       {props.children}
     </div>
   );

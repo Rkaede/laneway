@@ -2,6 +2,7 @@ import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import { imageCache } from '~/services/image-cache';
+import * as examples from '~/store/examples';
 import type {
   AssistantProps,
   ChatProps,
@@ -100,8 +101,8 @@ function clone<T>(obj: T): T {
 // the store and resetStore would not work.
 function createDefaultState(): State {
   return {
-    sessions: [],
-    chats: [],
+    sessions: [examples.story.session, examples.imageAttachment.session],
+    chats: [...examples.story.chats, ...examples.imageAttachment.chats],
     draftSession: {
       id: 'draft',
       title: 'New Chat',
@@ -208,8 +209,6 @@ function createDefaultState(): State {
     assistants: [],
   };
 }
-
-// the warning given by the rule here is not helpful in this case
 
 export const [store, setStore] = makePersisted(createStore(createDefaultState()), {
   name: 'chat-store',

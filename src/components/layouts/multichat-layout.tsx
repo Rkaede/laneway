@@ -114,6 +114,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
                       sessionId={s().id}
                       onChangeAssistant={(id) => setAssistant(id, chat.id)}
                       attachments={attachments()}
+                      isExample={s().created === -1}
                     />
                   );
                 }}

@@ -15,6 +15,7 @@ type ChatPanelProps = {
   onChangeAssistant?: (id: string) => void;
   attachments?: File[];
   variant?: 'chat' | 'note';
+  isExample?: boolean;
 };
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
@@ -48,11 +49,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           </Show>
 
           <Show when={props.chat.latest}>
-            {(message) => (
-              <IncomingMessage message={message()} />
-
-              // <Message content={message().content} role="assistant" id={message().id} />
-            )}
+            {(message) => <IncomingMessage message={message()} />}
           </Show>
 
           <Show when={props.chat.status === 'loading'}>
@@ -67,7 +64,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             <AlertNoVision />
           </Show>
 
-          <Show when={!chat.isApiKeyConfigured()}>
+          <Show when={!chat.isApiKeyConfigured() && props.isExample !== true}>
             <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
           </Show>
 
