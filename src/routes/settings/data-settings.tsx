@@ -33,7 +33,7 @@ export function Data() {
       <Setting inline title="Export Data" description="Backup all your data to a file.">
         <div class="flex justify-end">
           <Button
-            variant="default"
+            variant="outline"
             onClick={() => download(JSON.stringify(store), 'chat-data.json')}
           >
             Export Data

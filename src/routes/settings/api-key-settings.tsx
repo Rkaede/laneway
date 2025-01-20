@@ -31,14 +31,15 @@ export function APIKeySetting() {
     <Section
       title="API Keys"
       description="Keys are stored locally in your browser and are used to connect to the providers API."
+      anchor="api-keys"
     >
       <Setting
         title="OpenRouter"
         description={
           <>
-            <p>
-              Open router bridges AI providers like OpenAI, Anthropic, and Google. Required for
-              Anthropic & Llama models.
+            <p class="mb-1">
+              Openrouter is a gateway to multiple AI providers like OpenAI, Anthropic, and
+              Google. Required for Anthropic & Llama models.
             </p>
             <p>
               You can get a key from the{' '}
@@ -52,7 +53,6 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="Enter your OpenRouter API key..."
           autocomplete="off"
           type="password"
           value={apiKeys?.openrouter ?? ''}
@@ -87,7 +87,7 @@ export function APIKeySetting() {
         title="OpenAI"
         description={
           <>
-            Used for the ChatGPT models. You can get a key from the{' '}
+            Used for the ChatGPT models and TTS. You can get a key from the{' '}
             <a
               href="https://platform.openai.com/api-keys"
               target="_blank"
@@ -101,7 +101,6 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="Enter your OpenAI API key..."
           autocomplete="off"
           type="password"
           value={apiKeys?.openai ?? ''}
@@ -127,7 +126,6 @@ export function APIKeySetting() {
       >
         <Input
           data-1p-ignore // disable 1Password extension
-          placeholder="Enter your Google API key..."
           autocomplete="off"
           type="password"
           value={apiKeys?.google ?? ''}

@@ -1,11 +1,10 @@
-import { createEffect,type ParentComponent } from 'solid-js';
+import { createEffect, type ParentComponent } from 'solid-js';
 
 import { AppSidebar } from '~/app-sidebar';
 import { store } from '~/store';
 
 import { CommandMenu } from './command-menu';
 import About from './components/connected/about';
-import { WelcomeDialog } from './components/connected/welcome';
 
 export const AppLayout: ParentComponent = (props) => {
   createEffect(() => {
@@ -23,7 +22,6 @@ export const AppLayout: ParentComponent = (props) => {
       </div>
       <div class="max-w-full flex-1">{props.children}</div>
       <CommandMenu />
-      <WelcomeDialog />
       <About />
     </main>
   );

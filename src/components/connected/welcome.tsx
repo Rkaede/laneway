@@ -1,186 +1,121 @@
-import { type Component, createSignal } from 'solid-js';
+import { type Component, createSignal, Show } from 'solid-js';
 
 import { Button } from '~/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { setStore, store } from '~/store';
-import { apiKeys, setApiKeys } from '~/store/keys';
+import { APIKeySetting } from '~/routes/settings/api-key-settings';
+import { setApiKeys } from '~/store/keys';
+import { anyKeysSet } from '~/store/selectors';
 
-import { Google, OpenAI, OpenRouter } from '../icons/creators';
+import { IconArrowLeft, IconCircleCheck, IconGithub, IconKey } from '../icons/ui';
 
-export const WelcomeDialog: Component = () => {
-  const [openRouterKey, setOpenRouterKey] = createSignal('');
-  const [openAIKey, setOpenAIKey] = createSignal('');
-  const [googleKey, setGoogleKey] = createSignal('');
+function BulletPoint(props: { description: string; title?: string }) {
+  return (
+    <li>
+      <div class="grid grid-cols-[auto_1fr] items-center gap-x-1">
+        <IconCircleCheck class="size-4 text-green-500" />
+        <span class="shrink-0 font-bold">{props.title}</span>
+        <div />
+        <div class="mb-3">{props.description}</div>
+      </div>
+    </li>
+  );
+}
+
+export const WelcomeContent: Component<{
+  openRouterKey: () => string;
+  openAIKey: () => string;
+  googleKey: () => string;
+  setOpenRouterKey: (value: string) => void;
+  setOpenAIKey: (value: string) => void;
+  setGoogleKey: (value: string) => void;
+}> = () => {
+  const [showKeys, setShowKeys] = createSignal(false);
 
   const handleGetStarted = () => {
-    if (openRouterKey()) {
-      setApiKeys('openrouter', openRouterKey());
-    }
-    if (openAIKey()) {
-      setApiKeys('openai', openAIKey());
-    }
-    if (googleKey()) {
-      setApiKeys('google', googleKey());
-    }
-    closeDialog();
+    setApiKeys('hasCompletedWelcome', true);
   };
 
-  function closeDialog() {
-    setStore('settings', 'hasSeenWelcome', true);
+  function handleAddKeys() {
+    setShowKeys(true);
   }
 
-  const anyKeysSet = () => {
-    return !!apiKeys?.openai || !!apiKeys?.google || !!apiKeys?.openrouter;
-  };
-
   return (
-    <Dialog open={!anyKeysSet() && !store.settings.hasSeenWelcome}>
-      <DialogContent class="bg-gradient-to-br from-background to-background/80 backdrop-blur-sm sm:max-w-[800px]">
-        <DialogHeader class="mx-auto text-center">
-          <DialogTitle class="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-2xl font-bold">
-            Welcome to Laneway 👋
-          </DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          <div class="flex flex-col gap-4">
-            <div class="mx-auto w-full max-w-2xl">
-              <div class="mb-4 flex w-full gap-2">
-                <div>
-                  <p class="text-left text-sm leading-relaxed text-foreground/90">
-                    Laneway is a client-side AI chat app.
-                  </p>
-                  <ul class="list-inside list-disc text-left text-sm">
-                    <li>No middleman - connect directly to AI providers with your API keys.</li>
-                    <li>
-                      All data is stored locally in your browser for both speed and privacy.
-                    </li>
-                    <li>
-                      Chat with multiple frontier AI models without individual subscriptions,
-                      even at the same time!
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <hr class="mb-4" />
-              <p class="mb-4 text-lg font-medium text-primary">Configure your API keys</p>
-              <div class="s mb-4 rounded-xl border-primary/20 bg-primary/5 p-4">
-                <div class="mb-2 flex items-center gap-2">
-                  <div class="flex size-8 items-center justify-center rounded-full bg-primary/10">
-                    <OpenRouter class="size-5 text-primary" />
-                  </div>
-                  <p class="text-base font-semibold">OpenRouter</p>
-                </div>
-                <p class="mb-2 text-sm text-foreground/80">
-                  Access all AI models through a single key. Get one from their{' '}
-                  <a
-                    href="https://openrouter.ai/keys"
+    <div class="mt-16 flex flex-col gap-4">
+      <div class="mx-auto w-full max-w-2xl">
+        <div class="mb-4 flex w-full gap-2">
+          <div class="w-full">
+            <h1 class="text-5xl font-black">Laneway</h1>
+            <p class="-mt-1.5 mb-4">A local-first AI chat app.</p>
+
+            <div class="overflow-visible">
+              <Show when={showKeys() === false}>
+                <ul class="mb-4 flex flex-col gap-1" id="intro">
+                  <BulletPoint
+                    title="Local & Secure"
+                    description="All application data is stored locally in your browser."
+                  />
+                  <BulletPoint
+                    title="Direct Connection"
+                    description="Use your own API keys to chat with major AI providers."
+                  />
+                  <BulletPoint
+                    title="Frontier Models"
+                    description="Access frontier models without juggling multiple subscriptions."
+                  />
+                  <BulletPoint
+                    title="Cost-Effective"
+                    description="General usage costs less than an OpenAI subscription."
+                  />
+                  <BulletPoint
+                    title="Multi-Model Chats"
+                    description="Interact with and compare multiple AI models side by side."
+                  />
+                  <BulletPoint
+                    title="Powerful Extras"
+                    description="Attachments, TTS, model profiles, and multichat presets and more."
+                  />
+                  <BulletPoint
+                    title="Free & Open Source"
+                    description="No paid plans, analytics, or annoying funnels & upselling."
+                  />
+                </ul>
+                <div class="mb-4 flex justify-start gap-2">
+                  <Button
+                    variant="outline"
+                    as="a"
+                    href="https://github.com/Rkaede/laneway"
                     target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-primary hover:underline"
                   >
-                    keys page
-                  </a>
-                  .
-                </p>
-                <Input
-                  data-1p-ignore
-                  placeholder="Enter your OpenRouter API key"
-                  type="password"
-                  value={openRouterKey()}
-                  onInput={(e) => setOpenRouterKey(e.currentTarget.value)}
-                  class="bg-background/50"
-                />
-              </div>
-
-              <div class="space-y-4">
-                <p class="text-xs font-medium text-muted-foreground">
-                  Or configure individual provider keys:
-                </p>
-
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div class="rounded-lg border bg-primary/5 p-3 shadow-sm">
-                    <div class="mb-2 flex items-center gap-2">
-                      <div class="flex size-6 items-center justify-center rounded-full bg-[#74AA9C]/10">
-                        <OpenAI class="size-4 text-[#74AA9C]" />
-                      </div>
-                      <p class="text-sm font-medium">OpenAI</p>
-                    </div>
-                    <p class="mb-2 text-xs text-muted-foreground">
-                      For ChatGPT models. Get a key from{' '}
-                      <a
-                        href="https://platform.openai.com/api-keys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-primary hover:underline"
-                      >
-                        OpenAI
-                      </a>
-                      .
-                    </p>
-                    <Input
-                      data-1p-ignore
-                      placeholder="Enter your OpenAI API key"
-                      type="password"
-                      value={openAIKey()}
-                      onInput={(e) => setOpenAIKey(e.currentTarget.value)}
-                      class="bg-background/50"
-                    />
+                    <IconGithub class="mr-2 size-4" />
+                    View on Github
+                  </Button>
+                  <Button onClick={handleAddKeys}>
+                    <IconKey class="mr-2 size-4" />
+                    Enter API Keys
+                  </Button>
+                </div>
+              </Show>
+              <Show when={showKeys()}>
+                <div class="mb-4 flex justify-end gap-2">
+                  <APIKeySetting />
+                </div>
+                <div class="flex justify-between">
+                  <div>
+                    <Button variant="outline" onClick={() => setShowKeys(!showKeys())}>
+                      <IconArrowLeft class="mr-2 size-4" />
+                      Back
+                    </Button>
                   </div>
-
-                  <div class="rounded-lg border bg-primary/5 p-3 shadow-sm">
-                    <div class="mb-2 flex items-center gap-2">
-                      <div class="flex size-6 items-center justify-center rounded-full bg-[#4285F4]/10">
-                        <Google class="size-4 text-[#4285F4]" />
-                      </div>
-                      <p class="text-sm font-medium">Google</p>
-                    </div>
-                    <p class="mb-2 text-xs text-muted-foreground">
-                      For Gemini models. Get a key from{' '}
-                      <a
-                        href="https://aistudio.google.com/app/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-primary hover:underline"
-                      >
-                        Google AI Studio
-                      </a>
-                      .
-                    </p>
-                    <Input
-                      data-1p-ignore
-                      placeholder="Enter your Google API key"
-                      type="password"
-                      value={googleKey()}
-                      onInput={(e) => setGoogleKey(e.currentTarget.value)}
-                      class="bg-background/50"
-                    />
+                  <div class="mb-4 flex justify-end gap-2">
+                    <Button onClick={handleGetStarted} disabled={!anyKeysSet()}>
+                      Save & Get Started
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </Show>
             </div>
           </div>
-        </DialogDescription>
-        <DialogFooter class="mt-4 gap-3 sm:justify-center">
-          <Button variant="outline" onClick={handleGetStarted} class="min-w-[100px]">
-            Later
-          </Button>
-          <Button
-            onClick={handleGetStarted}
-            disabled={!openRouterKey() && !openAIKey() && !googleKey()}
-            class="min-w-[100px] bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
-          >
-            Get Started
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 };

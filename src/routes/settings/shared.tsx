@@ -13,13 +13,14 @@ import {
 type SectionProps = {
   title?: JSX.Element;
   description?: JSX.Element;
+  anchor?: string;
 };
 
 export const Section: ParentComponent<SectionProps> = (props) => {
   return (
     <form class="container mx-auto flex flex-col gap-1">
       <div class="pb-2 pl-2">
-        <SectionTitle>{props.title}</SectionTitle>
+        <SectionTitle id={props.anchor}>{props.title}</SectionTitle>
         <SectionDescription>{props.description}</SectionDescription>
       </div>
       <SectionContent>{props.children}</SectionContent>

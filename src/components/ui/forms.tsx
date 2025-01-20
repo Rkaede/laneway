@@ -6,9 +6,9 @@ export const PageTitle: ParentComponent = (props) => {
   return <h1 class="mb-0.5 text-3xl">{props.children}</h1>;
 };
 
-export const SectionTitle: ParentComponent = (props) => {
+export const SectionTitle: ParentComponent<{ id?: string }> = (props) => {
   return (
-    <h2 data-component="SectionTitle" class="flex items-baseline gap-2 text-2xl">
+    <h2 data-component="SectionTitle" class="flex items-baseline gap-2 text-2xl" id={props.id}>
       {props.children}
     </h2>
   );

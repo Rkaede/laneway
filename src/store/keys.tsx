@@ -7,12 +7,14 @@ type APIKeys = {
   openai?: string;
   google?: string;
   openrouter?: string;
+  hasCompletedWelcome?: boolean;
 };
 
 const defaultState = {
   openai: '',
   google: '',
   openrouter: '',
+  hasCompletedWelcome: false,
 };
 
 // the warning given by the rule here is not helpful in this case

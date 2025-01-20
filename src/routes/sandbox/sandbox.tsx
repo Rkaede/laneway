@@ -6,6 +6,7 @@ import * as AudioButtonStories from './audio-button.stories';
 import * as ButtonStories from './button.stories';
 import * as ChatInputStories from './chat-input.stories';
 import * as CodeblockStories from './codeblock.stories';
+import * as IconStories from './icons.stories';
 import * as MessageStories from './message.stories';
 import * as MultiComboboxStories from './multi-combobox.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
@@ -13,6 +14,7 @@ import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
 const stories = [
+  { title: 'Icons', stories: IconStories, noTheme: true },
   { title: 'useAnimatedText', stories: UseAnimatedText, noTheme: true },
   { title: 'MultiCombobox', stories: MultiComboboxStories },
   { title: 'CodeBlock', stories: CodeblockStories },
