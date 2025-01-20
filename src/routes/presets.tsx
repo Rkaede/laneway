@@ -125,7 +125,11 @@ export default function Presets() {
           />
         </div>
         <div class="flex gap-2">
-          <Button onClick={() => setIsGalleryOpen(true)} class="whitespace-nowrap">
+          <Button
+            variant="outline"
+            onClick={() => setIsGalleryOpen(true)}
+            class="whitespace-nowrap"
+          >
             <IconGallery class="mr-2 h-5 w-5" />
             Preset Library
           </Button>

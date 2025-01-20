@@ -2,10 +2,13 @@ import { useParams, useSearchParams } from '@solidjs/router';
 import { createEffect, Show } from 'solid-js';
 
 import { SessionProvider } from '~/components/connected/session-provider';
+import { WelcomeContent } from '~/components/connected/welcome';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
 import { store } from '~/store';
 import { newDraftSession } from '~/store/actions';
+import { apiKeys } from '~/store/keys';
+import { anyKeysSet } from '~/store/selectors';
 
 export function Session() {
   const params = useParams();
@@ -32,15 +35,29 @@ export function Session() {
     store.sessions.find((s) => s.id === params.id) ?? store.draftSession;
 
   return (
-    <Show when={activeSession()}>
-      <SessionProvider sessionId={params.id}>
-        <Show
-          when={activeSession()?.type === 'note'}
-          fallback={<MultiChatLayout sessionId={params.id} />}
-        >
-          <NoteLayout sessionId={params.id} />
-        </Show>
-      </SessionProvider>
+    <Show
+      when={anyKeysSet() && apiKeys.hasCompletedWelcome}
+      fallback={
+        <WelcomeContent
+          openRouterKey={() => ''}
+          openAIKey={() => ''}
+          googleKey={() => ''}
+          setOpenRouterKey={() => {}}
+          setOpenAIKey={() => {}}
+          setGoogleKey={() => {}}
+        />
+      }
+    >
+      <Show when={activeSession()}>
+        <SessionProvider sessionId={params.id}>
+          <Show
+            when={activeSession()?.type === 'note'}
+            fallback={<MultiChatLayout sessionId={params.id} />}
+          >
+            <NoteLayout sessionId={params.id} />
+          </Show>
+        </SessionProvider>
+      </Show>
     </Show>
   );
 }

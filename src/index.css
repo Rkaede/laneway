@@ -154,7 +154,7 @@ html {
   }
 
   a {
-    @apply text-accent-foreground;
+    @apply font-medium text-foreground;
   }
 }
 
