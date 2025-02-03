@@ -65,6 +65,15 @@ const defaults = {
     },
     icon: 'Microsoft',
   },
+  deepseek: {
+    creator: {
+      name: 'DeepSeek',
+      website: 'https://www.deepseek.com/',
+      icon: 'DeepSeek',
+      id: 'deepseek',
+    },
+    icon: 'Microsoft',
+  },
 } as const;
 
 const openai: Partial<ModelProps>[] = [
@@ -214,6 +223,13 @@ const google: Partial<ModelProps>[] = [
     title: 'Gemini 2.0 Flash Experimental (free)',
     provider: [{ id: 'openrouter', modelId: 'google/gemini-flash-1.5', primary: true }],
     icon: 'Gemini',
+  },
+  {
+    ...defaults.deepseek,
+    id: 'deepseek/deepseek-r1:free',
+    title: 'DeepSeek R1 (free)',
+    provider: [{ id: 'openrouter', modelId: 'deepseek/deepseek-r1:free', primary: true }],
+    icon: 'DeepSeek',
   },
 ];
 
