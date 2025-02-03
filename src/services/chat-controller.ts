@@ -76,17 +76,21 @@ export async function append({
       status: 'idle',
       latest: undefined,
     });
-  } catch (error) {
-    if (error instanceof Error && error.name !== 'AbortError') {
-      setStore('chats', (c) => c.id === chatId, {
-        controller: undefined,
-        latest: undefined,
-        status: 'error',
-        error: {
-          name: error.name,
-          message: error.message,
-        },
-      });
-    }
+  } catch (error: unknown) {
+    const errorMessage = (error as ErrorWithCode).message ?? 'Unknown';
+    const errorName = (error as ErrorWithCode).code ?? 'Unknown';
+
+    setStore('chats', (c) => c.id === chatId, {
+      controller: undefined,
+      latest: undefined,
+      status: 'error',
+      error: {
+        name: errorName,
+        message: errorMessage,
+      },
+    });
+    // }
   }
 }
+
+type ErrorWithCode = Error & { code?: string };
