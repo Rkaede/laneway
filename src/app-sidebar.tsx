@@ -51,7 +51,8 @@ function SessionGroup(props: {
   activeSession?: string;
 }) {
   const location = useLocation();
-  const loadingSessions = () => store.chats.filter((c) => c.controller).map((c) => c.sessionId);
+  const loadingSessions = () =>
+    store.chats.filter((c) => c.controller instanceof AbortController).map((c) => c.sessionId);
 
   return (
     <Show when={!(props.sessions.length === 0)}>
