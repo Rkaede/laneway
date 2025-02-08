@@ -1,3 +1,4 @@
+import { cva, type VariantProps } from 'class-variance-authority';
 import { For, type ParentComponent, Show } from 'solid-js';
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/components/ui/hover-card';
@@ -10,15 +11,28 @@ import { ModelIcon } from './model-icon';
 type ModelIconProps = {
   model?: ModelProps;
   class?: string;
-};
+} & VariantProps<typeof modelCardVariants>;
+
+const modelCardVariants = cva(
+  'rounded-full border border-transparent p-1 text-foreground hover:bg-muted',
+  {
+    variants: {
+      variant: {
+        default: '',
+        light: 'bg-background-2 group-hover:bg-background-2 hover:!bg-background-3',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+);
 
 export const ModelCard: ParentComponent<ModelIconProps> = (props) => {
   return (
     <HoverCard>
       <HoverCardTrigger href="#">
-        <div class="rounded-full border border-transparent p-1 text-foreground hover:bg-muted">
-          {props.children}
-        </div>
+        <div class={modelCardVariants({ variant: props.variant })}>{props.children}</div>
       </HoverCardTrigger>
       <HoverCardContent class="w-auto min-w-[280px] p-0">
         <Show when={props.model}>{(m) => <ModelCardContent model={m()} />}</Show>

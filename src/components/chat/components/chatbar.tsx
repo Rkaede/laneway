@@ -18,7 +18,8 @@ export const Chatbar: Component<ChatbarProps> = (props) => {
   return (
     <div
       class={cn(
-        'fade-out-below border-l-none sticky top-0 z-10 flex h-11 justify-between border-b border-r bg-background-main p-2 px-4 group-first-of-type:border-l',
+        'fade-out-below border-l-none sticky top-0 z-10 flex h-11 justify-between border-b border-r border-background-3 bg-background-main p-2 px-4',
+        'group-first-of-type:border-l group-last-of-type:border-r',
         props.class,
       )}
     >

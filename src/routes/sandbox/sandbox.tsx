@@ -3,8 +3,10 @@ import { For, JSX } from 'solid-js';
 import { cn } from '~/util';
 
 import * as AudioButtonStories from './audio-button.stories';
+import * as AvatarStories from './avatar.stories';
 import * as ButtonStories from './button.stories';
 import * as ChatInputStories from './chat-input.stories';
+import * as ChatCardStories from './chatcard.stories';
 import * as CodeblockStories from './codeblock.stories';
 import * as IconStories from './icons.stories';
 import * as MessageStories from './message.stories';
@@ -14,7 +16,9 @@ import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
 const stories = [
-  { title: 'Icons', stories: IconStories, noTheme: true },
+  { title: 'ChatCard', stories: ChatCardStories },
+  { title: 'Avatar', stories: AvatarStories },
+  { title: 'Icons', stories: IconStories },
   { title: 'useAnimatedText', stories: UseAnimatedText, noTheme: true },
   { title: 'MultiCombobox', stories: MultiComboboxStories },
   { title: 'CodeBlock', stories: CodeblockStories },
@@ -42,21 +46,21 @@ export default function Sandbox() {
                     <div>
                       <div>
                         <h3 class="text-lg font-semibold">{name}</h3>
-                        <div class="flex flex-wrap gap-4">
+                        <div class="flex flex-col gap-4">
                           {story.noTheme ? (
                             <Story>
                               <Component />
                             </Story>
                           ) : (
                             <>
-                              <div>
+                              <div class="w-full">
                                 <ThemeProvider theme="light">
                                   <Story>
                                     <Component />
                                   </Story>
                                 </ThemeProvider>
                               </div>
-                              <div>
+                              <div class="w-full">
                                 <ThemeProvider theme="dark">
                                   <Story>
                                     <Component />

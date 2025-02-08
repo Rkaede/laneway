@@ -141,7 +141,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
 export const ChatPanelLayout: ParentComponent<{ numChats: number }> = (props) => {
   return (
     <div
-      class="relative grid flex-1 justify-center px-4"
+      class="group/panels relative grid flex-1 justify-center px-4"
       style={{
         'grid-template-columns': `repeat(${props.numChats}, minmax(0, 70ch))`,
       }}

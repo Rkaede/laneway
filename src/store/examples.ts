@@ -9,7 +9,7 @@ export const story: Example = {
   session: {
     id: 'IRPl9snT8_dlVH0JvDuqu',
     type: 'chat',
-    presetTitle: 'Full House',
+    presetTitle: 'Flagship models',
     presetDescription: 'Compare frontier models.',
     templateId: 'full-house',
     chats: ['wM5RNPLziLK9WLhRz-3n-', 'ZmpJjHxzpK64XbOLzhMWG', '_LJSbFPMz9Up3_4aigJJS'],

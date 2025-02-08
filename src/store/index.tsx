@@ -15,7 +15,7 @@ import type {
 const defaultPreset: PresetProps = {
   id: 'full-house',
   type: 'chat',
-  presetTitle: 'Full House',
+  presetTitle: 'Flagship models',
   presetDescription: 'Compare frontier models.',
   templateId: 'full-house',
   chats: [

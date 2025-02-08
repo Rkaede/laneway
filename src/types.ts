@@ -85,7 +85,7 @@ export interface Architecture {
   instruct_type: null | string;
 }
 
-export type ModelTags = 'New' | 'Vision' | 'Free' | 'Online';
+export type ModelTags = 'new' | 'vision' | 'free' | 'online';
 
 export type AssistantProps = {
   id: string;

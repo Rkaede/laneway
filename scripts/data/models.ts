@@ -247,7 +247,7 @@ const perplexity: Partial<ModelProps>[] = [
   {
     ...defaults.perplexity,
     id: 'perplexity/llama-3.1-sonar-huge-128k-online',
-    title: 'Llama 3.1 Sonar 405B Online',
+    title: 'Sonar 405B',
     provider: [
       {
         id: 'openrouter',
@@ -259,7 +259,7 @@ const perplexity: Partial<ModelProps>[] = [
   {
     ...defaults.perplexity,
     id: 'perplexity/llama-3.1-sonar-large-128k-online',
-    title: 'Llama 3.1 Sonar 70B Online',
+    title: 'Sonar 70B',
     provider: [
       {
         id: 'openrouter',
@@ -320,20 +320,20 @@ export const generateModels = async () => {
     const tags: Array<ModelTags> = [];
     const vision = routerModel.architecture?.modality === 'text+image->text';
     if (vision) {
-      tags.push('Vision');
+      tags.push('vision');
     }
 
     // check if the model is less than 3 months old
     const twoMonthsAgo = new Date();
     twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
     if (new Date(routerModel.created * 1000) > twoMonthsAgo) {
-      tags.push('New');
+      tags.push('new');
     }
 
     const online = routerModel.name.includes('Online');
 
     if (online) {
-      tags.push('Online');
+      tags.push('online');
     }
 
     // Add a 'Free' tag if the model is free
@@ -343,7 +343,7 @@ export const generateModels = async () => {
       Number(routerModel.pricing.image) === 0 &&
       Number(routerModel.pricing.request) === 0
     ) {
-      tags.push('Free');
+      tags.push('free');
     }
 
     const updated = {

@@ -17,7 +17,6 @@ function fetchModels() {
 }
 
 // the warning given by the rule here is not helpful in this case
-// eslint-disable-next-line solid/reactivity
 export const [models, setModels] = makePersisted(createStore<ModelProps[]>([]), {
   name: 'laneway-models',
 });

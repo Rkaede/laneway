@@ -1,5 +1,6 @@
 export * from './alert';
 export * from './avatar';
+export * from './avatar-group';
 export * from './button';
 export * from './card';
 export * from './code-highlighter';
