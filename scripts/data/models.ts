@@ -109,7 +109,6 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openai', modelId: 'gpt-4', primary: true },
       { id: 'openrouter', modelId: 'openai/gpt-4' },
     ],
-    contextWindow: 8192,
   },
   {
     ...defaults.openai,
@@ -119,8 +118,6 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openai', modelId: 'gpt-4o', primary: true },
       { id: 'openrouter', modelId: 'openai/gpt-4o' },
     ],
-    vision: true,
-    contextWindow: 128000,
   },
   {
     ...defaults.openai,
@@ -130,8 +127,6 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openai', modelId: 'gpt-4o-mini', primary: true },
       { id: 'openrouter', modelId: 'openai/gpt-4o-mini' },
     ],
-    vision: true,
-    contextWindow: 128000,
   },
   {
     ...defaults.openai,
@@ -141,7 +136,6 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openai', modelId: 'o1-mini', primary: true },
       { id: 'openrouter', modelId: 'openai/o1-mini' },
     ],
-    contextWindow: 128000,
   },
   {
     ...defaults.openai,
@@ -151,7 +145,6 @@ const openai: Partial<ModelProps>[] = [
       { id: 'openai', modelId: 'o1-preview', primary: true },
       { id: 'openrouter', modelId: 'openai/o1-preview' },
     ],
-    contextWindow: 128000,
   },
   {
     ...defaults.openai,
@@ -159,9 +152,24 @@ const openai: Partial<ModelProps>[] = [
     title: 'o1',
     provider: [
       { id: 'openai', modelId: 'o1', primary: true },
-      { id: 'openrouter', modelId: 'openai/o1-preview' },
+      { id: 'openrouter', modelId: 'openai/o1' },
     ],
-    contextWindow: 200000,
+  },
+  {
+    ...defaults.openai,
+    id: 'openai/gpt-4.5-preview',
+    title: 'OpenAI: GPT-4.5 (Preview)',
+    provider: [
+      { id: 'openai', modelId: 'gpt-4.5-preview', primary: true },
+      { id: 'openrouter', modelId: 'openai/gpt-4.5-preview' },
+    ],
+  },
+
+  {
+    ...defaults.openai,
+    id: 'openai/o3-mini-high',
+    title: 'o3 Mini High',
+    provider: [{ id: 'openrouter', modelId: 'openai/o3-mini-high', primary: true }],
   },
 ];
 
@@ -171,28 +179,38 @@ const anthropic: Partial<ModelProps>[] = [
     id: 'anthropic/claude-3-haiku',
     title: 'Claude 3 Haiku',
     provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-haiku', primary: true }],
-    vision: true,
   },
   {
     ...defaults.anthropic,
     id: 'anthropic/claude-3-opus',
     title: 'Claude 3 Opus',
     provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-opus', primary: true }],
-    vision: true,
   },
   {
     ...defaults.anthropic,
     id: 'anthropic/claude-3-sonnet',
     title: 'Claude 3 Sonnet',
     provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-sonnet', primary: true }],
-    vision: true,
   },
   {
     ...defaults.anthropic,
     id: 'anthropic/claude-3.5-sonnet',
     title: 'Claude 3.5 Sonnet',
     provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3.5-sonnet', primary: true }],
-    vision: true,
+  },
+  {
+    ...defaults.anthropic,
+    id: 'anthropic/claude-3.7-sonnet',
+    title: 'Claude 3.7 Sonnet',
+    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3.7-sonnet', primary: true }],
+  },
+  {
+    ...defaults.anthropic,
+    id: 'anthropic/claude-3.7-sonnet:thinking',
+    title: 'Claude 3.7 Sonnet (thinking)',
+    provider: [
+      { id: 'openrouter', modelId: 'anthropic/claude-3.7-sonnet:thinking', primary: true },
+    ],
   },
 ];
 
@@ -219,11 +237,36 @@ const google: Partial<ModelProps>[] = [
   },
   {
     ...defaults.google,
-    id: 'google/gemini-2.0-flash-exp:free',
-    title: 'Gemini 2.0 Flash Experimental (free)',
-    provider: [{ id: 'openrouter', modelId: 'google/gemini-flash-1.5', primary: true }],
+    id: 'google/gemini-2.0-flash-001',
+    title: 'Gemini Flash 2.0',
+    provider: [{ id: 'openrouter', modelId: 'google/gemini-2.0-flash-001', primary: true }],
     icon: 'Gemini',
   },
+  {
+    ...defaults.google,
+    id: 'google/gemini-2.0-flash-lite-preview-02-05:free',
+    title: 'Gemini Flash Lite 2.0 Preview (free)',
+    provider: [
+      {
+        id: 'openrouter',
+        modelId: 'google/gemini-2.0-flash-lite-preview-02-05:free',
+        primary: true,
+      },
+    ],
+    icon: 'Gemini',
+  },
+  {
+    ...defaults.google,
+    id: 'google/gemini-2.0-flash-lite-001',
+    title: 'Gemini 2.0 Flash Lite',
+    provider: [
+      { id: 'openrouter', modelId: 'google/gemini-2.0-flash-lite-001', primary: true },
+    ],
+    icon: 'Gemini',
+  },
+];
+
+const other: Partial<ModelProps>[] = [
   {
     ...defaults.deepseek,
     id: 'deepseek/deepseek-r1:free',
@@ -246,18 +289,6 @@ const microsoft: Partial<ModelProps>[] = [
 const perplexity: Partial<ModelProps>[] = [
   {
     ...defaults.perplexity,
-    id: 'perplexity/llama-3.1-sonar-huge-128k-online',
-    title: 'Sonar 405B',
-    provider: [
-      {
-        id: 'openrouter',
-        modelId: 'perplexity/llama-3.1-sonar-huge-128k-online',
-        primary: true,
-      },
-    ],
-  },
-  {
-    ...defaults.perplexity,
     id: 'perplexity/llama-3.1-sonar-large-128k-online',
     title: 'Sonar 70B',
     provider: [
@@ -276,12 +307,19 @@ export const modelsBase: Partial<ModelProps>[] = [
   ...google,
   ...microsoft,
   ...perplexity,
+  ...other,
 ];
 
 if (isDevelopment) {
   modelsBase.push({
-    ...defaults.openai,
     id: 'aperture/glados',
+    creator: {
+      name: 'Aperture',
+      website: 'https://half-life.fandom.com/wiki/Aperture_Science',
+      icon: 'Aperture',
+      id: 'aperture',
+    },
+    icon: 'Aperture',
     title: 'GLaDOS',
     provider: [{ id: 'openrouter', modelId: 'aperture/glados', primary: true }],
   });
@@ -299,10 +337,10 @@ export const generateModels = async () => {
           instruct_type: null,
         },
         created: 1011079824, // Feb 1, 2024
-        description: 'A sarcastic and passive-aggressive AI assistant from Aperture Science.',
+        description: 'AI assistant from Aperture Science.',
         contextLength: 16384,
         maxCompletionTokens: 4096,
-        tags: ['New', 'Free'],
+        tags: ['new', 'free'],
         pricing: {
           prompt: 0,
           completion: 0,

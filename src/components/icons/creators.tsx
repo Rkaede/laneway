@@ -344,3 +344,34 @@ export function DeepSeek(props: SVGAttributes) {
     </svg>
   );
 }
+
+export function Aperture(props: SVGAttributes) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      version="1.1"
+      viewBox="-128 -128 256 256"
+      {...props}
+    >
+      <defs>
+        <clipPath id="e">
+          <path transform="rotate(-45,15,-69)" d="m-128-212h143v143h-143z" />
+        </clipPath>
+        <clipPath id="d">
+          <circle r="125.5" />
+        </clipPath>
+      </defs>
+      <g transform="rotate(-11.25)" clip-path="url(#d)">
+        <g id="b">
+          <g id="c">
+            <path id="a" d="m-128-212h143v143h-143z" clip-path="url(#e)" fill="#888" />
+            <use transform="rotate(180)" href="#a" />
+          </g>
+          <use transform="rotate(90)" href="#c" />
+        </g>
+        <use transform="rotate(45)" href="#b" />
+      </g>
+    </svg>
+  );
+}

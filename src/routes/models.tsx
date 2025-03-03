@@ -193,10 +193,10 @@ export default function ModelList() {
                       : 'N/A'}
                   </td>
                   <td class="py-1.5 pl-2 pr-7 text-right">
-                    ${(model.pricing.prompt * 1000000).toFixed(2)}
+                    {formatPrice(model.pricing?.prompt)}
                   </td>
                   <td class="px-2 py-1.5 pr-7 text-right">
-                    ${(model.pricing.completion * 1000000).toFixed(2)}
+                    {formatPrice(model.pricing?.completion)}
                   </td>
                 </tr>
               )}
@@ -206,4 +206,9 @@ export default function ModelList() {
       </div>
     </div>
   );
+}
+
+function formatPrice(price: number | undefined) {
+  if (price === undefined) return 'N/A';
+  return `$${(price * 1000000).toFixed(2)}`;
 }
