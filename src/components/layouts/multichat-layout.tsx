@@ -105,9 +105,10 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
           {(s) => (
             <ChatPanelLayout numChats={s().chats.length}>
               <For each={s().chats}>
-                {(chatId) => {
+                {(chatId, index) => {
                   const chat = store.chats.find((c) => c.id === chatId);
                   if (!chat) return null;
+
                   return (
                     <ChatPanel
                       chat={chat}
@@ -115,6 +116,8 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
                       onChangeAssistant={(id) => setAssistant(id, chat.id)}
                       attachments={attachments()}
                       isExample={s().created === -1}
+                      isFirst={index() === 0}
+                      isLast={index() === s().chats.length - 1}
                     />
                   );
                 }}
@@ -159,12 +162,14 @@ export function BlankSession(props: { attachments?: File[] }) {
   return (
     <ChatPanelLayout numChats={store.draftChats.length}>
       <For each={store.draftChats}>
-        {(chat) => (
+        {(chat, index) => (
           <ChatPanel
             chat={chat}
             sessionId={store.draftSession.id}
             onChangeAssistant={(id) => handleAssistantChange(id, chat.id)}
             attachments={props.attachments}
+            isFirst={index() === 0}
+            isLast={index() === store.draftChats.length - 1}
           />
         )}
       </For>

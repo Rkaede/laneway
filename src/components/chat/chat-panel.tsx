@@ -16,6 +16,8 @@ type ChatPanelProps = {
   attachments?: File[];
   variant?: 'chat' | 'note';
   isExample?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
 };
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
@@ -37,6 +39,8 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         provider={chat.provider()}
         type={props.chat.assistantId ? 'assistant' : 'model'}
         sessionType={props.variant}
+        isFirst={props.isFirst}
+        isLast={props.isLast}
       />
       <div class="fade-out-bottom flex min-h-full flex-1 flex-col px-1.5">
         <div class="flex min-h-full flex-1 flex-col gap-8 pb-8 pt-8">

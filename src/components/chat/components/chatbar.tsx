@@ -12,6 +12,8 @@ type ChatbarProps = {
   class?: string;
   type?: 'assistant' | 'model';
   sessionType?: 'chat' | 'note';
+  isFirst?: boolean;
+  isLast?: boolean;
 };
 
 export const Chatbar: Component<ChatbarProps> = (props) => {
@@ -19,7 +21,10 @@ export const Chatbar: Component<ChatbarProps> = (props) => {
     <div
       class={cn(
         'fade-out-below border-l-none sticky top-0 z-10 flex h-11 justify-between border-b border-r border-background-3 bg-background-main p-2 px-4',
-        'group-first-of-type:border-l group-last-of-type:border-r',
+        'group-first-of-type:border-l',
+        'group-last-of-type:border-r',
+        props.isFirst ? 'rounded-bl-md' : '',
+        props.isLast ? 'rounded-br-md' : '',
         props.class,
       )}
     >
