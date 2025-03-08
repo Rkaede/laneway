@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, Show } from 'solid-js';
 
 import { imageCache } from '~/services/image-cache';
 import { cn } from '~/util';
@@ -8,13 +8,14 @@ interface ImageProps {
   alt?: string;
   class?: string;
   sourceType?: 'store' | 'path';
+  onClick?: (event: MouseEvent) => void;
 }
 
 export function LocalImage(props: ImageProps) {
   const [imageSrc, setImageSrc] = createSignal<string | null>(null);
   const [available, setAvailable] = createSignal(true);
 
-  onMount(async () => {
+  createEffect(async () => {
     if (props.sourceType === 'path') {
       setImageSrc(props.src);
       return;
@@ -42,11 +43,7 @@ export function LocalImage(props: ImageProps) {
         </div>
       }
     >
-      <img
-        src={imageSrc() || ''}
-        alt={props.alt}
-        class={cn('mt-4 w-full max-w-64 rounded-lg shadow-sm', props.class)}
-      />
+      <img src={imageSrc() || ''} alt={props.alt} class={props.class} onClick={props.onClick} />
     </Show>
   );
 }

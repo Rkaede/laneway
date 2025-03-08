@@ -9,6 +9,7 @@ import * as ChatInputStories from './chat-input.stories';
 import * as ChatCardStories from './chatcard.stories';
 import * as CodeblockStories from './codeblock.stories';
 import * as IconStories from './icons.stories';
+import * as LightboxStories from './lightbox.stories';
 import * as MessageStories from './message.stories';
 import * as MultiComboboxStories from './multi-combobox.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
@@ -16,6 +17,7 @@ import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
 const stories = [
+  { title: 'Lightbox', stories: LightboxStories },
   { title: 'ChatCard', stories: ChatCardStories },
   { title: 'Avatar', stories: AvatarStories },
   { title: 'Icons', stories: IconStories },
