@@ -29,10 +29,6 @@ const defaults = {
   openai: {
     creator: { name: 'OpenAI', website: 'https://openai.com/', icon: 'OpenAI', id: 'openai' },
     icon: 'IconOpenAI',
-    maxFrequency: 2,
-    maxPenalty: 2,
-    maxTemperature: 2,
-    maxTokens: 4096,
   },
   anthropic: {
     creator: {
@@ -45,7 +41,7 @@ const defaults = {
   },
   google: {
     creator: { name: 'Google', website: 'https://ai.google/', icon: 'Google', id: 'google' },
-    icon: 'IconGeminiPro',
+    icon: 'Gemini',
   },
   perplexity: {
     creator: {
@@ -72,242 +68,136 @@ const defaults = {
       icon: 'DeepSeek',
       id: 'deepseek',
     },
-    icon: 'Microsoft',
+    icon: 'DeepSeek',
   },
 } as const;
 
 const openai: Partial<ModelProps>[] = [
   {
-    ...defaults.openai,
     id: 'openai/gpt-3.5-turbo',
     title: 'GPT-3.5 Turbo',
-    provider: [
-      { id: 'openai', modelId: 'gpt-3.5-turbo', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-3.5-turbo' },
-    ],
-    defaultSettings: {
-      temperature: 0.7,
-      topP: 1,
-      frequencyPenalty: 0,
-      presencePenalty: 0,
-    },
+    provider: [{ id: 'openai', modelId: 'gpt-3.5-turbo', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/gpt-4-turbo',
     title: 'GPT-4 Turbo',
-    provider: [
-      { id: 'openai', modelId: 'gpt-4-turbo', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-4-turbo' },
-    ],
+    provider: [{ id: 'openai', modelId: 'gpt-4-turbo', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/gpt-4',
     title: 'GPT-4',
-    provider: [
-      { id: 'openai', modelId: 'gpt-4', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-4' },
-    ],
+    provider: [{ id: 'openai', modelId: 'gpt-4', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/gpt-4o',
     title: 'GPT-4o',
-    provider: [
-      { id: 'openai', modelId: 'gpt-4o', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-4o' },
-    ],
+    provider: [{ id: 'openai', modelId: 'gpt-4o', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/gpt-4o-mini',
     title: 'GPT-4o-mini',
-    provider: [
-      { id: 'openai', modelId: 'gpt-4o-mini', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-4o-mini' },
-    ],
+    provider: [{ id: 'openai', modelId: 'gpt-4o-mini', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/o1-mini',
     title: 'o1-mini',
-    provider: [
-      { id: 'openai', modelId: 'o1-mini', primary: true },
-      { id: 'openrouter', modelId: 'openai/o1-mini' },
-    ],
+    provider: [{ id: 'openai', modelId: 'o1-mini', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/o1-preview',
     title: 'o1-preview',
-    provider: [
-      { id: 'openai', modelId: 'o1-preview', primary: true },
-      { id: 'openrouter', modelId: 'openai/o1-preview' },
-    ],
+    provider: [{ id: 'openai', modelId: 'o1-preview', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/o1',
     title: 'o1',
-    provider: [
-      { id: 'openai', modelId: 'o1', primary: true },
-      { id: 'openrouter', modelId: 'openai/o1' },
-    ],
+    provider: [{ id: 'openai', modelId: 'o1', primary: true }],
   },
   {
-    ...defaults.openai,
     id: 'openai/gpt-4.5-preview',
     title: 'OpenAI: GPT-4.5 (Preview)',
-    provider: [
-      { id: 'openai', modelId: 'gpt-4.5-preview', primary: true },
-      { id: 'openrouter', modelId: 'openai/gpt-4.5-preview' },
-    ],
+    provider: [{ id: 'openai', modelId: 'gpt-4.5-preview', primary: true }],
   },
-
   {
-    ...defaults.openai,
     id: 'openai/o3-mini-high',
     title: 'o3 Mini High',
-    provider: [{ id: 'openrouter', modelId: 'openai/o3-mini-high', primary: true }],
   },
 ];
 
 const anthropic: Partial<ModelProps>[] = [
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3-haiku',
-    title: 'Claude 3 Haiku',
-    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-haiku', primary: true }],
-  },
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3-opus',
-    title: 'Claude 3 Opus',
-    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-opus', primary: true }],
-  },
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3-sonnet',
-    title: 'Claude 3 Sonnet',
-    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3-sonnet', primary: true }],
-  },
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3.5-sonnet',
-    title: 'Claude 3.5 Sonnet',
-    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3.5-sonnet', primary: true }],
-  },
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3.7-sonnet',
-    title: 'Claude 3.7 Sonnet',
-    provider: [{ id: 'openrouter', modelId: 'anthropic/claude-3.7-sonnet', primary: true }],
-  },
-  {
-    ...defaults.anthropic,
-    id: 'anthropic/claude-3.7-sonnet:thinking',
-    title: 'Claude 3.7 Sonnet (thinking)',
-    provider: [
-      { id: 'openrouter', modelId: 'anthropic/claude-3.7-sonnet:thinking', primary: true },
-    ],
-  },
+  { id: 'anthropic/claude-3-haiku', title: 'Claude 3 Haiku' },
+  { id: 'anthropic/claude-3-opus', title: 'Claude 3 Opus' },
+  { id: 'anthropic/claude-3-sonnet', title: 'Claude 3 Sonnet' },
+  { id: 'anthropic/claude-3.5-sonnet', title: 'Claude 3.5 Sonnet' },
+  { id: 'anthropic/claude-3.7-sonnet', title: 'Claude 3.7 Sonnet' },
+  { id: 'anthropic/claude-3.7-sonnet:thinking', title: 'Claude 3.7 Sonnet (thinking)' },
 ];
 
 const google: Partial<ModelProps>[] = [
   {
-    ...defaults.google,
-    id: 'google/gemini-pro-1.5',
-    title: 'Gemini 1.5 Pro',
-    provider: [
-      { id: 'google', modelId: 'models/gemini-1.5-pro-latest', primary: true },
-      { id: 'openrouter', modelId: 'google/gemini-pro-1.5' },
-    ],
+    id: 'google/gemini-2.5-pro-exp-03-25:free',
+    title: 'Google: Gemini Pro 2.5 Experimental (free)',
     icon: 'GeminiPro',
   },
   {
-    ...defaults.google,
+    id: 'google/gemini-pro-1.5',
+    title: 'Gemini 1.5 Pro',
+    provider: [{ id: 'google', modelId: 'models/gemini-1.5-pro-latest', primary: true }],
+    icon: 'GeminiPro',
+  },
+  {
     id: 'google/gemini-flash-1.5',
     title: 'Gemini 1.5 Flash',
-    provider: [
-      { id: 'google', modelId: 'models/gemini-1.5-flash-latest', primary: true },
-      { id: 'openrouter', modelId: 'google/gemini-flash-1.5' },
-    ],
-    icon: 'Gemini',
+    provider: [{ id: 'google', modelId: 'models/gemini-1.5-flash-latest', primary: true }],
   },
   {
-    ...defaults.google,
     id: 'google/gemini-2.0-flash-001',
     title: 'Gemini Flash 2.0',
-    provider: [{ id: 'openrouter', modelId: 'google/gemini-2.0-flash-001', primary: true }],
-    icon: 'Gemini',
   },
   {
-    ...defaults.google,
     id: 'google/gemini-2.0-flash-lite-preview-02-05:free',
     title: 'Gemini Flash Lite 2.0 Preview (free)',
-    provider: [
-      {
-        id: 'openrouter',
-        modelId: 'google/gemini-2.0-flash-lite-preview-02-05:free',
-        primary: true,
-      },
-    ],
-    icon: 'Gemini',
   },
   {
-    ...defaults.google,
     id: 'google/gemini-2.0-flash-lite-001',
     title: 'Gemini 2.0 Flash Lite',
-    provider: [
-      { id: 'openrouter', modelId: 'google/gemini-2.0-flash-lite-001', primary: true },
-    ],
-    icon: 'Gemini',
   },
 ];
 
-const other: Partial<ModelProps>[] = [
-  {
-    ...defaults.deepseek,
-    id: 'deepseek/deepseek-r1:free',
-    title: 'DeepSeek R1 (free)',
-    provider: [{ id: 'openrouter', modelId: 'deepseek/deepseek-r1:free', primary: true }],
-    icon: 'DeepSeek',
-  },
+const deepseek = [
+  { id: 'deepseek/deepseek-chat-v3-0324', title: 'DeepSeek: DeepSeek V3 0324' },
+  { id: 'deepseek/deepseek-chat-v3-0324:free', title: 'DeepSeek: DeepSeek V3 0324 (free)' },
+  { id: 'deepseek/deepseek-r1:free', title: 'DeepSeek R1 (free)' },
 ];
 
-const microsoft: Partial<ModelProps>[] = [
-  {
-    ...defaults.microsoft,
-    id: 'microsoft/phi-4',
-    title: 'Phi 4',
-    provider: [{ id: 'openrouter', modelId: 'microsoft/phi-4', primary: true }],
-    contextWindow: 16384,
-  },
+const microsoft = [
+  { id: 'microsoft/phi-4', title: 'Phi 4' },
+  { id: 'microsoft/phi-4-multimodal-instruct', title: 'Phi 4 Multimodal Instruct' },
 ];
 
-const perplexity: Partial<ModelProps>[] = [
-  {
-    ...defaults.perplexity,
-    id: 'perplexity/llama-3.1-sonar-large-128k-online',
-    title: 'Sonar 70B',
-    provider: [
-      {
-        id: 'openrouter',
-        modelId: 'perplexity/llama-3.1-sonar-large-128k-online',
-        primary: true,
-      },
-    ],
-  },
-];
+const perplexity = [{ id: 'perplexity/llama-3.1-sonar-large-128k-online', title: 'Sonar 70B' }];
+
+function mapBase(base: Array<Partial<ModelProps>>, defaultsKey: keyof typeof defaults) {
+  return base.map((model) => {
+    const provider = model.id
+      ? [{ id: 'openrouter' as const, modelId: model.id, primary: true }]
+      : [];
+
+    return {
+      ...defaults[defaultsKey],
+      provider: [...provider, ...(model.provider || [])],
+      ...model,
+    };
+  });
+}
 
 export const modelsBase: Partial<ModelProps>[] = [
-  ...openai,
-  ...anthropic,
-  ...google,
-  ...microsoft,
-  ...perplexity,
-  ...other,
+  ...mapBase(openai, 'openai'),
+  ...mapBase(anthropic, 'anthropic'),
+  ...mapBase(google, 'google'),
+  ...mapBase(microsoft, 'microsoft'),
+  ...mapBase(perplexity, 'perplexity'),
+  ...mapBase(deepseek, 'deepseek'),
 ];
 
 if (isDevelopment) {
