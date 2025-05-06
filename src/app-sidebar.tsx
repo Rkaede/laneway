@@ -3,12 +3,10 @@ import { type Component, createEffect, createSignal, For, Show } from 'solid-js'
 
 import {
   IconBox,
-  IconChat,
   IconLayoutGrid,
   IconPlus,
   IconScanFace,
   IconSettings,
-  IconSquarePen,
   MoreHorizontalIcon,
 } from '~/components/icons/ui';
 import {
@@ -68,13 +66,6 @@ function SessionGroup(props: {
                   active={active()}
                   sessionId={session.id}
                   dropdown={<SidbarItemDropdown sessionId={session.id} />}
-                  icon={
-                    session.type === 'note' ? (
-                      <IconSquarePen class="size-4" stroke-width={1.25} />
-                    ) : (
-                      <IconChat class="size-4" stroke-width={1.25} />
-                    )
-                  }
                 >
                   {session.title}
                 </SidebarLinkItem>
@@ -182,7 +173,7 @@ function SidbarItemDropdown(props: { sessionId?: string }) {
       <DropdownMenuTrigger
         as={Button}
         aria-label="Session actions"
-        class="flex size-6 items-center justify-center rounded-md p-0 opacity-0 transition-none hover:bg-background-4 group-hover:opacity-100 data-[open='true']:opacity-100"
+        class="flex size-6 items-center justify-center rounded-md p-0 text-muted-foreground opacity-0 transition-none hover:text-foreground group-hover:opacity-100 data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
         size="icon"

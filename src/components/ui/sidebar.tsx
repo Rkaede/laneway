@@ -7,15 +7,15 @@ import { IconLoaderCircle } from '../icons/ui';
 
 export const SidebarGroup: ParentComponent<SidebarGroupProps> = (props) => {
   return (
-    <div class="pb-4">
-      <div class="px-4 py-1 pb-1 text-sm font-semibold">{props.title}</div>
+    <div class="px-2 pb-6">
+      <div class="px-2 py-1 pb-1 text-sm font-semibold">{props.title}</div>
       {props.children}
     </div>
   );
 };
 
 export const SidebarItems: ParentComponent<{ class?: string }> = (props) => {
-  return <ul class={cn('flex flex-col gap-[1px] px-2', props.class)}>{props.children}</ul>;
+  return <ul class={cn('flex flex-col gap-[1px]', props.class)}>{props.children}</ul>;
 };
 
 export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) => {
@@ -24,14 +24,16 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
       <a
         href={props.href}
         class={cn(
-          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 text-foreground hover:bg-background-2',
+          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-1 font-normal text-foreground hover:bg-background-2',
           props.active && 'bg-background-2 hover:bg-background-3',
           props.class,
         )}
         onMouseDown={(e) => e.currentTarget.click()}
       >
-        <div class="flex flex-1 items-center gap-1 text-sm">
-          <span>{props.icon}</span>
+        <div class="flex flex-1 items-center gap-1 text-base">
+          <Show when={props.icon}>
+            <span>{props.icon}</span>
+          </Show>
           <span class="truncate">{props.children}</span>
         </div>
         <Show when={props.isLoading}>
@@ -71,7 +73,9 @@ export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
   return (
     <li class={sidebarItem({ active: props.active, class: props.class, size: props.size })}>
       <button onClick={() => props.onClick()} class="flex w-full items-center" type="button">
-        <span>{props.icon}</span>
+        <Show when={props.icon}>
+          <span>{props.icon}</span>
+        </Show>
         <span class="flex-1 truncate">{props.children}</span>
         <Show when={props.dropdown}>
           <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
