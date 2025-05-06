@@ -4,10 +4,12 @@ import { cn } from '~/util';
 
 import * as AudioButtonStories from './audio-button.stories';
 import * as AvatarStories from './avatar.stories';
+import * as BadgeStories from './badge.stories';
 import * as ButtonStories from './button.stories';
 import * as ChatInputStories from './chat-input.stories';
 import * as ChatCardStories from './chatcard.stories';
 import * as CodeblockStories from './codeblock.stories';
+import * as IconBadgeStories from './icon-badge.stories';
 import * as IconStories from './icons.stories';
 import * as LightboxStories from './lightbox.stories';
 import * as MessageStories from './message.stories';
@@ -17,6 +19,8 @@ import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
 const stories = [
+  { title: 'IconBadge', stories: IconBadgeStories },
+  { title: 'Badge', stories: BadgeStories },
   { title: 'Lightbox', stories: LightboxStories },
   { title: 'ChatCard', stories: ChatCardStories },
   { title: 'Avatar', stories: AvatarStories },

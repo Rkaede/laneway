@@ -1,6 +1,7 @@
 export * from './alert';
 export * from './avatar';
 export * from './avatar-group';
+export * from './badge';
 export * from './button';
 export * from './card';
 export * from './code-highlighter';
@@ -11,6 +12,7 @@ export * from './delete-button';
 export * from './dialog';
 export * from './dropdown';
 export * from './forms';
+export * from './icon-badge';
 export * from './input';
 export * from './loader';
 export * from './mini-slider';
