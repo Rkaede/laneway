@@ -33,15 +33,15 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
                 const model = models.find((m) => m.id === item.referenceId);
                 const tags = ['model'];
 
-                if (model?.tags.includes('online')) {
+                if (model?.tags?.includes('online')) {
                   tags.push('online');
                 }
 
-                if (model?.tags.includes('free')) {
+                if (model?.tags?.includes('free')) {
                   tags.push('free');
                 }
 
-                if (model?.tags.includes('new')) {
+                if (model?.tags?.includes('new')) {
                   tags.push('new');
                 }
 
@@ -60,15 +60,15 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
                 const assistant = store.assistants.find((a) => a.id === item.referenceId);
                 const tags = ['assistant'];
                 const model = models.find((m) => m.id === assistant?.modelId);
-                if (model?.tags.includes('online')) {
+                if (model?.tags?.includes('online')) {
                   tags.push('online');
                 }
 
-                if (model?.tags.includes('free')) {
+                if (model?.tags?.includes('free')) {
                   tags.push('free');
                 }
 
-                if (model?.tags.includes('new')) {
+                if (model?.tags?.includes('new')) {
                   tags.push('new');
                 }
 
@@ -90,7 +90,7 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
 
                 const online = preset?.chats.some((c) => {
                   const model = models.find((m) => m.id === c.modelId);
-                  return model?.tags.includes('online');
+                  return model?.tags?.includes('online');
                 });
 
                 if (online) {

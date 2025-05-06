@@ -4,7 +4,8 @@ import { createMemo, createSignal, For } from 'solid-js';
 import { ModelIcon } from '~/components/connected/model-icon';
 import { IconChevronDown, IconChevronUp } from '~/components/icons/ui';
 import { PageTitle, SectionDescription } from '~/components/ui';
-import { Avatar, Tag } from '~/components/ui';
+import { Avatar } from '~/components/ui';
+import { IconBadge } from '~/components/ui/icon-badge';
 import { models } from '~/store/models';
 import type { ModelProps } from '~/types';
 
@@ -173,16 +174,21 @@ export default function ModelList() {
                       <div class="flex items-center gap-2">
                         <span class="font-semibold">{model.title}</span>
                         <div class="flex gap-1">
-                          <For each={model.tags}>{(tag) => <Tag variant={tag}>{tag}</Tag>}</For>
+                          <For each={model.tags}>
+                            {(tag) => <IconBadge variant={tag}>{tag}</IconBadge>}
+                          </For>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="px-2 py-1.5 pr-7 text-right">
+                  <td class="px-2 py-1.5 text-right">
                     {new Date(model.created * 1000).toLocaleDateString(undefined, {
                       year: 'numeric',
                       month: 'short',
                     })}
+                    <div class="inline-block w-4">
+                      {model.tags?.includes('new') && <IconBadge variant="new" class="ml-1" />}
+                    </div>
                   </td>
                   <td class="px-2 py-1.5 pr-7 text-right">
                     {model.contextLength ? model.contextLength.toLocaleString() : 'N/A'}

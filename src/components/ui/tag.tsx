@@ -23,8 +23,9 @@ const tagVariants = cva(
         assistant: 'bg-purple-200 text-purple-900',
         vision: 'bg-blue-300 text-blue-900',
         new: 'bg-green-300 text-green-900',
-        free: 'bg-amber-300 text-amber-900',
+        free: 'bg-purple-300 text-purple-900',
         online: 'bg-teal-100 text-teal-950',
+        reasoning: 'bg-pink-300 text-pink-900',
       },
     },
     defaultVariants: {

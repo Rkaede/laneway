@@ -2,56 +2,43 @@ import type { PresetProps } from '../../src/types';
 
 export const presets: PresetProps[] = [
   {
-    id: 'full-house',
+    id: 'flagship-models',
     type: 'chat',
-    presetTitle: 'Flagship models',
+    presetTitle: 'Flagship',
     presetDescription: 'Compare frontier models.',
-    templateId: 'full-house',
+    templateId: 'flagship-models',
     chats: [
       {
-        modelId: 'openai/gpt-4o',
+        modelId: 'openai/o3-mini-high',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3.5-sonnet',
+        modelId: 'anthropic/claude-3.7-sonnet:thinking',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-pro-1.5',
+        modelId: 'google/gemini-2.5-pro-preview-03-25',
         status: 'idle',
       },
     ],
   },
   {
-    id: 'reasoning-duet',
+    id: 'daily-driver',
     type: 'chat',
-    presetTitle: 'Duet',
-    presetDescription: 'The small reasoning models',
-    templateId: 'reasoning-duet',
+    presetTitle: 'Daily Driver',
+    presetDescription: 'Good enough',
+    templateId: 'daily-driver',
     chats: [
       {
-        modelId: 'openai/o1-mini',
+        modelId: 'openai/gpt-4.1',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.0-flash-exp:free',
-        status: 'idle',
-      },
-    ],
-  },
-  {
-    id: 'top-models',
-    type: 'chat',
-    presetTitle: 'Large frontier models',
-    presetDescription: 'Claude 3 Opus & GPT-4',
-    templateId: 'top-models',
-    chats: [
-      {
-        modelId: 'openai/gpt-4',
+        modelId: 'anthropic/claude-3.7-sonnet',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3-opus',
+        modelId: 'google/gemini-2.5-pro-preview-03-25',
         status: 'idle',
       },
     ],
@@ -64,15 +51,15 @@ export const presets: PresetProps[] = [
     templateId: 'ux-writer-default',
     chats: [
       {
-        modelId: 'openai/gpt-4o',
+        modelId: 'openai/gpt-4.1',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3.5-sonnet',
+        modelId: 'anthropic/claude-3.7-sonnet',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-pro-1.5',
+        modelId: 'google/gemini-2.5-pro-preview-03-25',
         status: 'idle',
       },
     ],

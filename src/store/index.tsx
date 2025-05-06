@@ -13,33 +13,28 @@ import type {
 } from '~/types';
 
 const defaultPreset: PresetProps = {
-  id: 'full-house',
+  id: 'daily-driver',
   type: 'chat',
-  presetTitle: 'Flagship models',
-  presetDescription: 'Compare frontier models.',
-  templateId: 'full-house',
+  presetTitle: 'Daily Driver',
+  presetDescription: 'Good enough',
+  templateId: 'daily-driver',
   chats: [
-    { modelId: 'openai/gpt-4o', status: 'idle' },
-    { modelId: 'anthropic/claude-3.5-sonnet', status: 'idle' },
-    { modelId: 'google/gemini-pro-1.5', status: 'idle' },
+    { modelId: 'openai/gpt-4.1', status: 'idle' },
+    { modelId: 'anthropic/claude-3.7-sonnet', status: 'idle' },
+    { modelId: 'google/gemini-2.5-pro-preview-03-25', status: 'idle' },
   ],
 };
 
-const reasoningDuet: PresetProps = {
-  id: 'reasoning-duet',
+const flagshipModels: PresetProps = {
+  id: 'flagship-models',
   type: 'chat',
-  presetTitle: 'Duet',
-  presetDescription: 'The small reasoning models',
-  templateId: 'reasoning-duet',
+  presetTitle: 'Flagship',
+  presetDescription: 'Compare frontier models.',
+  templateId: 'flagship-models',
   chats: [
-    {
-      modelId: 'openai/o1-mini',
-      status: 'idle',
-    },
-    {
-      modelId: 'google/gemini-2.0-flash-exp:free',
-      status: 'idle',
-    },
+    { modelId: 'openai/o3-mini-high', status: 'idle' },
+    { modelId: 'anthropic/claude-3.7-sonnet:thinking', status: 'idle' },
+    { modelId: 'google/gemini-2.5-pro-preview-03-25', status: 'idle' },
   ],
 };
 
@@ -120,46 +115,46 @@ function createDefaultState(): State {
     ],
     speedDial: [
       {
-        id: 'full-house-dial',
+        id: 'daily-driver-dial',
         type: 'preset',
-        referenceId: 'full-house',
+        referenceId: 'daily-driver',
         sessionType: 'chat',
-        title: 'Compare frontier models',
+        title: 'Good enough',
       },
       {
-        id: 'reasoning-duet-dial',
+        id: 'flagship-models-dial',
         type: 'preset',
-        referenceId: 'reasoning-duet',
+        referenceId: 'flagship-models',
         sessionType: 'chat',
-        title: 'Small reasoning models',
+        title: 'Flagship models',
       },
       {
-        id: 'claude-3.5-sonnet-dial',
+        id: 'claude-3.7-sonnet-dial',
         type: 'model',
-        referenceId: 'anthropic/claude-3.5-sonnet',
+        referenceId: 'anthropic/claude-3.7-sonnet',
         sessionType: 'chat',
         title: 'Best of the vibecheck',
       },
       {
-        id: 'gpt-4o-mini-dial',
+        id: 'gpt-4.1-dial',
         type: 'model',
-        referenceId: 'openai/gpt-4o-mini',
+        referenceId: 'openai/gpt-4.1',
         sessionType: 'chat',
         title: 'Small & fast',
       },
       {
-        id: 'sonar-70b-dial',
+        id: 'sonar-reasoning-pro-dial',
         type: 'model',
-        referenceId: 'perplexity/llama-3.1-sonar-large-128k-online',
+        referenceId: 'perplexity/sonar-reasoning-pro',
         sessionType: 'chat',
-        title: 'Online model from perplexity',
+        title: 'Online reasoning model',
       },
       {
-        id: 'o1-preview-dial',
+        id: 'gemini-2.5-pro-preview-free-dial',
         type: 'model',
-        referenceId: 'openai/o1-preview',
+        referenceId: 'google/gemini-2.5-pro-exp-03-25:free',
         sessionType: 'chat',
-        title: 'Preview model from openai',
+        title: 'Gemini Pro 2.5 Preview',
       },
     ],
     dialogs: {
@@ -175,18 +170,18 @@ function createDefaultState(): State {
       completions: false,
     },
     settings: {
-      systemModel: 'openai/gpt-4o',
+      systemModel: 'openai/gpt-4.1',
       noteModel: {
         type: 'model',
-        referenceId: 'openai/gpt-4o',
+        referenceId: 'openai/gpt-4.1',
       },
       completions: {
         enabled: false,
-        model: 'openai/gpt-4o',
+        model: 'openai/gpt-4.1-nano',
       },
       defaultSession: {
         type: 'model',
-        id: 'openai/gpt-4o',
+        id: 'openai/gpt-4.1',
       },
       tts: {
         enabled: true,
@@ -205,7 +200,7 @@ function createDefaultState(): State {
         showModelTitle: false,
       },
     },
-    presets: [...clone([defaultPreset, reasoningDuet])],
+    presets: [...clone([defaultPreset, flagshipModels])],
     assistants: [],
   };
 }

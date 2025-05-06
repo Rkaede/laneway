@@ -50,11 +50,12 @@ export type ModelProps = {
   creator: Creator;
   created: number;
   icon?: string;
-  tags: Array<ModelTags>;
+  tags?: Array<ModelTags>;
   contextLength?: number;
   maxCompletionTokens?: number;
   title: string;
   vision?: boolean;
+  reasoning?: boolean;
   maxFrequency?: number;
   maxTokens?: number;
   maxPenalty?: number;
@@ -85,7 +86,7 @@ export interface Architecture {
   instruct_type: null | string;
 }
 
-export type ModelTags = 'new' | 'vision' | 'free' | 'online';
+export type ModelTags = 'new' | 'vision' | 'free' | 'online' | 'reasoning';
 
 export type AssistantProps = {
   id: string;

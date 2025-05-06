@@ -101,26 +101,51 @@ const openai: Partial<ModelProps>[] = [
   {
     id: 'openai/o1-mini',
     title: 'o1-mini',
+    reasoning: true,
     provider: [{ id: 'openai', modelId: 'o1-mini', primary: true }],
   },
   {
     id: 'openai/o1-preview',
     title: 'o1-preview',
+    reasoning: true,
     provider: [{ id: 'openai', modelId: 'o1-preview', primary: true }],
   },
   {
     id: 'openai/o1',
     title: 'o1',
+    reasoning: true,
     provider: [{ id: 'openai', modelId: 'o1', primary: true }],
   },
   {
     id: 'openai/gpt-4.5-preview',
-    title: 'OpenAI: GPT-4.5 (Preview)',
+    title: 'GPT-4.5 (Preview)',
     provider: [{ id: 'openai', modelId: 'gpt-4.5-preview', primary: true }],
   },
+
   {
     id: 'openai/o3-mini-high',
     title: 'o3 Mini High',
+    reasoning: true,
+  },
+  {
+    id: 'openai/o3-mini',
+    title: 'o3 Mini',
+    reasoning: true,
+  },
+  {
+    id: 'openai/gpt-4.1',
+    title: 'GPT-4.1',
+    provider: [{ id: 'openai', modelId: 'gpt-4.1', primary: true }],
+  },
+  {
+    id: 'openai/gpt-4.1-mini',
+    title: 'GPT-4.1 Mini',
+    provider: [{ id: 'openai', modelId: 'gpt-4.1-mini', primary: true }],
+  },
+  {
+    id: 'openai/gpt-4.1-nano',
+    title: 'GPT-4.1 Nano',
+    provider: [{ id: 'openai', modelId: 'gpt-4.1-nano', primary: true }],
   },
 ];
 
@@ -130,14 +155,19 @@ const anthropic: Partial<ModelProps>[] = [
   { id: 'anthropic/claude-3-sonnet', title: 'Claude 3 Sonnet' },
   { id: 'anthropic/claude-3.5-sonnet', title: 'Claude 3.5 Sonnet' },
   { id: 'anthropic/claude-3.7-sonnet', title: 'Claude 3.7 Sonnet' },
-  { id: 'anthropic/claude-3.7-sonnet:thinking', title: 'Claude 3.7 Sonnet (thinking)' },
+  {
+    id: 'anthropic/claude-3.7-sonnet:thinking',
+    title: 'Claude 3.7 Sonnet (thinking)',
+    reasoning: true,
+  },
 ];
 
 const google: Partial<ModelProps>[] = [
   {
     id: 'google/gemini-2.5-pro-exp-03-25:free',
-    title: 'Google: Gemini Pro 2.5 Experimental (free)',
+    title: 'Gemini Pro 2.5 Exp.',
     icon: 'GeminiPro',
+    reasoning: true,
   },
   {
     id: 'google/gemini-pro-1.5',
@@ -162,12 +192,18 @@ const google: Partial<ModelProps>[] = [
     id: 'google/gemini-2.0-flash-lite-001',
     title: 'Gemini 2.0 Flash Lite',
   },
+  {
+    id: 'google/gemini-2.5-pro-preview-03-25',
+    title: 'Gemini Pro 2.5 Preview',
+    icon: 'GeminiPro',
+    reasoning: true,
+  },
 ];
 
 const deepseek = [
   { id: 'deepseek/deepseek-chat-v3-0324', title: 'DeepSeek: DeepSeek V3 0324' },
   { id: 'deepseek/deepseek-chat-v3-0324:free', title: 'DeepSeek: DeepSeek V3 0324 (free)' },
-  { id: 'deepseek/deepseek-r1:free', title: 'DeepSeek R1 (free)' },
+  { id: 'deepseek/deepseek-r1:free', title: 'DeepSeek R1 (free)', reasoning: true },
 ];
 
 const microsoft = [
@@ -175,7 +211,12 @@ const microsoft = [
   { id: 'microsoft/phi-4-multimodal-instruct', title: 'Phi 4 Multimodal Instruct' },
 ];
 
-const perplexity = [{ id: 'perplexity/llama-3.1-sonar-large-128k-online', title: 'Sonar 70B' }];
+const perplexity = [
+  { id: 'perplexity/llama-3.1-sonar-large-128k-online', title: 'Sonar 70B' },
+  { id: 'perplexity/sonar-reasoning-pro', title: 'Sonar Reasoning Pro', reasoning: true },
+  { id: 'perplexity/sonar-pro', title: 'Sonar Pro' },
+  { id: 'perplexity/sonar-deep-research', title: 'Sonar Deep Research', reasoning: true },
+];
 
 function mapBase(base: Array<Partial<ModelProps>>, defaultsKey: keyof typeof defaults) {
   return base.map((model) => {
@@ -272,6 +313,10 @@ export const generateModels = async () => {
       Number(routerModel.pricing.request) === 0
     ) {
       tags.push('free');
+    }
+
+    if (model.reasoning) {
+      tags.push('reasoning');
     }
 
     const updated = {

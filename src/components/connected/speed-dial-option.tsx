@@ -26,6 +26,7 @@ const tagMap: Record<string, TagProps['variant']> = {
   assistant: 'purple',
   online: 'online',
   note: 'note',
+  free: 'free',
 };
 
 export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
