@@ -6,7 +6,7 @@ Just another AI chat app 🤷‍♂️
 - All data is stored locally in your browser for both speed and privacy.
 - Chat with multiple frontier AI models without individual subscriptions, even at the same time!
 
-Head over the [https://laneway.app](https://laneway.app) to use the app directly.
+Head over to <https://laneway.app> to use the app directly.
 
 ![Laneway Example](https://files.laneway.app/laneway-main.png)
 
