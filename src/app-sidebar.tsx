@@ -65,7 +65,7 @@ function SessionGroup(props: {
                   href={`/session/${session.id}`}
                   active={active()}
                   sessionId={session.id}
-                  dropdown={<SidbarItemDropdown sessionId={session.id} />}
+                  dropdown={<SidebarItemDropdown sessionId={session.id} />}
                 >
                   {session.title}
                 </SidebarLinkItem>
@@ -165,7 +165,7 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   );
 };
 
-function SidbarItemDropdown(props: { sessionId?: string }) {
+function SidebarItemDropdown(props: { sessionId?: string }) {
   const navigate = useNavigate();
   const [open, setOpen] = createSignal(false);
   return (
