@@ -16,7 +16,7 @@ export async function generateSpeech(content: string, voice: string = 'alloy') {
       model: 'tts-1',
       input: content,
       voice,
-      reponse_format: 'mp3',
+      response_format: 'mp3',
     }),
   });
 
