@@ -1,8 +1,7 @@
 import fs from 'fs';
-import path from 'path';
 
 function readFile(filePath: string) {
-  return fs.readFileSync(path.join(__dirname, filePath), 'utf-8');
+  return fs.readFileSync(new URL(filePath, import.meta.url), 'utf-8');
 }
 
 const codingSeaBodybuilder3943 = readFile('./coding-sea-bodybuilder-3943.md');

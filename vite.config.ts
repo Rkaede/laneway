@@ -1,10 +1,13 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
 
