@@ -91,6 +91,8 @@ export function createSession(sessionId?: Accessor<string>) {
         autonameChat(id, _input);
       }
     }
+
+    setSessionStore('attachments', []);
   }
 
   const hook = mergeProps(session, sessionStore, {

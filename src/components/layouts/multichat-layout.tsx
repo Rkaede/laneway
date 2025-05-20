@@ -95,6 +95,8 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
         autonameChat(id, inputValue);
       }
     }
+
+    setAttachments(undefined);
   }
 
   return (
