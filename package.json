@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "test": "bun test"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.0.10",

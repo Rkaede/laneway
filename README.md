@@ -41,9 +41,17 @@ Head over to <https://laneway.app> to use the app directly.
 3. Run the app:
 
    ```
-   pnpm run dev
-   ```
+  pnpm run dev
+  ```
 
 4. Set up your API keys:
    - Open the app and go to the Settings page
    - Enter your API keys for the providers you want to use (OpenAI, Google, OpenRouter)
+
+### Running Tests
+
+Run the unit tests with Bun:
+
+```bash
+pnpm test
+```
