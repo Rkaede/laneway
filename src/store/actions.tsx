@@ -245,9 +245,11 @@ export async function autonameChat(sessionId: string, title: string) {
 export async function getCompletion(input: string) {
   const prompt = completion.replace('{{input}}', input);
   const llm = await router;
+  const provider = getProvider(store.settings.completions.model);
   const response = await llm.getText({
     messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
-    modelId: store.settings.completions.model,
+    modelId: provider?.modelId,
+    provider: provider?.id,
   });
 
   return response?.text;
