@@ -44,8 +44,10 @@ export function groupByDate(sessions: SessionProps[]) {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
   const lastWeek = new Date(today);
   lastWeek.setDate(lastWeek.getDate() - 7);
+  lastWeek.setHours(0, 0, 0, 0);
 
   const groupedObjects: Record<string, SessionProps[]> = {
     today: [],
@@ -64,7 +66,7 @@ export function groupByDate(sessions: SessionProps[]) {
         groupedObjects.today.push(session);
       } else if (objDate.toDateString() === yesterday.toDateString()) {
         groupedObjects.yesterday.push(session);
-      } else if (objDate > lastWeek) {
+      } else if (objDate >= lastWeek) {
         groupedObjects.last7Days.push(session);
       } else {
         groupedObjects.older.push(session);
