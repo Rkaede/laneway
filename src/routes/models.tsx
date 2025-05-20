@@ -48,11 +48,11 @@ export default function ModelList() {
       let aValue, bValue;
 
       if (_sortColumn === 'pricing-context') {
-        aValue = a.pricing.prompt;
-        bValue = b.pricing.prompt;
+        aValue = a.pricing?.prompt;
+        bValue = b.pricing?.prompt;
       } else if (_sortColumn === 'pricing-output') {
-        aValue = a.pricing.completion;
-        bValue = b.pricing.completion;
+        aValue = a.pricing?.completion;
+        bValue = b.pricing?.completion;
       } else if (_sortColumn === 'creator') {
         aValue = a.creator.name;
         bValue = b.creator.name;
