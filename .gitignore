@@ -3,6 +3,9 @@ public/models.json
 public/presets.json
 public/assistants.json
 
+# playwright
+test-results
+
 # Logs
 logs
 *.log

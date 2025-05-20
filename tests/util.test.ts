@@ -1,5 +1,7 @@
-import { formatResponseTime, groupByDate } from '../src/util';
 import { describe, expect, it } from 'bun:test';
+
+import { formatResponseTime, groupByDate } from '../src/util';
+
 
 // < 2000 returns "Nms"
 describe('formatResponseTime', () => {
