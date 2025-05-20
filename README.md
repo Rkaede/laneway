@@ -35,25 +35,13 @@ Head over to <https://laneway.app> to use the app directly.
 2. Install dependencies:
 
    ```
-   npm install
-   ```
-
-   or
-
-   ```
-   bun install
+   pnpm install
    ```
 
 3. Run the app:
 
    ```
-   npm run dev
-   ```
-
-   or
-
-   ```
-   bun run dev
+   pnpm run dev
    ```
 
 4. Set up your API keys:
