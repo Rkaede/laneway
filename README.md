@@ -55,3 +55,9 @@ Run the unit tests with Bun:
 ```bash
 pnpm test
 ```
+
+To run end-to-end tests with Playwright:
+
+```bash
+pnpm run test:e2e
+```
