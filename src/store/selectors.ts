@@ -30,9 +30,7 @@ export const selectChatById = (id: string | Accessor<string | undefined>) => {
   });
 };
 
-export const selectAssistantById = (
-  id: string | Accessor<string | undefined>,
-) => {
+export const selectAssistantById = (id: string | Accessor<string | undefined>) => {
   return createMemo(() => {
     const _id = typeof id === 'function' ? id() : id;
     return store.assistants.find((a) => a.id === _id);
@@ -46,9 +44,7 @@ export const selectPresetById = (id: string | Accessor<string | undefined>) => {
   });
 };
 
-export const selectDraftChatById = (
-  id: string | Accessor<string | undefined>,
-) => {
+export const selectDraftChatById = (id: string | Accessor<string | undefined>) => {
   return createMemo(() => {
     const _id = typeof id === 'function' ? id() : id;
     return store.draftChats.find((c) => c.id === _id);

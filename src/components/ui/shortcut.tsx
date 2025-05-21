@@ -1,5 +1,5 @@
 import { isMac } from '@solid-primitives/platform';
-import { cva,type VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import type { Component, ComponentProps } from 'solid-js';
 import { splitProps } from 'solid-js';
 

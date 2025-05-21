@@ -15,11 +15,7 @@ import {
 } from '~/components/ui';
 import { store } from '~/store';
 import { models, modelsByCreator } from '~/store/models';
-import {
-  selectAssistantById,
-  selectModelById,
-  selectPresetById,
-} from '~/store/selectors';
+import { selectAssistantById, selectModelById, selectPresetById } from '~/store/selectors';
 import { cn } from '~/util';
 
 import { ModelIcon } from './model-icon';

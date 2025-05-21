@@ -6,11 +6,7 @@ import { useActionContext } from '~/hooks/use-action-context';
 import { store } from '~/store';
 import { actions } from '~/store/actions';
 import { models } from '~/store/models';
-import {
-  selectAssistantById,
-  selectPresetById,
-  selectModelById,
-} from '~/store/selectors';
+import { selectAssistantById, selectPresetById, selectModelById } from '~/store/selectors';
 import type { SpeedDialItem } from '~/types';
 
 import { SpeedDialOption } from './speed-dial-option';

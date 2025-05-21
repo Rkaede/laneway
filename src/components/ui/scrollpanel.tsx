@@ -27,7 +27,7 @@ export function ScrollPanel(props: ScrollPanelProps) {
 }
 
 function FadeOutBottom() {
-  return <div class="bg-fade-out sticky bottom-0 left-0 right-0 h-8 w-full" />;
+  return <div class="sticky bottom-0 left-0 right-0 h-8 w-full bg-fade-out" />;
 }
 
 export type ScrollPanelVariantProps = VariantProps<typeof scrollPanelVariants>;

@@ -6,10 +6,7 @@ import { getProvider } from '~/services/util';
 import { setStore } from '~/store';
 import { clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
-import {
-  selectAssistantById,
-  selectModelById,
-} from '~/store/selectors';
+import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { ChatProps, MessageProps } from '~/types';
 const router = import('~/services/llm');
 import { append, cancel } from '~/services/chat-controller';

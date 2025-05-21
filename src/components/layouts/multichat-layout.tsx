@@ -55,9 +55,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
       const _sessionChats = (session() ? session()?.chats : store.draftSession.chats) || [];
 
       for (const chatId of _sessionChats) {
-        const chat = _isDraft
-          ? selectDraftChatById(chatId)()
-          : selectChatById(chatId)();
+        const chat = _isDraft ? selectDraftChatById(chatId)() : selectChatById(chatId)();
         const model = selectModelById(chat?.modelId)();
 
         if (model?.vision === false) {

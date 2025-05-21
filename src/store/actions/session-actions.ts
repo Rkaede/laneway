@@ -1,9 +1,6 @@
 import { nanoid } from 'nanoid';
 
-import {
-  IconNewSession,
-  IconTrash,
-} from '~/components/icons/ui';
+import { IconNewSession, IconTrash } from '~/components/icons/ui';
 import { imageCache } from '~/services/image-cache';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
@@ -25,10 +22,7 @@ import { createSessionFromPreset } from '../util';
 export function addMessage(chatId: string, message: MessageProps) {
   const chatIndex = store.chats.findIndex((c) => c.id === chatId);
   if (chatIndex === -1) return;
-  setStore('chats', chatIndex, 'messages', [
-    ...store.chats[chatIndex].messages,
-    message,
-  ]);
+  setStore('chats', chatIndex, 'messages', [...store.chats[chatIndex].messages, message]);
 }
 
 function createSessionFromDraft() {
@@ -123,8 +117,7 @@ export function addMessageToSessionChats(
       const model = models.find((m) => m.id === chat?.modelId);
 
       const hasImageContent =
-        Array.isArray(message.content) &&
-        message.content.some((part) => part.type === 'image');
+        Array.isArray(message.content) && message.content.some((part) => part.type === 'image');
       const supportsVision = model?.vision === true;
 
       if (!hasImageContent || supportsVision) {
@@ -187,8 +180,14 @@ export function deleteSession(sessionId: string) {
 
   deleteImagesForSession(sessionId);
 
-  setStore('chats', store.chats.filter((c) => !session.chats.includes(c.id)));
-  setStore('sessions', store.sessions.filter((s) => s.id !== sessionId));
+  setStore(
+    'chats',
+    store.chats.filter((c) => !session.chats.includes(c.id)),
+  );
+  setStore(
+    'sessions',
+    store.sessions.filter((s) => s.id !== sessionId),
+  );
 }
 
 export function renameSession(sessionId: string, title: string) {

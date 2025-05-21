@@ -298,8 +298,6 @@ export const generateModels = async () => {
         vision: false,
       };
     }
-
-    console.log(base);
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);

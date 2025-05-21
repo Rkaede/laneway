@@ -1,9 +1,4 @@
-import {
-  IconInfo,
-  IconPencilLine,
-  IconSidebar,
-  IconSun,
-} from '~/components/icons/ui';
+import { IconInfo, IconPencilLine, IconSidebar, IconSun } from '~/components/icons/ui';
 import type { Actions } from '~/types';
 import { setStore, store } from '..';
 
