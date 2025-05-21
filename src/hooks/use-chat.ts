@@ -6,7 +6,10 @@ import { getProvider } from '~/services/util';
 import { setStore, store } from '~/store';
 import { clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
-import { models } from '~/store/models';
+import {
+  selectAssistantById,
+  selectModelById,
+} from '~/store/selectors';
 import type { ChatProps, MessageProps } from '~/types';
 const router = import('~/services/llm');
 import { append, cancel } from '~/services/chat-controller';
@@ -22,10 +25,10 @@ type ChatStore = {
 };
 
 export function useChat({ chat }: UseChat) {
-  const assistant = () => store.assistants.find((a) => a.id === chat.assistantId);
-  const model = () =>
-    models.find((m) => m.id === assistant()?.modelId) ??
-    models.find((m) => m.id === chat.modelId);
+  const assistant = selectAssistantById(() => chat.assistantId);
+  const modelFromAssistant = selectModelById(() => assistant()?.modelId);
+  const modelFromChat = selectModelById(() => chat.modelId);
+  const model = () => modelFromAssistant() ?? modelFromChat();
 
   const provider = () => {
     const modelId = model()?.id;
