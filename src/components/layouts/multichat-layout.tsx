@@ -55,7 +55,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
 
       for (const chatId of _sessionChats) {
         const chat = _isDraft ? selectDraftChatById(chatId)() : selectChatById(chatId)();
-        const model = selectModelById(chat?.modelId)();
+        const model = selectModelById(() => chat?.modelId)();
 
         if (model?.vision === false) {
           return; // Early return if any model does not support vision

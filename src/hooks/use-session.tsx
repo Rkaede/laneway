@@ -50,7 +50,7 @@ export function createSession(sessionId?: Accessor<string>) {
         const chat = sessionStore.draft
           ? selectDraftChatById(chatId)()
           : selectChatById(chatId)();
-        const model = selectModelById(chat?.modelId)();
+        const model = selectModelById(() => chat?.modelId)();
 
         if (model?.vision === false) {
           return; // Early return if any model does not support vision

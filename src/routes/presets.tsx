@@ -227,10 +227,10 @@ const PresetCard: Component<{
         <div class="mb-2 flex flex-wrap gap-2">
           <For each={props.preset.chats}>
             {(chat) => {
-              const assistant = selectAssistantById(chat.assistantId)();
+              const assistant = selectAssistantById(() => chat.assistantId)();
               const model = assistant
-                ? selectModelById(assistant.modelId)()
-                : selectModelById(chat.modelId)();
+                ? selectModelById(() => assistant?.modelId)()
+                : selectModelById(() => chat.modelId)();
               return (
                 <Show when={model?.icon}>
                   <Avatar>
@@ -292,7 +292,7 @@ const DeleteConfirmDialog: Component<{
   const associatedAssistants = () => {
     if (!props.preset) return [];
     return props.preset.chats
-      .map((chat) => selectAssistantById(chat.assistantId)())
+      .map((chat) => selectAssistantById(() => chat.assistantId)())
       .filter(Boolean);
   };
 

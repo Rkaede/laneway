@@ -29,7 +29,7 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
           {(item) => {
             const record = () => {
               if (item.type === 'model') {
-                const model = selectModelById(item.referenceId)();
+                const model = selectModelById(() => item.referenceId)();
                 const tags = ['model'];
 
                 if (model?.tags?.includes('online')) {
@@ -56,9 +56,9 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
                 };
               }
               if (item.type === 'assistant') {
-                const assistant = selectAssistantById(item.referenceId)();
+                const assistant = selectAssistantById(() => item.referenceId)();
                 const tags = ['assistant'];
-                const model = selectModelById(assistant?.modelId)();
+                const model = selectModelById(() => assistant?.modelId)();
                 if (model?.tags?.includes('online')) {
                   tags.push('online');
                 }
@@ -84,11 +84,11 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
               }
 
               if (item.type === 'preset') {
-                const preset = selectPresetById(item.referenceId)();
+                const preset = selectPresetById(() => item.referenceId)();
                 const tags = ['preset'];
 
                 const online = preset?.chats.some((c) => {
-                  const model = selectModelById(c.modelId)();
+                  const model = selectModelById(() => c.modelId)();
                   return model?.tags?.includes('online');
                 });
 
