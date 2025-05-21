@@ -8,6 +8,12 @@ import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
 import { addMessageToSessionChats, autonameChat } from '~/store/actions';
 import { models } from '~/store/models';
+import {
+  selectSessionById,
+  selectDraftChatById,
+  selectChatById,
+  selectModelById,
+} from '~/store/selectors';
 import { ImagePart, MessageProps } from '~/types';
 
 type SessionStore = {
@@ -18,8 +24,8 @@ type SessionStore = {
 
 export function createSession(sessionId?: Accessor<string>) {
   const navigate = useNavigate();
-  const session = () =>
-    store.sessions.find((s) => s.id === sessionId?.()) ?? store.draftSession;
+  const selectedSession = selectSessionById(() => sessionId?.());
+  const session = () => selectedSession() ?? store.draftSession;
 
   const [sessionStore, setSessionStore] = createStore<SessionStore>({
     attachments: [],
@@ -43,9 +49,9 @@ export function createSession(sessionId?: Accessor<string>) {
     if (sessionStore.attachments && sessionStore.attachments.length > 0) {
       for (const chatId of sessionStore.chatIds) {
         const chat = sessionStore.draft
-          ? store.draftChats.find((c) => c.id === chatId)
-          : store.chats.find((c) => c.id === chatId);
-        const model = models.find((m) => m.id === chat?.modelId);
+          ? selectDraftChatById(chatId)()
+          : selectChatById(chatId)();
+        const model = selectModelById(chat?.modelId)();
 
         if (model?.vision === false) {
           return; // Early return if any model does not support vision

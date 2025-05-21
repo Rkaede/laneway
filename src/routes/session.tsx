@@ -6,6 +6,7 @@ import { WelcomeContent } from '~/components/connected/welcome';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
 import { store } from '~/store';
+import { selectSessionById } from '~/store/selectors';
 import { newDraftSession } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
 import { anyKeysSet } from '~/store/selectors';
@@ -31,8 +32,8 @@ export function Session() {
     }
   });
 
-  const activeSession = () =>
-    store.sessions.find((s) => s.id === params.id) ?? store.draftSession;
+  const selectedSession = selectSessionById(() => params.id);
+  const activeSession = () => selectedSession() ?? store.draftSession;
 
   return (
     <Show

@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui';
 import { models, providers } from '~/store/models';
+import { selectModelById } from '~/store/selectors';
 import type { ProviderId } from '~/types';
 import { cn } from '~/util';
 
@@ -30,7 +31,7 @@ export const ProviderCombobox: Component<ProviderComboboxProps> = (props) => {
 
   const availableProviders = () => {
     if (!props.modelId) return [];
-    const model = models.find((m) => m.id === props.modelId);
+    const model = selectModelById(() => props.modelId)();
     return model ? model.provider : [];
   };
 

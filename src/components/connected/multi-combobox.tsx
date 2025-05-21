@@ -15,6 +15,11 @@ import {
 } from '~/components/ui';
 import { store } from '~/store';
 import { models, modelsByCreator } from '~/store/models';
+import {
+  selectAssistantById,
+  selectModelById,
+  selectPresetById,
+} from '~/store/selectors';
 import { cn } from '~/util';
 
 import { ModelIcon } from './model-icon';
@@ -37,15 +42,15 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
 
   const selectedItem = () => {
     if (props.includeAssistants && props.value?.type === 'assistant') {
-      const assistant = store.assistants.find((a) => a.id === props.value?.id);
+      const assistant = selectAssistantById(() => props.value?.id)();
       if (assistant) return { ...assistant, type: 'assistant' as const };
     }
     if (props.includeModels && props.value?.type === 'model') {
-      const model = models.find((m) => m.id === props.value?.id);
+      const model = selectModelById(() => props.value?.id)();
       if (model) return { ...model, type: 'model' as const };
     }
     if (props.includePresets && props.value?.type === 'preset') {
-      const preset = store.presets.find((p) => p.id === props.value?.id);
+      const preset = selectPresetById(() => props.value?.id)();
       if (preset) return { ...preset, type: 'preset' as const, title: preset.presetTitle };
     }
     return undefined;

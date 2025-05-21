@@ -29,6 +29,7 @@ import {
 } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import { setStore, store } from '~/store';
+import { selectSessionById } from '~/store/selectors';
 import { actions, deleteSession, renameSession, toggleSidebar } from '~/store/actions';
 import type { SessionProps } from '~/types';
 import { groupByDate } from '~/util';
@@ -207,7 +208,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
 
 const RenameDialog: Component<{ sessionId: string }> = (props) => {
   const [title, setTitle] = createSignal('');
-  const session = () => store.sessions.find((s) => s.id === props.sessionId);
+  const session = selectSessionById(() => props.sessionId);
 
   createEffect(() => {
     if (session()) {

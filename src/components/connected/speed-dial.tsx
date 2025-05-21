@@ -6,6 +6,11 @@ import { useActionContext } from '~/hooks/use-action-context';
 import { store } from '~/store';
 import { actions } from '~/store/actions';
 import { models } from '~/store/models';
+import {
+  selectAssistantById,
+  selectPresetById,
+  selectModelById,
+} from '~/store/selectors';
 import type { SpeedDialItem } from '~/types';
 
 import { SpeedDialOption } from './speed-dial-option';
@@ -30,7 +35,7 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
           {(item) => {
             const record = () => {
               if (item.type === 'model') {
-                const model = models.find((m) => m.id === item.referenceId);
+                const model = selectModelById(item.referenceId)();
                 const tags = ['model'];
 
                 if (model?.tags?.includes('online')) {
@@ -57,9 +62,9 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
                 };
               }
               if (item.type === 'assistant') {
-                const assistant = store.assistants.find((a) => a.id === item.referenceId);
+                const assistant = selectAssistantById(item.referenceId)();
                 const tags = ['assistant'];
-                const model = models.find((m) => m.id === assistant?.modelId);
+                const model = selectModelById(assistant?.modelId)();
                 if (model?.tags?.includes('online')) {
                   tags.push('online');
                 }
@@ -85,11 +90,11 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
               }
 
               if (item.type === 'preset') {
-                const preset = store.presets.find((p) => p.id === item.referenceId);
+                const preset = selectPresetById(item.referenceId)();
                 const tags = ['preset'];
 
                 const online = preset?.chats.some((c) => {
-                  const model = models.find((m) => m.id === c.modelId);
+                  const model = selectModelById(c.modelId)();
                   return model?.tags?.includes('online');
                 });
 

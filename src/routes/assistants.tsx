@@ -34,6 +34,7 @@ import { Input } from '~/components/ui/input';
 import { setStore, store } from '~/store';
 import { addAssistant, deleteAssistant } from '~/store/actions';
 import { models } from '~/store/models';
+import { selectModelById } from '~/store/selectors';
 import type { AssistantProps } from '~/types';
 import { clone } from '~/util';
 
@@ -303,7 +304,7 @@ const AssistantCard: Component<{
     props.onEdit();
   }
 
-  const model = () => models.find((m) => m.id === props.assistant.modelId);
+  const model = selectModelById(() => props.assistant.modelId);
 
   return (
     <Card variant="solid" onClick={handleCardClick}>

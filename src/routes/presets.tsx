@@ -45,6 +45,10 @@ import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
 import { models } from '~/store/models';
+import {
+  selectAssistantById,
+  selectModelById,
+} from '~/store/selectors';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';
 
@@ -227,10 +231,10 @@ const PresetCard: Component<{
         <div class="mb-2 flex flex-wrap gap-2">
           <For each={props.preset.chats}>
             {(chat) => {
-              const assistant = store.assistants.find((a) => a.id === chat.assistantId);
+              const assistant = selectAssistantById(chat.assistantId)();
               const model = assistant
-                ? models.find((m) => m.id === assistant.modelId)
-                : models.find((m) => m.id === chat.modelId);
+                ? selectModelById(assistant.modelId)()
+                : selectModelById(chat.modelId)();
               return (
                 <Show when={model?.icon}>
                   <Avatar>
@@ -292,7 +296,7 @@ const DeleteConfirmDialog: Component<{
   const associatedAssistants = () => {
     if (!props.preset) return [];
     return props.preset.chats
-      .map((chat) => store.assistants.find((a) => a.id === chat.assistantId))
+      .map((chat) => selectAssistantById(chat.assistantId)())
       .filter(Boolean);
   };
 
@@ -496,10 +500,10 @@ const AssistantList: Component<{
       }));
 
     if (type === 'assistant') {
-      const selected = store.assistants.find((a) => a.id === id);
+      const selected = selectAssistantById(id)();
       if (selected) addChat({ assistantId: selected.id });
     } else if (type === 'model') {
-      const selected = models.find((m) => m.id === id);
+      const selected = selectModelById(id)();
       if (selected) addChat({ modelId: selected.id });
     }
   }
@@ -552,11 +556,11 @@ const Assistant: Component<{
   presetId: string;
   onDelete: () => void;
 }> = (props) => {
-  const assistant = () => store.assistants.find((a) => a.id === props.assistantId);
+  const assistant = selectAssistantById(() => props.assistantId);
   const model = () =>
     assistant()
-      ? models.find((m) => m.id === assistant()?.modelId)
-      : models.find((m) => m.id === props.modelId);
+      ? selectModelById(() => assistant()?.modelId)()
+      : selectModelById(() => props.modelId)();
 
   return (
     <div class="inline-flex items-center gap-2 rounded-lg border border-input py-1 pl-2 pr-2">

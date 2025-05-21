@@ -5,6 +5,12 @@ import { createSignal, For, ParentComponent, Show } from 'solid-js';
 import { imageCache } from '~/services/image-cache';
 import { setStore, store } from '~/store';
 import {
+  selectSessionById,
+  selectDraftChatById,
+  selectChatById,
+  selectModelById,
+} from '~/store/selectors';
+import {
   addMessageToSessionChats,
   autonameChat,
   setAssistant,
@@ -24,7 +30,8 @@ type MultiChatLayoutProps = {
 
 export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) => {
   const navigate = useNavigate();
-  const session = () => store.sessions.find((s) => s.id === props.sessionId);
+  const selectedSession = selectSessionById(() => props.sessionId);
+  const session = () => selectedSession();
   const [attachments, setAttachments] = createSignal<File[] | undefined>();
   const sessionContext = useSession();
 
@@ -49,9 +56,9 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
 
       for (const chatId of _sessionChats) {
         const chat = _isDraft
-          ? store.draftChats.find((c) => c.id === chatId)
-          : store.chats.find((c) => c.id === chatId);
-        const model = models.find((m) => m.id === chat?.modelId);
+          ? selectDraftChatById(chatId)()
+          : selectChatById(chatId)();
+        const model = selectModelById(chat?.modelId)();
 
         if (model?.vision === false) {
           return; // Early return if any model does not support vision
@@ -108,7 +115,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
             <ChatPanelLayout numChats={s().chats.length}>
               <For each={s().chats}>
                 {(chatId, index) => {
-                  const chat = store.chats.find((c) => c.id === chatId);
+                  const chat = selectChatById(chatId)();
                   if (!chat) return null;
 
                   return (

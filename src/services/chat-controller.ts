@@ -7,9 +7,10 @@ import { nanoid } from 'nanoid';
 import * as router from '~/services/llm';
 import { setStore, store } from '~/store';
 import { addMessage } from '~/store/actions';
+import { selectChatById } from '~/store/selectors';
 
 export async function cancel({ chatId }: { chatId: string }) {
-  const chat = store.chats.find((c) => c.id === chatId);
+  const chat = selectChatById(chatId)();
   if (!chat) return;
 
   chat.controller?.abort();

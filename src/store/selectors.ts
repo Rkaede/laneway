@@ -38,3 +38,19 @@ export const selectAssistantById = (
     return store.assistants.find((a) => a.id === _id);
   });
 };
+
+export const selectPresetById = (id: string | Accessor<string | undefined>) => {
+  return createMemo(() => {
+    const _id = typeof id === 'function' ? id() : id;
+    return store.presets.find((p) => p.id === _id);
+  });
+};
+
+export const selectDraftChatById = (
+  id: string | Accessor<string | undefined>,
+) => {
+  return createMemo(() => {
+    const _id = typeof id === 'function' ? id() : id;
+    return store.draftChats.find((c) => c.id === _id);
+  });
+};

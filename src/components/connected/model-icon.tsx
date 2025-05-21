@@ -5,6 +5,7 @@ import * as creatorIcons from '~/components/icons/creators';
 import * as modelIcons from '~/components/icons/models';
 import { IconBot } from '~/components/icons/ui';
 import { models } from '~/store/models';
+import { selectModelById } from '~/store/selectors';
 import { cn } from '~/util';
 
 type ModelIconProps = {
@@ -17,7 +18,7 @@ type CreatorIcons = keyof typeof creatorIcons;
 
 export const ModelIcon: Component<ModelIconProps> = (props) => {
   const icon = createMemo(() => {
-    const model = models.find((m) => m.id === props.modelId);
+    const model = selectModelById(() => props.modelId)();
 
     if (model?.icon) {
       const modelIcon = modelIcons[model.icon as ModelIcons];

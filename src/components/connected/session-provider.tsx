@@ -2,6 +2,7 @@ import type { ParentProps } from 'solid-js';
 import { createContext, useContext } from 'solid-js';
 
 import { setStore, store } from '~/store';
+import { selectChatById } from '~/store/selectors';
 import type { SessionProps as StoreSessionProps } from '~/types';
 
 export interface SessionContextValue {
@@ -36,7 +37,7 @@ export function SessionProvider(props: SessionProps) {
     if (!props.session) return false;
 
     return props.session.chats.some((chatId) => {
-      const chat = store.chats.find((c) => c.id === chatId);
+      const chat = selectChatById(chatId)();
       return chat?.status === 'loading';
     });
   };

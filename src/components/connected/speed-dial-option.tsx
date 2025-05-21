@@ -3,6 +3,7 @@ import { For, Show, splitProps } from 'solid-js';
 
 import { Tag, type TagProps } from '~/components/ui/tag';
 import { models } from '~/store/models';
+import { selectModelById } from '~/store/selectors';
 import { cn } from '~/util';
 
 import { AvatarGroup } from '../ui';
@@ -64,7 +65,7 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
                 <For each={local.models}>
                   {/* {(modelId) => <Avatar modelId={modelId} size="sm" variant="flat" />} */}
                   {(modelId) => {
-                    const model = models.find((m) => m.id === modelId);
+                    const model = selectModelById(modelId)();
                     return (
                       <ModelCard model={model} class="size-4" variant="light">
                         <ModelIcon modelId={modelId} class="size-4" />
