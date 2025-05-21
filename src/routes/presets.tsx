@@ -489,30 +489,18 @@ const AssistantList: Component<{
   setLocalPreset: (updater: (prev: PresetProps) => PresetProps) => void;
 }> = (props) => {
   function handleSelect(id: string, type: 'assistant' | 'model' | 'preset') {
-    // todo: refactor this, it could be cleaner
+    const addChat = (chat: { assistantId?: string; modelId?: string }) =>
+      props.setLocalPreset((prev) => ({
+        ...prev,
+        chats: [...(prev.chats || []), { ...chat, messages: [], status: 'idle' }],
+      }));
+
     if (type === 'assistant') {
       const selected = store.assistants.find((a) => a.id === id);
-      if (selected) {
-        props.setLocalPreset((prev) => ({
-          ...prev,
-          chats: [
-            ...(prev.chats || []),
-            { assistantId: selected.id, messages: [], status: 'idle' },
-          ],
-        }));
-      }
-    }
-    if (type === 'model') {
+      if (selected) addChat({ assistantId: selected.id });
+    } else if (type === 'model') {
       const selected = models.find((m) => m.id === id);
-      if (selected) {
-        props.setLocalPreset((prev) => ({
-          ...prev,
-          chats: [
-            ...(prev.chats || []),
-            { modelId: selected.id, messages: [], status: 'idle' },
-          ],
-        }));
-      }
+      if (selected) addChat({ modelId: selected.id });
     }
   }
 
