@@ -3,6 +3,10 @@ public/models.json
 public/presets.json
 public/assistants.json
 
+# Local copy of the models from openrouter.
+# Used in offline development. 
+models.json
+
 # playwright
 test-results
 

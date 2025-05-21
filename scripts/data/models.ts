@@ -1,21 +1,38 @@
+import { existsSync, readFileSync } from 'fs';
+import path from 'path';
+
 import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-// https://openrouter.ai/api/v1/models
+
 
 async function fetchModels() {
-  console.info('Fetching model data from OpenRouter.');
 
+  // Local copy of the models from openrouter.
+  // Used in offline development. 
+  const modelsPath = path.resolve('./models.json');
+  if (existsSync(modelsPath)) {
+    console.info('Loading model data from local models.json.');
+    try {
+      const data = JSON.parse(readFileSync(modelsPath, 'utf-8'));
+      return data;
+    } catch (error) {
+      console.error('Error reading local models.json:', error);
+      throw error;
+    }
+  }
+
+  console.info('Fetching model data from OpenRouter.');
   try {
     const response = await fetch('https://openrouter.ai/api/v1/models');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-
     return data;
   } catch (error) {
     console.error('Error fetching models:', error);
+    throw error;
   }
 }
 
@@ -282,6 +299,8 @@ export const generateModels = async () => {
       };
     }
 
+    console.log(base);
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
     if (!routerModel) return model;
