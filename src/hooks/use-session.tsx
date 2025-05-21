@@ -1,19 +1,13 @@
 import { useNavigate } from '@solidjs/router';
-import { nanoid } from 'nanoid';
 import { Accessor, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
-import { imageCache } from '~/services/image-cache';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
 import { addMessageToSessionChats, autonameChat } from '~/store/actions';
-import {
-  selectChatById,
-  selectDraftChatById,
-  selectModelById,
-  selectSessionById,
-} from '~/store/selectors';
-import { ImagePart, MessageProps } from '~/types';
+import { selectSessionById } from '~/store/selectors';
+
+import { createMessage } from './message-utils';
 
 type SessionStore = {
   attachments: File[];
@@ -45,19 +39,6 @@ export function createSession(sessionId?: Accessor<string>) {
   }
 
   async function handleSubmit() {
-    if (sessionStore.attachments && sessionStore.attachments.length > 0) {
-      for (const chatId of sessionStore.chatIds) {
-        const chat = sessionStore.draft
-          ? selectDraftChatById(chatId)()
-          : selectChatById(chatId)();
-        const model = selectModelById(() => chat?.modelId)();
-
-        if (model?.vision === false) {
-          return; // Early return if any model does not support vision
-        }
-      }
-    }
-
     const _input = session().input;
     if (_input === '' || _input === undefined) return;
 
@@ -65,28 +46,12 @@ export function createSession(sessionId?: Accessor<string>) {
       setSessionInput('', sessionId?.());
     }
 
-    // if attachments are present, add them to the session
-    const imageCacheFiles: { filename: string; storageId: string }[] = [];
-    if (sessionStore.attachments) {
-      for (const file of sessionStore.attachments) {
-        // generate a unique name for the file
-        const name = file.name + '_' + Date.now();
-        imageCacheFiles.push({ filename: file.name, storageId: name });
-        await imageCache.add(name, file);
-      }
-    }
+    const message = await createMessage(_input, sessionStore.attachments, {
+      chatIds: sessionStore.chatIds,
+      draft: sessionStore.draft,
+    });
 
-    const message = {
-      id: nanoid(),
-      role: 'user',
-      content:
-        imageCacheFiles.length > 0
-          ? [
-              ...imageCacheFiles.map((file) => ({ type: 'image', image: file }) as ImagePart),
-              { type: 'text', text: _input },
-            ]
-          : _input,
-    } satisfies MessageProps;
+    if (!message) return;
 
     const id = addMessageToSessionChats(message, sessionId?.(), session().type);
 
