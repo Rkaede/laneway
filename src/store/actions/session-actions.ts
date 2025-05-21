@@ -14,8 +14,9 @@ import type {
 
 const router = import('~/services/llm');
 
-import { setStore, store } from '..';
 import { getProvider } from '~/services/util';
+
+import { setStore, store } from '..';
 import { models } from '../models';
 import { createSessionFromPreset } from '../util';
 

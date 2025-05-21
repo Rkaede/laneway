@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui';
-import { models, providers } from '~/store/models';
+import { providers } from '~/store/models';
 import { selectModelById } from '~/store/selectors';
 import type { ProviderId } from '~/types';
 import { cn } from '~/util';

@@ -6,8 +6,8 @@ import { IconSendHorizontal } from '~/components/icons/ui';
 import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
 import { store } from '~/store';
-import { selectChatById } from '~/store/selectors';
 import { setSessionInput } from '~/store/actions';
+import { selectChatById } from '~/store/selectors';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 export function NoteLayout(props: { sessionId: string }) {

@@ -7,12 +7,11 @@ import { imageCache } from '~/services/image-cache';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
 import { addMessageToSessionChats, autonameChat } from '~/store/actions';
-import { models } from '~/store/models';
 import {
-  selectSessionById,
-  selectDraftChatById,
   selectChatById,
+  selectDraftChatById,
   selectModelById,
+  selectSessionById,
 } from '~/store/selectors';
 import { ImagePart, MessageProps } from '~/types';
 

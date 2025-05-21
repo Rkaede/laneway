@@ -2,6 +2,7 @@ import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import { imageCache } from '~/services/image-cache';
+
 import { createDefaultState, defaults } from './default-state';
 
 export const [store, setStore] = makePersisted(createStore(createDefaultState()), {

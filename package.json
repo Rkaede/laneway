@@ -8,13 +8,13 @@
     "build": "tsx scripts/generate-data.ts && tsc && vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
-    "format": "prettier --write ./src",
+    "format": "prettier --log-level warn --write ./src",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "test": "bun test ./**/*.test.*",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "validate": "pnpm run format && pnpm run lint:fix && pnpm run test"
+    "validate": "pnpm format && pnpm typecheck && pnpm lint:fix && pnpm test"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.0.10",

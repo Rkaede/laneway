@@ -44,7 +44,6 @@ import { Input } from '~/components/ui/input';
 import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
-import { models } from '~/store/models';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';

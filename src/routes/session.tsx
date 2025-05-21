@@ -6,9 +6,9 @@ import { WelcomeContent } from '~/components/connected/welcome';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
 import { store } from '~/store';
-import { selectSessionById } from '~/store/selectors';
 import { newDraftSession } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
+import { selectSessionById } from '~/store/selectors';
 import { anyKeysSet } from '~/store/selectors';
 
 export function Session() {

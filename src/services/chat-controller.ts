@@ -5,7 +5,7 @@
 import { nanoid } from 'nanoid';
 
 import * as router from '~/services/llm';
-import { setStore, store } from '~/store';
+import { setStore } from '~/store';
 import { addMessage } from '~/store/actions';
 import { selectChatById } from '~/store/selectors';
 

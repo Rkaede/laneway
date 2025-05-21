@@ -2,7 +2,6 @@ import type { ComponentProps, ParentComponent } from 'solid-js';
 import { For, Show, splitProps } from 'solid-js';
 
 import { Tag, type TagProps } from '~/components/ui/tag';
-import { models } from '~/store/models';
 import { selectModelById } from '~/store/selectors';
 import { cn } from '~/util';
 

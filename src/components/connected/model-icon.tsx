@@ -4,7 +4,6 @@ import { Dynamic } from 'solid-js/web';
 import * as creatorIcons from '~/components/icons/creators';
 import * as modelIcons from '~/components/icons/models';
 import { IconBot } from '~/components/icons/ui';
-import { models } from '~/store/models';
 import { selectModelById } from '~/store/selectors';
 import { cn } from '~/util';
 

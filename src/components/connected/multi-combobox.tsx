@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui';
 import { store } from '~/store';
-import { models, modelsByCreator } from '~/store/models';
+import { modelsByCreator } from '~/store/models';
 import { selectAssistantById, selectModelById, selectPresetById } from '~/store/selectors';
 import { cn } from '~/util';
 

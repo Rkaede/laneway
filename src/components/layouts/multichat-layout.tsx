@@ -5,18 +5,17 @@ import { createSignal, For, ParentComponent, Show } from 'solid-js';
 import { imageCache } from '~/services/image-cache';
 import { setStore, store } from '~/store';
 import {
-  selectSessionById,
-  selectDraftChatById,
-  selectChatById,
-  selectModelById,
-} from '~/store/selectors';
-import {
   addMessageToSessionChats,
   autonameChat,
   setAssistant,
   setSessionInput,
 } from '~/store/actions';
-import { models } from '~/store/models';
+import {
+  selectChatById,
+  selectDraftChatById,
+  selectModelById,
+  selectSessionById,
+} from '~/store/selectors';
 import { ImagePart, MessageProps } from '~/types';
 
 import { ChatInput } from '../chat/chat-input';

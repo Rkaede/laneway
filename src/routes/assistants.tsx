@@ -33,7 +33,6 @@ import { PageTitle, SectionDescription } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
 import { setStore, store } from '~/store';
 import { addAssistant, deleteAssistant } from '~/store/actions';
-import { models } from '~/store/models';
 import { selectModelById } from '~/store/selectors';
 import type { AssistantProps } from '~/types';
 import { clone } from '~/util';

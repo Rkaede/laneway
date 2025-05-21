@@ -29,8 +29,8 @@ import {
 } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import { setStore, store } from '~/store';
-import { selectSessionById } from '~/store/selectors';
 import { actions, deleteSession, renameSession, toggleSidebar } from '~/store/actions';
+import { selectSessionById } from '~/store/selectors';
 import type { SessionProps } from '~/types';
 import { groupByDate } from '~/util';
 

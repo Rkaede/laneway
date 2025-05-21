@@ -6,6 +6,7 @@ import {
   IconSettings,
 } from '~/components/icons/ui';
 import type { ActionContext, Actions } from '~/types';
+
 import { store } from '..';
 
 export const navigationActions: Actions = {
