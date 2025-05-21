@@ -3,7 +3,7 @@ import { createEffect, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { getProvider } from '~/services/util';
-import { setStore, store } from '~/store';
+import { setStore } from '~/store';
 import { clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
 import {
