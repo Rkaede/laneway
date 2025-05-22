@@ -112,7 +112,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
       </Show>
       <div class="flex-1 space-y-2 px-1">
         {Array.isArray(props.content) ? (
-          props.content
+          [...props.content]
             .sort((a, b) => (a.type === 'image' ? 1 : b.type === 'image' ? -1 : 0))
             .map((part) => {
               if (part.type === 'text') {
