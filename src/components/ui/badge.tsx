@@ -1,14 +1,12 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import {
-  BoxIcon,
-  BrainIcon,
-  HeadphonesIcon,
-  ImageIcon,
-  LayoutTemplateIcon,
-  SparklesIcon,
-  TagIcon,
-  WifiIcon,
-} from 'lucide-solid';
+import BoxIcon from 'lucide-solid/icons/box';
+import BrainIcon from 'lucide-solid/icons/brain';
+import HeadphonesIcon from 'lucide-solid/icons/headphones';
+import ImageIcon from 'lucide-solid/icons/image';
+import LayoutTemplateIcon from 'lucide-solid/icons/layout-template';
+import SparklesIcon from 'lucide-solid/icons/sparkles';
+import TagIcon from 'lucide-solid/icons/tag';
+import WifiIcon from 'lucide-solid/icons/wifi';
 import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
 import { mergeProps, Show, splitProps } from 'solid-js';
 

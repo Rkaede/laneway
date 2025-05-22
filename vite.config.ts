@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -43,6 +43,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'src'),
+      // https://christopher.engineering/en/blog/lucide-icons-with-vite-dev-server/
+      'lucide-solid/icons': fileURLToPath(
+        new URL('./node_modules/lucide-solid/dist/source/icons', import.meta.url),
+      ),
     },
+  },
+  server: {
+    // ... existing code ...
   },
 });
