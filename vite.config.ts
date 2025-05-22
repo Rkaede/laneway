@@ -33,7 +33,12 @@ export default defineConfig({
   plugins: [solid(), VitePWA({ registerType: 'autoUpdate' })],
   optimizeDeps: {
     // Add both @codemirror/state and @codemirror/view to included deps to optimize
-    include: ['@codemirror/state', '@codemirror/view'],
+    include: [
+      '@codemirror/state',
+      '@codemirror/view',
+      'solid-markdown > micromark',
+      'solid-markdown > unified',
+    ],
   },
   resolve: {
     alias: {

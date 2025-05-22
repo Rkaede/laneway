@@ -38,7 +38,7 @@
     "nanoid": "^5.0.7",
     "solid-codemirror": "^2.3.1",
     "solid-js": "^1.8.15",
-    "solid-markdown": "^2.0.13"
+    "solid-markdown": "^2.0.14"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.1",

@@ -72,7 +72,7 @@ importers:
         specifier: ^1.8.15
         version: 1.9.7
       solid-markdown:
-        specifier: ^2.0.13
+        specifier: ^2.0.14
         version: 2.0.14(solid-js@1.9.7)
     devDependencies:
       '@eslint/compat':
