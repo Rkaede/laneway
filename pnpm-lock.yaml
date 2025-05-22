@@ -111,6 +111,9 @@ importers:
       eslint-plugin-solid:
         specifier: ^0.14.0
         version: 0.14.5(eslint@9.27.0(jiti@1.21.7))(typescript@5.8.3)
+      globals:
+        specifier: ^16.1.0
+        version: 16.1.0
       lint-staged:
         specifier: ^15.2.9
         version: 15.5.2
@@ -2392,6 +2395,10 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+
+  globals@16.1.0:
+    resolution: {integrity: sha512-aibexHNbb/jiUSObBgpHLj+sIuUmJnYcgXBlrfsiDZ9rt4aF2TFRbyLgZ2iFQuVZ1K5Mx3FVkbKRSgKrbK3K2g==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -6670,6 +6677,8 @@ snapshots:
   globals@11.12.0: {}
 
   globals@14.0.0: {}
+
+  globals@16.1.0: {}
 
   globalthis@1.0.4:
     dependencies:
