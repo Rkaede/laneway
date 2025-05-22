@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development tsx scripts/generate-data.ts && vite --force",
-    "build": "tsx scripts/generate-data.ts && tsc && vite build",
+    "dev": "NODE_ENV=development bun scripts/generate-data.ts && vite --force",
+    "build": "bun scripts/generate-data.ts && tsc && vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
     "format": "prettier --log-level warn --write ./src",
