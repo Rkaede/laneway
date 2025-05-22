@@ -5,11 +5,9 @@ import type { Architecture, ModelProps, ModelTags } from '../../src/types';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-
 async function fetchModels() {
-
   // Local copy of the models from openrouter.
-  // Used in offline development. 
+  // Used in offline development.
   const modelsPath = path.resolve('./models.json');
   if (existsSync(modelsPath)) {
     console.info('Loading model data from local models.json.');
@@ -243,8 +241,10 @@ function mapBase(base: Array<Partial<ModelProps>>, defaultsKey: keyof typeof def
 
     return {
       ...defaults[defaultsKey],
-      provider: [...provider, ...(model.provider || [])],
       ...model,
+      // This needs to go after we spread the model.
+      // Otherwise the provider will be overwritten!
+      provider: [...provider, ...(model.provider || [])],
     };
   });
 }
@@ -275,6 +275,7 @@ if (isDevelopment) {
 
 export const generateModels = async () => {
   const base = await fetchModels();
+
   const results = modelsBase.map((model) => {
     if (model.id === 'aperture/glados') {
       return {
@@ -298,7 +299,7 @@ export const generateModels = async () => {
         vision: false,
       };
     }
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
     if (!routerModel) return model;
@@ -309,7 +310,7 @@ export const generateModels = async () => {
       tags.push('vision');
     }
 
-    // check if the model is less than 3 months old
+    // Check if the model is less than 3 months old
     const twoMonthsAgo = new Date();
     twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
     if (new Date(routerModel.created * 1000) > twoMonthsAgo) {
@@ -355,5 +356,6 @@ export const generateModels = async () => {
     };
     return updated;
   });
+
   return results;
 };
