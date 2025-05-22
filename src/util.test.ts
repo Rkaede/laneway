@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { formatResponseTime, groupByDate } from '../src/util';
-
+import { formatResponseTime, groupByDate } from './util';
 
 // < 2000 returns "Nms"
 describe('formatResponseTime', () => {
@@ -31,9 +30,7 @@ describe('groupByDate', () => {
     const sevenDaysAgo = new Date(now);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const groups = groupByDate([
-      { ...baseSession, id: 'a', created: sevenDaysAgo.getTime() },
-    ]);
+    const groups = groupByDate([{ ...baseSession, id: 'a', created: sevenDaysAgo.getTime() }]);
     // Debugging
     //console.log({ groups });
 
@@ -45,9 +42,7 @@ describe('groupByDate', () => {
     const eightDaysAgo = new Date(now);
     eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
 
-    const groups = groupByDate([
-      { ...baseSession, id: 'b', created: eightDaysAgo.getTime() },
-    ]);
+    const groups = groupByDate([{ ...baseSession, id: 'b', created: eightDaysAgo.getTime() }]);
 
     expect(groups.older.map((s) => s.id)).toContain('b');
   });
