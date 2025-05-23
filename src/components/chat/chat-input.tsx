@@ -3,6 +3,7 @@ import { Component, createEffect, For, lazy, Show } from 'solid-js';
 
 import { IconPaperclip, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
+import config from '~/config';
 import { cn } from '~/util';
 
 import { Thumbnail } from '../ui';
@@ -25,6 +26,10 @@ interface FileSelectDetail {
   target: { files: FileList | null };
 }
 
+const isValidImageType = (file: File): boolean => {
+  return config.attachments.types.includes(file.type);
+};
+
 export const ChatInput: Component<PromptProps> = (props) => {
   let fileInputRef: HTMLInputElement | undefined;
   let ref: HTMLTextAreaElement | undefined;
@@ -46,7 +51,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
         ? event.detail.target.files?.[0]
         : (event.target as HTMLInputElement).files?.[0];
 
-    if (file) {
+    if (file && isValidImageType(file)) {
       props.onFileSelect?.(file);
       // remove the file from the input
       (event.target as HTMLInputElement).value = '';
@@ -58,7 +63,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
       .find((item) => item.type.startsWith('image/'))
       ?.getAsFile();
 
-    if (file) {
+    if (file && isValidImageType(file)) {
       props.onFileSelect?.(file);
     }
   };
@@ -106,7 +111,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             <input
               type="file"
               ref={fileInputRef}
-              accept="image/*"
+              accept={config.attachments.extensions.join(',')}
               class="hidden"
               onChange={handleFileSelect}
             />
