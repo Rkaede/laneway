@@ -138,9 +138,6 @@ importers:
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.17
-      tsx:
-        specifier: ^4.8.1
-        version: 4.19.4
       typescript:
         specifier: ^5.6.2
         version: 5.8.3
@@ -8121,6 +8118,7 @@ snapshots:
       get-tsconfig: 4.10.0
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   type-check@0.4.0:
     dependencies:
