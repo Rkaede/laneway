@@ -178,6 +178,10 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
         data-open={open()}
         variant="ghost"
         size="icon"
+        onClick={(e: MouseEvent) => e.stopPropagation()}
+        // we need this to prevent this event from bubbling up to the parent
+        // which would cause navigation to the session
+        onMouseDown={(e: MouseEvent) => e.stopPropagation()}
       >
         <MoreHorizontalIcon class="size-4" />
       </DropdownMenuTrigger>
