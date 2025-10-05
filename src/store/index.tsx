@@ -49,7 +49,6 @@ if (store.settings.tts === undefined) {
 }
 
 export const deleteData = () => {
-  setStore({});
   setStore(createDefaultState());
   imageCache.clearAll();
 };

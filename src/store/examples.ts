@@ -5,102 +5,104 @@ type Example = {
   chats: ChatProps[];
 };
 
-export const story: Example = {
-  session: {
-    id: 'IRPl9snT8_dlVH0JvDuqu',
-    type: 'chat',
-    presetTitle: 'Flagship models',
-    presetDescription: 'Compare frontier models.',
-    templateId: 'full-house',
-    chats: ['wM5RNPLziLK9WLhRz-3n-', 'ZmpJjHxzpK64XbOLzhMWG', '_LJSbFPMz9Up3_4aigJJS'],
-    title: 'Multi-chat',
-    created: -1,
-    input: '',
-  },
-  chats: [
-    {
-      modelId: 'openai/gpt-4o',
-      id: 'wM5RNPLziLK9WLhRz-3n-',
-      created: 1737349542103,
-      status: 'idle',
-      messages: [
-        {
-          id: '9W2NbQbTVfNIoneeAfE9r',
-          role: 'user',
-          content:
-            'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
-        },
-        {
-          id: 'V8kMO_HnKmlr4SHUINwhr',
-          role: 'assistant',
-          content:
-            "In the quaint town of Willow Creek, where secrets were as common as the rustling leaves, a mischievous talking dog named Max found himself wearing the mayor's sash after a series of unexpected and hilarious events.",
-          usage: {
-            promptTokens: 30,
-            completionTokens: 43,
-            totalTokens: 73,
-            created: 1737349543707,
-            timeTaken: 1517,
-          },
-        },
-      ],
+export function story(): Example {
+  return {
+    session: {
+      id: 'IRPl9snT8_dlVH0JvDuqu',
+      type: 'chat',
+      presetTitle: 'Flagship models',
+      presetDescription: 'Compare frontier models.',
+      templateId: 'full-house',
+      chats: ['wM5RNPLziLK9WLhRz-3n-', 'ZmpJjHxzpK64XbOLzhMWG', '_LJSbFPMz9Up3_4aigJJS'],
+      title: 'Multi-chat',
+      created: -1,
+      input: '',
     },
-    {
-      modelId: 'anthropic/claude-3.5-sonnet',
-      id: 'ZmpJjHxzpK64XbOLzhMWG',
-      created: 1737349542103,
-      status: 'idle',
-      messages: [
-        {
-          id: '9W2NbQbTVfNIoneeAfE9r',
-          role: 'user',
-          content:
-            'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
-        },
-        {
-          id: 'SKNKbock2WlZpcVoa6pDl',
-          role: 'assistant',
-          content:
-            'Nobody in the sleepy town of Millbrook was more surprised than Max the golden retriever when his bark of "Lower property taxes!" during a televised mayoral debate was mistaken for brilliant political commentary, launching him into an unexpected campaign that would change everything.',
-          usage: {
-            promptTokens: 31,
-            completionTokens: 58,
-            totalTokens: 89,
-            created: 1737349546242,
-            timeTaken: 4052,
+    chats: [
+      {
+        modelId: 'openai/gpt-4o',
+        id: 'wM5RNPLziLK9WLhRz-3n-',
+        created: 1737349542103,
+        status: 'idle',
+        messages: [
+          {
+            id: '9W2NbQbTVfNIoneeAfE9r',
+            role: 'user',
+            content:
+              'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
           },
-        },
-      ],
-    },
-    {
-      modelId: 'google/gemini-2.5-pro',
-      id: '_LJSbFPMz9Up3_4aigJJS',
-      created: 1737349542103,
-      status: 'idle',
-      messages: [
-        {
-          id: '9W2NbQbTVfNIoneeAfE9r',
-          role: 'user',
-          content:
-            'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
-        },
-        {
-          id: 'JCygelkgMLEzER4Fa0RsX',
-          role: 'assistant',
-          content:
-            "Barnaby, a scruffy terrier mix with a penchant for pilfered sausages and an eloquent vocabulary he'd gleaned from talk radio, never intended to run for mayor, let alone win.\n",
-          usage: {
-            promptTokens: 21,
-            completionTokens: 40,
-            totalTokens: 61,
-            created: 1737349545710,
-            timeTaken: 3519,
+          {
+            id: 'V8kMO_HnKmlr4SHUINwhr',
+            role: 'assistant',
+            content:
+              "In the quaint town of Willow Creek, where secrets were as common as the rustling leaves, a mischievous talking dog named Max found himself wearing the mayor's sash after a series of unexpected and hilarious events.",
+            usage: {
+              promptTokens: 30,
+              completionTokens: 43,
+              totalTokens: 73,
+              created: 1737349543707,
+              timeTaken: 1517,
+            },
           },
-        },
-      ],
-    },
-  ],
-};
+        ],
+      },
+      {
+        modelId: 'anthropic/claude-3.5-sonnet',
+        id: 'ZmpJjHxzpK64XbOLzhMWG',
+        created: 1737349542103,
+        status: 'idle',
+        messages: [
+          {
+            id: '9W2NbQbTVfNIoneeAfE9r',
+            role: 'user',
+            content:
+              'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
+          },
+          {
+            id: 'SKNKbock2WlZpcVoa6pDl',
+            role: 'assistant',
+            content:
+              'Nobody in the sleepy town of Millbrook was more surprised than Max the golden retriever when his bark of "Lower property taxes!" during a televised mayoral debate was mistaken for brilliant political commentary, launching him into an unexpected campaign that would change everything.',
+            usage: {
+              promptTokens: 31,
+              completionTokens: 58,
+              totalTokens: 89,
+              created: 1737349546242,
+              timeTaken: 4052,
+            },
+          },
+        ],
+      },
+      {
+        modelId: 'google/gemini-2.5-flash',
+        id: '_LJSbFPMz9Up3_4aigJJS',
+        created: 1737349542103,
+        status: 'idle',
+        messages: [
+          {
+            id: '9W2NbQbTVfNIoneeAfE9r',
+            role: 'user',
+            content:
+              'Write the opening sentence of a story about a mischievous talking dog who accidentally becomes mayor of a small town.',
+          },
+          {
+            id: 'JCygelkgMLEzER4Fa0RsX',
+            role: 'assistant',
+            content:
+              "Barnaby, a scruffy terrier mix with a penchant for pilfered sausages and an eloquent vocabulary he'd gleaned from talk radio, never intended to run for mayor, let alone win.\n",
+            usage: {
+              promptTokens: 21,
+              completionTokens: 40,
+              totalTokens: 61,
+              created: 1737349545710,
+              timeTaken: 3519,
+            },
+          },
+        ],
+      },
+    ],
+  };
+}
 
 export const imageAttachment: Example = {
   session: {
