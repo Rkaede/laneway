@@ -36,8 +36,8 @@ const SortableHeader: ParentComponent<SortableHeaderProps> = (props) => (
 );
 
 export default function ModelList() {
-  const [sortColumn, setSortColumn] = createSignal<string>('created');
-  const [sortDirection, setSortDirection] = createSignal<'ASC' | 'DESC' | undefined>('DESC');
+  const [sortColumn, setSortColumn] = createSignal<string>('creator');
+  const [sortDirection, setSortDirection] = createSignal<'ASC' | 'DESC' | undefined>('ASC');
 
   const sortedModels = createMemo(() => {
     const _sortColumn = sortColumn();
