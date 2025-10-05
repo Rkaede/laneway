@@ -54,6 +54,7 @@ export type ModelProps = {
   contextLength?: number;
   maxCompletionTokens?: number;
   title: string;
+  legacy?: boolean; // the model has a newer version
   vision?: boolean;
   reasoning?: boolean;
   maxFrequency?: number;
