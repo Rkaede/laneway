@@ -35,3 +35,7 @@ dist-ssr
 *.sln
 *.sw?
 *.cursorrules
+
+
+# misc
+todo.md
