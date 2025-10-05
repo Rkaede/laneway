@@ -9,15 +9,15 @@ export const presets: PresetProps[] = [
     templateId: 'flagship-models',
     chats: [
       {
-        modelId: 'openai/o3-mini-high',
+        modelId: 'openai/gpt-5',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3.7-sonnet:thinking',
+        modelId: 'anthropic/claude-opus-4.1',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-pro-preview-03-25',
+        modelId: 'google/gemini-2.5-pro',
         status: 'idle',
       },
     ],
@@ -30,15 +30,15 @@ export const presets: PresetProps[] = [
     templateId: 'daily-driver',
     chats: [
       {
-        modelId: 'openai/gpt-4.1',
+        modelId: 'openai/gpt-5-mini',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3.7-sonnet',
+        modelId: 'anthropic/claude-sonnet-4.5',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-pro-preview-03-25',
+        modelId: 'google/gemini-2.5-flash',
         status: 'idle',
       },
     ],

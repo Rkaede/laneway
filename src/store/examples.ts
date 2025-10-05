@@ -73,7 +73,7 @@ export const story: Example = {
       ],
     },
     {
-      modelId: 'google/gemini-pro-1.5',
+      modelId: 'google/gemini-2.5-pro',
       id: '_LJSbFPMz9Up3_4aigJJS',
       created: 1737349542103,
       status: 'idle',

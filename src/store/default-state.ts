@@ -66,9 +66,9 @@ const defaultPreset: PresetProps = {
   presetDescription: 'Good enough',
   templateId: 'daily-driver',
   chats: [
-    { modelId: 'openai/gpt-4.1', status: 'idle' },
-    { modelId: 'anthropic/claude-3.7-sonnet', status: 'idle' },
-    { modelId: 'google/gemini-2.5-pro-preview-03-25', status: 'idle' },
+    { modelId: 'openai/gpt-5-mini', status: 'idle' },
+    { modelId: 'anthropic/claude-sonnet-4.5', status: 'idle' },
+    { modelId: 'google/gemini-2.5-flash', status: 'idle' },
   ],
 };
 
@@ -79,9 +79,9 @@ const flagshipModels: PresetProps = {
   presetDescription: 'Compare frontier models.',
   templateId: 'flagship-models',
   chats: [
-    { modelId: 'openai/o3-mini-high', status: 'idle' },
-    { modelId: 'anthropic/claude-3.7-sonnet:thinking', status: 'idle' },
-    { modelId: 'google/gemini-2.5-pro-preview-03-25', status: 'idle' },
+    { modelId: 'openai/gpt-5', status: 'idle' },
+    { modelId: 'anthropic/claude-opus-4.1', status: 'idle' },
+    { modelId: 'google/gemini-2.5-pro', status: 'idle' },
   ],
 };
 
@@ -147,9 +147,9 @@ export function createDefaultState(): State {
         title: 'Online reasoning model',
       },
       {
-        id: 'gemini-2.5-pro-preview-free-dial',
+        id: 'gemini-2.5-pro-dial',
         type: 'model',
-        referenceId: 'google/gemini-2.5-pro-exp-03-25:free',
+        referenceId: 'google/gemini-2.5-pro',
         sessionType: 'chat',
         title: 'Gemini Pro 2.5 Preview',
       },
