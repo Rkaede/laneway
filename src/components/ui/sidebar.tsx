@@ -24,13 +24,13 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
       <a
         href={props.href}
         class={cn(
-          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-1 font-normal text-foreground hover:bg-background-2',
+          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 font-normal text-foreground hover:bg-background-2',
           props.active && 'bg-background-2 hover:bg-background-3',
           props.class,
         )}
         onMouseDown={(e) => e.currentTarget.click()}
       >
-        <div class="flex flex-1 items-center gap-1 text-base">
+        <div class="flex flex-1 items-center gap-1 text-sm">
           <Show when={props.icon}>
             <span>{props.icon}</span>
           </Show>
