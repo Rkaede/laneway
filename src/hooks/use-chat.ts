@@ -29,6 +29,7 @@ export function useChat({ chat }: UseChat) {
 
   const provider = () => {
     const modelId = model()?.id;
+
     if (!modelId) return undefined;
     return getProvider(modelId);
   };
