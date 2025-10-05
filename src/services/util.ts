@@ -42,11 +42,13 @@ export function getProvider(modelId: string) {
     return openrouterProvider;
   }
 
-  if (openRouterUsage === 'fallback' && primaryProvider) {
-    const isPrimaryApiKeySet = !!apiKeys?.[primaryProvider.id];
+  if (openRouterUsage === 'fallback') {
+    if (primaryProvider) {
+      const isPrimaryApiKeySet = !!apiKeys?.[primaryProvider.id];
 
-    if (isPrimaryApiKeySet) {
-      return primaryProvider;
+      if (isPrimaryApiKeySet) {
+        return primaryProvider;
+      }
     }
     if (openrouterProvider && isOpenRouterConfigured) {
       return openrouterProvider;
