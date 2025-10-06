@@ -1,17 +1,14 @@
+import remarkGfm from 'remark-gfm';
 import { type Component, Show } from 'solid-js';
 import { SolidMarkdown } from 'solid-markdown';
 
 import { CodeBlock } from '~/components/ui';
 import { cn, sanitizeMessage } from '~/util';
 
-// type MarkdownProps = {
-//   children: string;
-//   class?: string;
-// };
-
 const Markdown: Component<{ text: string }> = (props) => {
   return (
     <SolidMarkdown
+      remarkPlugins={[remarkGfm]}
       components={{
         pre(preProps) {
           return <pre class="not-prose overflow-hidden rounded" {...preProps} />;
