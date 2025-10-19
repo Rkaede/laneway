@@ -27,3 +27,21 @@ export function WithTTS() {
     </div>
   );
 }
+
+export function WithTable() {
+  const tableContent = `### Summary and Recommendation
+
+| Option | Implementation Effort | Downtime on Deploy | Cost Impact | Scalability | Recommendation |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Change ECS Deployment** | **Very Low** (Config change) | **Yes** (minutes) | None | Low (1 instance only) | **Good short-term fix** |
+| **2. Migrate to RDS/Aurora** | **Medium** (Code + Infra change) | **No** | Medium | **High** | **Best long-term solution** |
+| **3. Use SQLite WAL Mode** | Low (Code change) | No | None | Low (1 instance only) | **Not Recommended (Risk of data corruption)** |`;
+
+  return (
+    <div class="grid grid-cols-3 gap-4">
+      <Message id="with-table-1" role="assistant" content={tableContent} usage={stats} />
+      <Message id="with-table-2" role="assistant" content={tableContent} usage={stats} />
+      <Message id="with-table-3" role="assistant" content={tableContent} usage={stats} />
+    </div>
+  );
+}
