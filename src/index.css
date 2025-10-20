@@ -191,3 +191,8 @@ pre {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--muted-foreground)) transparent;
 }
+
+/* this adds scrolling to tables in markdown when they are too wide */
+.prose table {
+  @apply block w-full overflow-x-auto;
+}
