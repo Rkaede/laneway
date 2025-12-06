@@ -42,7 +42,7 @@ export default function ModelList() {
   const sortedModels = createMemo(() => {
     const _sortColumn = sortColumn();
 
-    return [...models].sort((a, b) => {
+    return [...models].filter((model) => !model.deprecated).sort((a, b) => {
       if (_sortColumn === '') return 0;
 
       let aValue, bValue;

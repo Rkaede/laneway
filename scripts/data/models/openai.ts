@@ -39,6 +39,7 @@ export const openai: Partial<ModelProps>[] = [
     title: 'o1-mini',
     legacy: true,
     reasoning: true,
+    deprecated: true,
     provider: [{ ...openaiProvider, modelId: 'o1-mini' }],
   },
   {
@@ -85,8 +86,14 @@ export const openai: Partial<ModelProps>[] = [
   { id: 'openai/gpt-5', title: 'GPT-5' },
   { id: 'openai/gpt-5-mini', title: 'GPT-5 Mini' },
   { id: 'openai/gpt-5-nano', title: 'GPT-5 Nano' },
-  { id: 'openai/gpt-oss-120b:free', title: 'gpt-oss-120b (free)' },
+  { id: 'openai/gpt-oss-120b:free', title: 'gpt-oss-120b (free)', deprecated: true },
   { id: 'openai/gpt-oss-120b', title: 'gpt-oss-120b' },
   { id: 'openai/gpt-oss-20b:free', title: 'gpt-oss-20b (free)' },
   { id: 'openai/gpt-oss-20b', title: 'gpt-oss-20b' },
+  { id: 'openai/gpt-5.1-codex-max', title: 'GPT-5.1 Codex Max' },
+  { id: 'openai/gpt-5.1', title: 'GPT-5.1' },
+  { id: 'openai/gpt-5.1-chat', title: 'GPT-5.1 Chat' },
+  { id: 'openai/gpt-5.1-codex', title: 'GPT-5.1 Codex' },
+  { id: 'openai/gpt-5.1-codex-mini', title: 'GPT-5.1 Codex Mini' },
+  { id: 'openai/gpt-5-pro', title: 'GPT-5 Pro' },
 ];

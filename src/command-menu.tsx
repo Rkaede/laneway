@@ -64,7 +64,7 @@ export function CommandMenu() {
   }[] => [
     {
       heading: 'New chat with model...',
-      items: models.map((model) => ({
+      items: models.filter((model) => !model.deprecated).map((model) => ({
         type: 'model',
         id: `c-${model.id}`,
         title: model.title,

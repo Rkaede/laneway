@@ -47,6 +47,7 @@ export type ModelProps = {
   id: string;
   provider: Provider[];
   description?: string;
+  deprecated?: boolean;
   creator: Creator;
   created: number;
   icon?: string;

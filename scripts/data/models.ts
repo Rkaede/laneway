@@ -174,7 +174,7 @@ export const generateModels = async () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
-    if (!routerModel) {
+    if (!routerModel || routerModel.deprecated) {
       console.log('warning: model not on openrouter', model.id);
       return model;
     }
