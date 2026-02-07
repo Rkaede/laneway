@@ -64,13 +64,15 @@ export function CommandMenu() {
   }[] => [
     {
       heading: 'New chat with model...',
-      items: models.filter((model) => !model.deprecated).map((model) => ({
-        type: 'model',
-        id: `c-${model.id}`,
-        title: model.title,
-        sessionType: 'chat',
-        referenceId: model.id,
-      })),
+      items: models
+        .filter((model) => !model.deprecated)
+        .map((model) => ({
+          type: 'model',
+          id: `c-${model.id}`,
+          title: model.title,
+          sessionType: 'chat',
+          referenceId: model.id,
+        })),
     },
     {
       heading: 'New chat with assistant...',

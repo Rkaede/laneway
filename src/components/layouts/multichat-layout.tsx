@@ -142,8 +142,8 @@ export function BlankSession(props: { attachments?: File[] }) {
           />
         )}
       </For>
-      <div class="absolute inset-0 flex items-center justify-center gap-4 pointer-events-none">
-        <div class="flex flex-col gap-20 self-center pointer-events-auto">
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center gap-4">
+        <div class="pointer-events-auto flex flex-col gap-20 self-center">
           <SpeedDial items={store.speedDial} />
         </div>
       </div>

@@ -42,31 +42,33 @@ export default function ModelList() {
   const sortedModels = createMemo(() => {
     const _sortColumn = sortColumn();
 
-    return [...models].filter((model) => !model.deprecated).sort((a, b) => {
-      if (_sortColumn === '') return 0;
+    return [...models]
+      .filter((model) => !model.deprecated)
+      .sort((a, b) => {
+        if (_sortColumn === '') return 0;
 
-      let aValue, bValue;
+        let aValue, bValue;
 
-      if (_sortColumn === 'pricing-context') {
-        aValue = a.pricing?.prompt;
-        bValue = b.pricing?.prompt;
-      } else if (_sortColumn === 'pricing-output') {
-        aValue = a.pricing?.completion;
-        bValue = b.pricing?.completion;
-      } else if (_sortColumn === 'creator') {
-        aValue = a.creator.name;
-        bValue = b.creator.name;
-      } else {
-        aValue = a[_sortColumn as keyof ModelProps];
-        bValue = b[_sortColumn as keyof ModelProps];
-      }
+        if (_sortColumn === 'pricing-context') {
+          aValue = a.pricing?.prompt;
+          bValue = b.pricing?.prompt;
+        } else if (_sortColumn === 'pricing-output') {
+          aValue = a.pricing?.completion;
+          bValue = b.pricing?.completion;
+        } else if (_sortColumn === 'creator') {
+          aValue = a.creator.name;
+          bValue = b.creator.name;
+        } else {
+          aValue = a[_sortColumn as keyof ModelProps];
+          bValue = b[_sortColumn as keyof ModelProps];
+        }
 
-      if (aValue === undefined || bValue === undefined) return 0;
+        if (aValue === undefined || bValue === undefined) return 0;
 
-      if (aValue < bValue) return sortDirection() === 'ASC' ? -1 : 1;
-      if (aValue > bValue) return sortDirection() === 'ASC' ? 1 : -1;
-      return 0;
-    });
+        if (aValue < bValue) return sortDirection() === 'ASC' ? -1 : 1;
+        if (aValue > bValue) return sortDirection() === 'ASC' ? 1 : -1;
+        return 0;
+      });
   });
 
   const handleSort = (column: string) => {

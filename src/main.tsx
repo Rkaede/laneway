@@ -38,10 +38,7 @@ if (root) {
 
           {/* Sandbox routes with SandboxLayout */}
           <Route path="/sandbox" component={SandboxLayout}>
-            <Route
-              path="/:story"
-              component={StoryPage}
-            />
+            <Route path="/:story" component={StoryPage} />
             <Route
               path="/"
               component={() => (
