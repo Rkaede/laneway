@@ -270,7 +270,9 @@ export const sessionActions: Actions = {
     keywords: [],
     icon: IconTrash,
     fn: (context: ActionContext) => {
-      deleteSession(context.params.id);
+      const sessionId = context.params.id;
+      if (!sessionId) return;
+      deleteSession(sessionId);
       context.navigate('/');
     },
   },

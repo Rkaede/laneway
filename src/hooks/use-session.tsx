@@ -15,14 +15,14 @@ type SessionStore = {
   chatIds: string[];
 };
 
-export function createSession(sessionId?: Accessor<string>) {
+export function createSession(sessionId?: Accessor<string | undefined>) {
   const navigate = useNavigate();
   const selectedSession = selectSessionById(() => sessionId?.());
   const session = () => selectedSession() ?? store.draftSession;
 
   const [sessionStore, setSessionStore] = createStore<SessionStore>({
     attachments: [],
-    draft: sessionId === undefined,
+    draft: !sessionId?.(),
     chatIds: session().chats,
   });
 

@@ -17,7 +17,7 @@ import { useSession } from '../connected/session-provider';
 import { SpeedDial } from '../connected/speed-dial';
 
 type MultiChatLayoutProps = {
-  sessionId: string;
+  sessionId?: string;
 };
 
 export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) => {

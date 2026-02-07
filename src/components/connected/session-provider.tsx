@@ -14,7 +14,7 @@ export interface SessionContextValue {
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
 
 interface SessionProps extends ParentProps {
-  sessionId: string;
+  sessionId?: string;
   session: StoreSessionProps;
 }
 
@@ -45,7 +45,7 @@ export function SessionProvider(props: SessionProps) {
   return (
     <SessionContext.Provider
       value={{
-        sessionId: () => props.sessionId,
+        sessionId: () => props.sessionId ?? props.session.id,
         cancelChats,
         isLoading,
       }}

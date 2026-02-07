@@ -10,7 +10,7 @@ import { setSessionInput } from '~/store/actions';
 import { selectChatById } from '~/store/selectors';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
-export function NoteLayout(props: { sessionId: string }) {
+export function NoteLayout(props: { sessionId?: string }) {
   const session = createSession(() => props.sessionId);
 
   return (
