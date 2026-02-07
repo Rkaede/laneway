@@ -2,7 +2,7 @@
   "name": "laneway",
   "private": true,
   "version": "0.0.0",
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "bun@1.3.0",
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development bun scripts/generate-data.ts && vite --force",
@@ -15,7 +15,7 @@
     "test": "bun test ./**/*.test.*",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "validate": "pnpm format && pnpm typecheck && pnpm lint:fix && pnpm test"
+    "validate": "bun run format && bun run typecheck && bun run lint:fix && bun run test"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.0.10",

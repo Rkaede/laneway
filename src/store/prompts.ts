@@ -28,7 +28,7 @@ What are the key differences between npm, yarn,
 </current_input>
 
 <completion_suggestion>
- and pnpm?
+ and bun?
 </completion_suggestion>
 `;
 

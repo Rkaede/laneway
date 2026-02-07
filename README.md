@@ -35,13 +35,13 @@ Head over to <https://laneway.app> to use the app directly.
 2. Install dependencies:
 
    ```
-   pnpm install
+   bun install
    ```
 
 3. Run the app:
 
    ```
-  pnpm run dev
+  bun run dev
   ```
 
 4. Set up your API keys:
@@ -53,11 +53,11 @@ Head over to <https://laneway.app> to use the app directly.
 Run the unit tests with Bun:
 
 ```bash
-pnpm test
+bun test
 ```
 
 To run end-to-end tests with Playwright:
 
 ```bash
-pnpm run test:e2e
+bun run test:e2e
 ```
