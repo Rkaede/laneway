@@ -34,8 +34,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.cursorrules
 
 
 # misc
 todo.md
+temp
