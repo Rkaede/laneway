@@ -96,4 +96,10 @@ export const openai: Partial<ModelProps>[] = [
   { id: 'openai/gpt-5.1-codex', title: 'GPT-5.1 Codex' },
   { id: 'openai/gpt-5.1-codex-mini', title: 'GPT-5.1 Codex Mini' },
   { id: 'openai/gpt-5-pro', title: 'GPT-5 Pro' },
+  { id: 'openai/gpt-5.3-codex', title: 'GPT-5.3 Codex' },
+  { id: 'openai/gpt-5.3-chat', title: 'GPT-5.3 Chat' },
+  { id: 'openai/gpt-5.4', title: 'GPT-5.4' },
+  { id: 'openai/gpt-5.4-pro', title: 'GPT-5.4 Pro' },
+  { id: 'openai/gpt-5.4-mini', title: 'GPT-5.4 Mini' },
+  { id: 'openai/gpt-5.4-nano', title: 'GPT-5.4 Nano' },
 ];

@@ -21,6 +21,7 @@ export const google: Partial<ModelProps>[] = [
     id: 'google/gemini-2.5-flash-preview-09-2025',
     title: 'Gemini 2.5 Flash Preview (09-2025)',
     reasoning: true,
+    deprecated: true,
   },
   {
     id: 'google/gemini-2.5-flash-lite-preview-09-2025',
@@ -34,5 +35,13 @@ export const google: Partial<ModelProps>[] = [
   {
     id: 'google/gemini-2.5-flash-lite',
     title: 'Gemini 2.5 Flash Lite',
-  }
+  },
+  {
+    id: 'google/gemini-3.1-pro-preview',
+    title: 'Gemini 3.1 Pro Preview',
+  },
+  {
+    id: 'google/gemini-3.1-flash-lite-preview',
+    title: 'Gemini 3.1 Flash Lite Preview',
+  },
 ];
