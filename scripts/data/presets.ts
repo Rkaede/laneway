@@ -9,15 +9,15 @@ export const presets: PresetProps[] = [
     templateId: 'flagship-models',
     chats: [
       {
-        modelId: 'openai/gpt-5',
+        modelId: 'openai/gpt-5.4-chat',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-opus-4.1',
+        modelId: 'anthropic/claude-opus-4.6',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-pro',
+        modelId: 'google/gemini-3.1-pro-preview',
         status: 'idle',
       },
     ],
