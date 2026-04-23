@@ -65,8 +65,8 @@ export function mockStream({ abortSignal }: { abortSignal?: AbortSignal }) {
       }
     })(),
     usage: Promise.resolve({
-      promptTokens: 0,
-      completionTokens: 0,
+      inputTokens: 0,
+      outputTokens: 0,
       totalTokens: 0,
     }),
   };

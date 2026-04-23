@@ -18,8 +18,8 @@
     "validate": "bun run format && bun run typecheck && bun run lint:fix && bun run test"
   },
   "dependencies": {
-    "@ai-sdk/google": "^1.0.10",
-    "@ai-sdk/openai": "^1.0.8",
+    "@ai-sdk/google": "^2.0.70",
+    "@ai-sdk/openai": "^2.0.103",
     "@codemirror/commands": "^6.6.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.33.0",
@@ -27,7 +27,7 @@
     "@solid-primitives/platform": "^0.1.2",
     "@solid-primitives/storage": "^4.2.1",
     "@solidjs/router": "^0.15.1",
-    "ai": "^4.0.18",
+    "ai": "^5.0.179",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk-solid": "^1.0.1",

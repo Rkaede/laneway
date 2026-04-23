@@ -9,7 +9,7 @@ import type { MessageProps } from '~/types';
 import { mockStream } from './llm-mock';
 import { createThrottle, formatMessages } from './util';
 
-const openai = () => createOpenAI({ apiKey: apiKeys?.openai, compatibility: 'strict' });
+const openai = () => createOpenAI({ apiKey: apiKeys?.openai });
 const openrouter = () => createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
 const google = () => createGoogleGenerativeAI({ apiKey: apiKeys?.google });
 
@@ -39,7 +39,7 @@ export async function getStream(
   const service = createService();
   const formattedMessages = await formatMessages(messages);
 
-  return await streamText({
+  return streamText({
     model: service(modelId),
     messages: formattedMessages,
     abortSignal: options?.abortSignal,

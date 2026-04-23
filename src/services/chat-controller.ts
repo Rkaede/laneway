@@ -65,8 +65,8 @@ export async function append({
       role: 'assistant',
       content: latestContent,
       usage: {
-        promptTokens: usage.promptTokens,
-        completionTokens: usage.completionTokens,
+        promptTokens: usage.inputTokens,
+        completionTokens: usage.outputTokens,
         totalTokens: usage.totalTokens,
         created: Date.now(),
         timeTaken,
