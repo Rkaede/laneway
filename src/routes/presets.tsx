@@ -1,9 +1,7 @@
 import { TextField } from '@kobalte/core/text-field';
-import { dequal } from 'dequal/lite';
 import { nanoid } from 'nanoid';
 import {
   type Component,
-  createEffect,
   createMemo,
   createResource,
   createSignal,
@@ -11,46 +9,13 @@ import {
   For,
   Show,
 } from 'solid-js';
-import { createStore } from 'solid-js/store';
 
 import { ModelIcon } from '~/components/connected/model-icon';
 import { MultiCombobox } from '~/components/connected/multi-combobox';
-import {
-  IconCheck,
-  IconGallery,
-  IconPlus,
-  IconSearch,
-  IconX,
-  MoreHorizontalIcon,
-} from '~/components/icons/ui';
 import { DeleteButton } from '~/components/ui';
 import { Avatar } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { CollectionEmptyState } from '~/components/ui/collection-empty-state';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/components/ui/dialog';
-import { confirmDialogDismiss } from '~/components/ui/dialog-dismiss';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown';
-import {
-  FormContainer,
-  PageTitle,
-  SectionDescription,
-  SettingDescription,
-  SettingTitle,
-} from '~/components/ui/forms';
+import { DialogDescription } from '~/components/ui/dialog';
+import { FormContainer, SettingDescription, SettingTitle } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
 import { showSuccess } from '~/components/ui/notifications';
 import { TextArea } from '~/components/ui/textarea';
@@ -60,26 +25,32 @@ import { validatePreset } from '~/store/editor-validation';
 import { models } from '~/store/models';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { AssistantProps, PresetProps } from '~/types';
-import { clone } from '~/util';
 
 import { addPresetChat, removePresetChat } from './preset-chats';
+import {
+  TemplateCard,
+  TemplateDeleteDialog,
+  TemplateDetailsDialog,
+  TemplateDetailsFooter,
+  TemplateGalleryCard,
+  TemplateGalleryDialog,
+  TemplatePage,
+  TemplateValidationError,
+} from './template-collection';
+import { createTemplateEditor, fetchTemplateGallery } from './template-helpers';
 
 const fetchPresetGallery = async () => {
-  const [presetResponse, assistantResponse] = await Promise.all([
-    fetch('/presets.json'),
-    fetch('/assistants.json'),
+  const [presets, assistants] = await Promise.all([
+    fetchTemplateGallery<PresetProps>('/presets.json'),
+    fetchTemplateGallery<AssistantProps>('/assistants.json'),
   ]);
-  return {
-    presets: (await presetResponse.json()) as PresetProps[],
-    assistants: (await assistantResponse.json()) as AssistantProps[],
-  };
+  return { presets, assistants };
 };
 
 export default function Presets() {
   const [gallery] = createResource(fetchPresetGallery);
   const [selectedPreset, setSelectedPreset] = createSignal<PresetProps | null>(null);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
-  const [searchTerm, setSearchTerm] = createSignal('');
   const [isNewPreset, setIsNewPreset] = createSignal(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = createSignal(false);
   const [presetToDelete, setPresetToDelete] = createSignal<PresetProps | null>(null);
@@ -124,82 +95,49 @@ export default function Presets() {
     showSuccess('Preset added.');
   }
 
-  const filteredPresets = () => {
-    return store.presets.filter(
-      (preset) =>
-        preset.presetTitle?.toLowerCase().includes(searchTerm().toLowerCase()) ?? false,
-    );
-  };
-
   return (
-    <div class="mx-auto flex h-full max-w-5xl flex-col gap-8 px-10 py-6">
-      <div>
-        <PageTitle>Presets</PageTitle>
-        <SectionDescription>
-          Teams of AI helpers designed to work side-by-side.
-        </SectionDescription>
-      </div>
-
-      <div class="flex items-center justify-between gap-4">
-        <div class="relative grow">
-          <IconSearch class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted" />
-          <Input
-            type="text"
-            placeholder="Search..."
-            class="pl-10"
-            value={searchTerm()}
-            onInput={(e) => setSearchTerm(e.currentTarget.value)}
+    <>
+      <TemplatePage
+        title="Presets"
+        description="Teams of AI helpers designed to work side-by-side."
+        itemName="Preset"
+        emptyDescription="Create a preset or add one from the Preset Library."
+        items={store.presets}
+        getTitle={(preset) => preset.presetTitle}
+        onAdd={handleAdd}
+        onOpenGallery={() => setIsGalleryOpen(true)}
+      >
+        {(preset) => (
+          <PresetCard
+            preset={preset}
+            onEdit={() => {
+              setSelectedPreset(preset);
+              setIsNewPreset(false);
+              setIsModalOpen(true);
+            }}
+            onDelete={() => handleDeletePreset(preset)}
           />
-        </div>
-        <div class="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsGalleryOpen(true)}
-            class="whitespace-nowrap"
-          >
-            <IconGallery class="h-5 w-5" />
-            Preset Library
-          </Button>
-          <Button onClick={handleAdd} class="whitespace-nowrap">
-            <IconPlus class="h-5 w-5" />
-            New Preset
-          </Button>
-        </div>
-      </div>
+        )}
+      </TemplatePage>
 
-      <div class="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        <For
-          each={filteredPresets()}
-          fallback={
-            <CollectionEmptyState
-              name="presets"
-              description="Create a preset or add one from the Preset Library."
-              searchTerm={searchTerm()}
-              onClearSearch={() => setSearchTerm('')}
-            />
-          }
-        >
-          {(preset) => (
-            <PresetCard
-              preset={preset}
-              onEdit={() => {
-                setSelectedPreset(preset);
-                setIsNewPreset(false);
-                setIsModalOpen(true);
-              }}
-              onDelete={() => handleDeletePreset(preset)}
-            />
-          )}
-        </For>
-      </div>
-
-      <PresetDetailsDialog
+      <TemplateDetailsDialog
+        title={isNewPreset() ? 'New Preset' : 'Edit Preset'}
         isOpen={isModalOpen()}
         onOpenChange={setIsModalOpen}
-        selectedPreset={selectedPreset()}
-        isNewPreset={isNewPreset()}
-        onDelete={(id) => handleDeletePreset({ id } as PresetProps)}
-      />
+        selectedItem={selectedPreset()}
+      >
+        {(preset, onDirtyChange) => (
+          <DialogDescription>
+            <PresetDetails
+              onDirtyChange={onDirtyChange}
+              initialPreset={preset}
+              onClose={() => setIsModalOpen(false)}
+              onDelete={(id) => handleDeletePreset({ id } as PresetProps)}
+              isNewPreset={isNewPreset()}
+            />
+          </DialogDescription>
+        )}
+      </TemplateDetailsDialog>
 
       <DeleteConfirmDialog
         isOpen={isDeleteConfirmOpen()}
@@ -214,7 +152,7 @@ export default function Presets() {
         onAddFromGallery={handleAddFromGallery}
         presets={gallery()?.presets}
       />
-    </div>
+    </>
   );
 }
 
@@ -223,103 +161,33 @@ const PresetCard: Component<{
   onEdit: () => void;
   onDelete: () => void;
 }> = (props) => {
-  const [open, setOpen] = createSignal(false);
-
-  function handleCardClick() {
-    props.onEdit();
-  }
-
   return (
-    <Card variant="solid" onClick={handleCardClick}>
-      <CardHeader class="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle class="flex items-center gap-2 text-lg font-semibold">
-          <div>{props.preset.presetTitle?.trim() || 'Untitled'}</div>
-        </CardTitle>
-        <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
-          <DropdownMenuTrigger
-            as={Button}
-            class="flex size-6 items-center justify-center rounded-md p-0 text-muted hover:bg-surface-hover hover:text-main"
-            data-open={open()}
-            variant="ghost"
-            size="icon"
-            onClick={(e: MouseEvent) => e.stopPropagation()}
-          >
-            <MoreHorizontalIcon class="size-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent class="w-36">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={(e: MouseEvent) => e.stopPropagation()}
-                onSelect={props.onDelete}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
-      <CardContent class="flex-1">
-        <div class="mb-2 flex flex-wrap gap-2">
-          <For each={props.preset.chats}>
-            {(chat) => {
-              const assistant = selectAssistantById(() => chat.assistantId);
-              const model = selectModelById(() =>
-                assistant() ? assistant()?.modelId : chat.modelId,
-              );
-              return (
-                <Show when={model()?.icon}>
-                  <Avatar>
-                    <ModelIcon modelId={model()?.id} class="size-5" />
-                  </Avatar>
-                </Show>
-              );
-            }}
-          </For>
-        </div>
-        <p class="mb-2 line-clamp-2 text-sm text-muted">
-          {props.preset.presetDescription || 'No description'}
-        </p>
-      </CardContent>
-    </Card>
-  );
-};
-
-const PresetDetailsDialog: Component<{
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  selectedPreset: PresetProps | null;
-  isNewPreset: boolean;
-  onDelete: (id: string) => void;
-}> = (props) => {
-  const [isDirty, setIsDirty] = createSignal(false);
-
-  return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent
-        class="max-w-3xl"
-        onEscapeKeyDown={(event) => confirmDialogDismiss(event, isDirty())}
-        onPointerDownOutside={(event) => confirmDialogDismiss(event, isDirty())}
-      >
-        <Show when={props.selectedPreset}>
-          {(preset) => (
-            <>
-              <DialogHeader>
-                <DialogTitle>{props.isNewPreset ? 'New Preset' : 'Edit Preset'}</DialogTitle>
-              </DialogHeader>
-              <DialogDescription>
-                <PresetDetails
-                  onDirtyChange={setIsDirty}
-                  initialPreset={preset()}
-                  onClose={() => props.onOpenChange(false)}
-                  onDelete={props.onDelete}
-                  isNewPreset={props.isNewPreset}
-                />
-              </DialogDescription>
-            </>
-          )}
-        </Show>
-      </DialogContent>
-    </Dialog>
+    <TemplateCard
+      title={<div>{props.preset.presetTitle?.trim() || 'Untitled'}</div>}
+      onEdit={props.onEdit}
+      onDelete={props.onDelete}
+    >
+      <div class="mb-2 flex flex-wrap gap-2">
+        <For each={props.preset.chats}>
+          {(chat) => {
+            const assistant = selectAssistantById(() => chat.assistantId);
+            const model = selectModelById(() =>
+              assistant() ? assistant()?.modelId : chat.modelId,
+            );
+            return (
+              <Show when={model()?.icon}>
+                <Avatar>
+                  <ModelIcon modelId={model()?.id} class="size-5" />
+                </Avatar>
+              </Show>
+            );
+          }}
+        </For>
+      </div>
+      <p class="mb-2 line-clamp-2 text-sm text-muted">
+        {props.preset.presetDescription || 'No description'}
+      </p>
+    </TemplateCard>
   );
 };
 
@@ -337,34 +205,24 @@ const DeleteConfirmDialog: Component<{
   });
 
   return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-        </DialogHeader>
-        <DialogDescription class="flex flex-col gap-4">
-          <p>Are you sure you want to delete this preset? This action cannot be undone.</p>
-          <div>
-            <Show when={associatedAssistants().length > 0}>
-              <p>This preset uses the following assistants, they will not be removed:</p>
-              <ul class="list-inside list-disc">
-                <For each={associatedAssistants()}>
-                  {(assistant) => <li>{assistant?.title}</li>}
-                </For>
-              </ul>
-            </Show>
-          </div>
-        </DialogDescription>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => props.onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={props.onConfirm}>
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <TemplateDeleteDialog
+      isOpen={props.isOpen}
+      onOpenChange={props.onOpenChange}
+      onConfirm={props.onConfirm}
+      descriptionClass="flex flex-col gap-4"
+    >
+      <p>Are you sure you want to delete this preset? This action cannot be undone.</p>
+      <div>
+        <Show when={associatedAssistants().length > 0}>
+          <p>This preset uses the following assistants, they will not be removed:</p>
+          <ul class="list-inside list-disc">
+            <For each={associatedAssistants()}>
+              {(assistant) => <li>{assistant?.title}</li>}
+            </For>
+          </ul>
+        </Show>
+      </div>
+    </TemplateDeleteDialog>
   );
 };
 
@@ -375,74 +233,35 @@ const PresetGalleryDialog: Component<{
   presets: PresetProps[] | undefined;
 }> = (props) => {
   return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent class="max-w-5xl">
-        <DialogHeader class="flex flex-row items-center justify-between">
-          <DialogTitle>Preset Library</DialogTitle>
-          <Button
-            variant="toolbar"
-            class="size-10 rounded-full p-0"
-            onClick={() => props.onOpenChange(false)}
+    <TemplateGalleryDialog
+      title="Preset Library"
+      isOpen={props.isOpen}
+      onOpenChange={props.onOpenChange}
+      description="Assistants used in presets will be added to the assistant list."
+    >
+      <For each={props.presets}>
+        {(preset) => (
+          <TemplateGalleryCard
+            title={<div>{preset.presetTitle}</div>}
+            contentClass="flex flex-col gap-2"
+            isAdded={store.presets.some((p) => p.templateId === preset.id)}
+            validationError={validatePreset(preset, store.presets)}
+            onAdd={() => props.onAddFromGallery(preset)}
           >
-            <IconX class="h-4 w-4" />
-            <span class="sr-only">Close</span>
-          </Button>
-        </DialogHeader>
-        <p>Assistants used in presets will be added to the assistant list.</p>
-        <div class="grid grid-cols-3 gap-4 py-4">
-          <For each={props.presets}>
-            {(preset) => {
-              const isAdded = () => store.presets.some((p) => p.templateId === preset.id);
-              const validationError = () => validatePreset(preset, store.presets);
-              return (
-                <Card>
-                  <CardHeader>
-                    <CardTitle class="flex items-center justify-between gap-2">
-                      <div>{preset.presetTitle}</div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent class="flex flex-col gap-2">
-                    <div class="flex gap-1">
-                      <For each={preset.chats}>
-                        {(chat) => {
-                          return (
-                            <Show when={chat.modelId}>
-                              <ModelIcon modelId={chat.modelId} class="h-4 w-4" />
-                            </Show>
-                          );
-                        }}
-                      </For>
-                    </div>
-                    <p class="text-sm text-muted">{preset.presetDescription}</p>
-
-                    <div class="mt-4 flex justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isAdded() || !!validationError()}
-                        title={validationError()}
-                        onClick={() => {
-                          props.onAddFromGallery(preset);
-                        }}
-                      >
-                        {isAdded() ? (
-                          <div class="flex items-center gap-1">
-                            <div class="text-sm">Added</div>
-                            <IconCheck class="size-4 text-success" />
-                          </div>
-                        ) : (
-                          'Add'
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            }}
-          </For>
-        </div>
-      </DialogContent>
-    </Dialog>
+            <div class="flex gap-1">
+              <For each={preset.chats}>
+                {(chat) => (
+                  <Show when={chat.modelId}>
+                    <ModelIcon modelId={chat.modelId} class="h-4 w-4" />
+                  </Show>
+                )}
+              </For>
+            </div>
+            <p class="text-sm text-muted">{preset.presetDescription}</p>
+          </TemplateGalleryCard>
+        )}
+      </For>
+    </TemplateGalleryDialog>
   );
 };
 
@@ -453,33 +272,33 @@ const PresetDetails: Component<{
   onDelete: (id: string) => void;
   isNewPreset: boolean;
 }> = (props) => {
-  const [localPreset, setLocalPreset] = createStore<PresetProps>(clone(props.initialPreset));
-  const validationError = () =>
-    validatePreset(
-      localPreset,
-      store.presets,
-      props.isNewPreset ? undefined : props.initialPreset.id,
-    );
+  const {
+    value: localPreset,
+    setValue: setLocalPreset,
+    validationError,
+    hasChanges,
+    save,
+  } = createTemplateEditor({
+    initialValue: () => props.initialPreset,
+    validate: (preset) =>
+      validatePreset(
+        preset,
+        store.presets,
+        props.isNewPreset ? undefined : props.initialPreset.id,
+      ),
+    onDirtyChange: props.onDirtyChange,
+    onSave: (value) => {
+      const preset = { ...value, presetTitle: value.presetTitle!.trim() };
+      if (props.isNewPreset) {
+        addPreset(preset, store.assistants);
+      } else {
+        setStore('presets', (p) => p.id === props.initialPreset.id, preset);
+      }
+      props.onClose();
+      showSuccess('Preset saved.');
+    },
+  });
   const saveHintId = createUniqueId();
-
-  function handleSave() {
-    if (validationError()) return;
-
-    const preset = { ...localPreset, presetTitle: localPreset.presetTitle!.trim() };
-    if (props.isNewPreset) {
-      addPreset(preset, store.assistants);
-    } else {
-      setStore('presets', (p) => p.id === props.initialPreset.id, preset);
-    }
-    props.onClose();
-    showSuccess('Preset saved.');
-  }
-
-  function hasChanges() {
-    return !dequal(props.initialPreset, localPreset);
-  }
-
-  createEffect(() => props.onDirtyChange(hasChanges()));
 
   return (
     <>
@@ -492,13 +311,7 @@ const PresetDetails: Component<{
               onInput={(e) => setLocalPreset('presetTitle', e.target.value)}
             />
           </TextField>
-          <Show when={validationError()}>
-            {(error) => (
-              <p role="alert" class="mt-2 text-sm text-danger">
-                {error()}
-              </p>
-            )}
-          </Show>
+          <TemplateValidationError error={validationError()} />
         </div>
         <div class="mb-4">
           <SettingTitle>Description</SettingTitle>
@@ -543,18 +356,12 @@ const PresetDetails: Component<{
             Add at least one assistant or model to save this preset.
           </p>
         </Show>
-        <DialogFooter>
-          <Button variant="outline" onClick={props.onClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!hasChanges() || !localPreset.chats?.length || !!validationError()}
-            aria-describedby={!localPreset.chats?.length ? saveHintId : undefined}
-          >
-            Save
-          </Button>
-        </DialogFooter>
+        <TemplateDetailsFooter
+          onClose={props.onClose}
+          onSave={save}
+          disabled={!hasChanges() || !localPreset.chats?.length || !!validationError()}
+          describedBy={!localPreset.chats?.length ? saveHintId : undefined}
+        />
       </div>
     </>
   );
