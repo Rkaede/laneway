@@ -1,7 +1,7 @@
 import { useLocation } from '@solidjs/router';
 import { Component, createEffect, For, lazy, Show } from 'solid-js';
 
-import { IconPaperclip, IconSquare } from '~/components/icons/ui';
+import { IconPlus, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import config from '~/config';
 import { cn } from '~/util';
@@ -81,9 +81,9 @@ export const ChatInput: Component<PromptProps> = (props) => {
   };
 
   return (
-    <div class="relative mx-auto w-full max-w-[800px]">
+    <div class="relative mx-auto w-full max-w-[534px]">
       <Show when={props.attachments && props.attachments.length > 0}>
-        <div class="absolute top-0 left-2 ml-[50px] flex w-full -translate-y-full gap-2 py-2">
+        <div class="absolute top-0 left-2 ml-3 flex w-full -translate-y-full gap-2 py-2">
           <For each={props.attachments || []}>
             {(file) => (
               <Thumbnail
@@ -96,16 +96,26 @@ export const ChatInput: Component<PromptProps> = (props) => {
         </div>
       </Show>
       <div class="mb-4 flex items-end gap-0.5">
-        {props.hasVision && (
-          <div>
+        <form
+          onSubmit={(e: Event) => {
+            e.preventDefault();
+            submitForm();
+          }}
+          class={cn(
+            'relative flex flex-1 items-end gap-1 rounded-composer border border-composer-border bg-composer pt-0 pr-4 shadow-composer transition-[color,box-shadow] focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
+            props.hasVision ? 'pl-1.5' : 'pl-4',
+            props.class,
+          )}
+        >
+          <Show when={props.hasVision}>
             <Button
-              variant="bare"
+              variant="ghost"
               size="icon"
-              disabled={!props.hasVision || props.isLoading}
-              class="my-0.5 rounded-full transition-transform hover:scale-110"
+              disabled={props.isLoading}
+              class="my-3 size-7 shrink-0 p-0 text-faint hover:text-main"
               onClick={() => fileInputRef?.click()}
             >
-              <IconPaperclip class="size-5 -rotate-45" />
+              <IconPlus class="size-4" />
               <span class="sr-only">Attach file</span>
             </Button>
             <input
@@ -115,30 +125,21 @@ export const ChatInput: Component<PromptProps> = (props) => {
               class="hidden"
               onChange={handleFileSelect}
             />
+          </Show>
+          <div class="min-w-0 flex-1">
+            <TextEditor
+              initialValue={props.input}
+              onInput={(value) => props.onInput(value)}
+              onSubmit={handleSubmit}
+              onPaste={handlePasteFile}
+            />
           </div>
-        )}
-        <form
-          onSubmit={(e: Event) => {
-            e.preventDefault();
-            submitForm();
-          }}
-          class={cn(
-            'relative grid flex-1 rounded-[22px] border border-border-emphasis bg-surface-input px-4 pt-0 transition-[color,box-shadow] focus-within:border-border-focus focus-within:ring-[3px] focus-within:ring-border-focus/50',
-            props.class,
-          )}
-        >
-          <TextEditor
-            initialValue={props.input}
-            onInput={(value) => props.onInput(value)}
-            onSubmit={handleSubmit}
-            onPaste={handlePasteFile}
-          />
 
           <Show when={props.isLoading}>
             <Button
               variant="default"
               size="icon"
-              class="absolute right-0 bottom-0 m-1.5 mb-[5px] size-7 rounded-full bg-main text-inverse transition-transform hover:scale-110"
+              class="absolute right-0 bottom-0 m-1.5 mb-3 size-7 rounded-full bg-main text-inverse transition-transform hover:scale-110"
               onClick={props.onCancel}
             >
               <IconSquare class="size-3" fill="currentColor" />

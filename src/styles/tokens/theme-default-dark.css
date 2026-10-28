@@ -343,7 +343,7 @@
   --card-radius: 10px;
   --modal-radius: 14px;
   --badge-radius: 8px;
-  --composer-radius: 22px; /* a pill at one line, a soft rectangle once it grows */
+  --composer-radius: 28px; /* a pill at one line, a soft rectangle once it grows */
 
   /* The primary button has a faint highlight along its top edge, the secondary
      is a flat fill, and outline buttons draw a strong hairline with a whisper

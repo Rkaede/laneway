@@ -38,5 +38,5 @@
   --radius-card: var(--card-radius, var(--radius-xl));
   --radius-modal: var(--modal-radius, var(--radius-2xl));
   --radius-badge: var(--badge-radius, var(--radius-full));
-  --radius-composer: var(--composer-radius, 22px);
+  --radius-composer: var(--composer-radius, 28px);
 }

@@ -4,10 +4,14 @@
 
 .cm-editor .cm-content {
   caret-color: var(--main);
-  margin-block: calc(var(--spacing) * 2);
+  margin-block: calc(var(--spacing) * 4.25);
   padding: 0;
   font-family: inherit;
   height: 100%;
+}
+
+.cm-editor .cm-placeholder {
+  color: var(--placeholder-fg);
 }
 
 .cm-editor .cm-scroller {
