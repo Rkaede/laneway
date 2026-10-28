@@ -70,6 +70,34 @@ describe('Markdown', () => {
     expect(html).not.toContain('onerror');
   });
 
+  it.each([
+    ['[docs](https://example.com/guide)', 'https://example.com/guide'],
+    ['[docs](http://example.com/guide)', 'http://example.com/guide'],
+    ['[docs](HTTPS://example.com/guide)', 'HTTPS://example.com/guide'],
+    ['[docs](//example.com/guide)', '//example.com/guide'],
+    ['https://example.com/guide', 'https://example.com/guide'],
+    ['[docs][guide]\n\n[guide]: https://example.com/guide', 'https://example.com/guide'],
+  ])('opens web links separately with opener and referrer protection: %s', (text, href) => {
+    const link = render(text).match(/<a\b[^>]*>/)?.[0];
+
+    expect(link).toContain(`href="${href}"`);
+    expect(link).toContain('target="_blank"');
+    expect(link).toContain('rel="noopener noreferrer"');
+  });
+
+  it.each([
+    ['[email](mailto:hello@example.com)', 'mailto:hello@example.com'],
+    ['[phone](tel:+61312345678)', 'tel:+61312345678'],
+    ['[docs](/guide)', '/guide'],
+    ['[heading](#heading)', '#heading'],
+  ])('leaves non-web links without a target: %s', (text, href) => {
+    const link = render(text).match(/<a\b[^>]*>/)?.[0];
+
+    expect(link).toContain(`href="${href}"`);
+    expect(link).not.toContain('target=');
+    expect(link).not.toContain('rel=');
+  });
+
   it('keeps unsafe links and remote images blocked', () => {
     const html = render(
       '[unsafe](javascript:alert%281%29) ![alt text](https://example.com/image.png)',

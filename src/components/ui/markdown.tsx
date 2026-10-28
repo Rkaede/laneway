@@ -13,11 +13,15 @@ const Markdown: Component<{ text: string }> = (props) => {
       renderingStrategy="reconcile"
       remarkPlugins={[remarkGfm]}
       transformLinkUri={sanitizeMarkdownLink}
+      linkTarget={(href) => (/^(https?:|\/\/)/i.test(href) ? '_blank' : undefined)}
       components={{
         a(linkProps) {
           return (
             <Show when={linkProps.href} fallback={<span>{linkProps.children}</span>}>
-              <a {...linkProps} />
+              <a
+                {...linkProps}
+                rel={linkProps.target === '_blank' ? 'noopener noreferrer' : undefined}
+              />
             </Show>
           );
         },
