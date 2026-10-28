@@ -173,7 +173,11 @@ export const generateModels = async () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
-    if (model.deprecated || !routerModel || routerModel.deprecated) {
+    if (
+      model.deprecated ||
+      !routerModel ||
+      (routerModel.expiration_date && Date.parse(routerModel.expiration_date) <= Date.now())
+    ) {
       console.log('warning: model not on openrouter', model.id);
       return { ...model, deprecated: true };
     }

@@ -47,7 +47,7 @@ describe('generateModels catalogue', () => {
       Response.json({
         data: [
           routerModel('openai/gpt-4o'),
-          { ...routerModel('openai/gpt-4.1'), deprecated: true },
+          { ...routerModel('openai/gpt-4.1'), expiration_date: '2000-01-01' },
           routerModel('openai/o1-mini'),
           routerModel('other/uncurated'),
         ],
@@ -76,6 +76,38 @@ describe('generateModels catalogue', () => {
       vision: true,
       pricing: { prompt: 0.000003, completion: 0.000015, image: 0, request: 0 },
     });
+  });
+
+  it.each([
+    { name: 'past', expirationDate: '2026-10-27', deprecated: true },
+    { name: 'current', expirationDate: '2026-10-28', deprecated: true },
+    { name: 'future', expirationDate: '2026-10-29', deprecated: false },
+    { name: 'omitted', expirationDate: undefined, deprecated: false },
+    { name: 'null', expirationDate: null, deprecated: false },
+  ])('handles $name expiration dates', async ({ expirationDate, deprecated }) => {
+    spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-28T00:00:00Z'));
+    spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        data: [{ ...routerModel('openai/gpt-4o'), expiration_date: expirationDate }],
+      }),
+    );
+
+    const model = (await generateModels()).find((model) => model.id === 'openai/gpt-4o');
+
+    if (deprecated) {
+      expect(model).toMatchObject({
+        ...modelsBase.find((model) => model.id === 'openai/gpt-4o'),
+        deprecated: true,
+      });
+      expect(console.log).toHaveBeenCalledWith('warning: model not on openrouter', model?.id);
+    } else {
+      expect(model?.deprecated).not.toBe(true);
+      expect(model?.contextLength).toBe(128000);
+      expect(console.log).not.toHaveBeenCalledWith(
+        'warning: model not on openrouter',
+        model?.id,
+      );
+    }
   });
 
   it.each([
