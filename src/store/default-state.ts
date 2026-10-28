@@ -95,11 +95,12 @@ function clone<T>(obj: T): T {
 // the store and resetStore would not work.
 export function createDefaultState(): State {
   const story = examples.story();
+  const imageAttachment = examples.imageAttachment();
 
   return {
     schemaVersion: 1,
-    sessions: [story.session, examples.imageAttachment.session],
-    chats: [...story.chats, ...examples.imageAttachment.chats],
+    sessions: [story.session, imageAttachment.session],
+    chats: [...story.chats, ...imageAttachment.chats],
     draftSession: {
       id: 'draft',
       title: 'New Chat',

@@ -104,55 +104,57 @@ export function story(): Example {
   };
 }
 
-export const imageAttachment: Example = {
-  session: {
-    id: 'tFWtxeAihD7pPOpdkrvqz',
-    title: 'Vision',
-    type: 'chat',
-    chats: ['12-WoSkDNvACQuJ1tD_2V'],
-    created: -1,
-    input: '',
-  },
-  chats: [
-    {
-      id: '12-WoSkDNvACQuJ1tD_2V',
-      status: 'idle',
-      created: 1737408255192,
-      messages: [
-        {
-          id: 'SVEnbLc2FxNBhYCcGmctu',
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              image: {
-                sourceType: 'path',
-                filename: 'food.jpg',
-                storageId: '/examples/food.jpg',
-              },
-            },
-            {
-              type: 'text',
-              text: 'Describe this dish, estimate its calories, and then give me a recipe.',
-            },
-          ],
-        },
-        {
-          id: '4i05gtTXMqQdtgIcJLdR1',
-          role: 'assistant',
-          content:
-            "This appears to be a plate of Mexican-style street tacos, likely cauliflower tacos based on the filling visible. They're served on corn tortillas and garnished with:\n- Pickled red onions\n- Fresh cucumber\n- Avocado sauce/crema\n- Lime wedges\n- Chopped cilantro\n- Shredded carrots\n- What appears to be a green salsa or sauce\n\nEstimated calories for 3 tacos as shown: 350-400 calories\n\nRecipe for Cauliflower Tacos (serves 4):\n\nIngredients:\n- 1 large head cauliflower, cut into florets\n- 12 corn tortillas\n- 2 tbsp olive oil\n- 1 tsp cumin\n- 1 tsp chili powder\n- 1 tsp garlic powder\n- Salt and pepper to taste\n\nPickled Onions:\n- 1 red onion, thinly sliced\n- 1 cup white vinegar\n- 1 tbsp sugar\n- 1 tsp salt\n\nAvocado Crema:\n- 1 ripe avocado\n- 1/2 cup Mexican crema or sour cream\n- 1 lime, juiced\n- Salt to taste\n\nGarnish:\n- Sliced cucumber\n- Shredded carrots\n- Fresh cilantro\n- Lime wedges\n\nInstructions:\n1. Toss cauliflower with oil and spices, roast at 425°F for 25-30 minutes until crispy\n2. Make pickled onions: bring vinegar, sugar, salt to boil, pour over sliced onions, let cool\n3. Blend avocado crema ingredients until smooth\n4. Warm tortillas\n5. Assemble tacos with roasted cauliflower, topped with pickled onions, avocado crema, and garnishes\n\nServe immediately with lime wedges on the side.",
-          usage: {
-            promptTokens: 1591,
-            completionTokens: 462,
-            totalTokens: 2053,
-            created: 1737408281399,
-            timeTaken: 26191,
-          },
-        },
-      ],
-      modelId: 'anthropic/claude-sonnet-4.6',
-      sessionId: 'tFWtxeAihD7pPOpdkrvqz',
+export function imageAttachment(): Example {
+  return {
+    session: {
+      id: 'tFWtxeAihD7pPOpdkrvqz',
+      title: 'Vision',
+      type: 'chat',
+      chats: ['12-WoSkDNvACQuJ1tD_2V'],
+      created: -1,
+      input: '',
     },
-  ],
-};
+    chats: [
+      {
+        id: '12-WoSkDNvACQuJ1tD_2V',
+        status: 'idle',
+        created: 1737408255192,
+        messages: [
+          {
+            id: 'SVEnbLc2FxNBhYCcGmctu',
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                image: {
+                  sourceType: 'path',
+                  filename: 'food.jpg',
+                  storageId: '/examples/food.jpg',
+                },
+              },
+              {
+                type: 'text',
+                text: 'Describe this dish, estimate its calories, and then give me a recipe.',
+              },
+            ],
+          },
+          {
+            id: '4i05gtTXMqQdtgIcJLdR1',
+            role: 'assistant',
+            content:
+              "This appears to be a plate of Mexican-style street tacos, likely cauliflower tacos based on the filling visible. They're served on corn tortillas and garnished with:\n- Pickled red onions\n- Fresh cucumber\n- Avocado sauce/crema\n- Lime wedges\n- Chopped cilantro\n- Shredded carrots\n- What appears to be a green salsa or sauce\n\nEstimated calories for 3 tacos as shown: 350-400 calories\n\nRecipe for Cauliflower Tacos (serves 4):\n\nIngredients:\n- 1 large head cauliflower, cut into florets\n- 12 corn tortillas\n- 2 tbsp olive oil\n- 1 tsp cumin\n- 1 tsp chili powder\n- 1 tsp garlic powder\n- Salt and pepper to taste\n\nPickled Onions:\n- 1 red onion, thinly sliced\n- 1 cup white vinegar\n- 1 tbsp sugar\n- 1 tsp salt\n\nAvocado Crema:\n- 1 ripe avocado\n- 1/2 cup Mexican crema or sour cream\n- 1 lime, juiced\n- Salt to taste\n\nGarnish:\n- Sliced cucumber\n- Shredded carrots\n- Fresh cilantro\n- Lime wedges\n\nInstructions:\n1. Toss cauliflower with oil and spices, roast at 425°F for 25-30 minutes until crispy\n2. Make pickled onions: bring vinegar, sugar, salt to boil, pour over sliced onions, let cool\n3. Blend avocado crema ingredients until smooth\n4. Warm tortillas\n5. Assemble tacos with roasted cauliflower, topped with pickled onions, avocado crema, and garnishes\n\nServe immediately with lime wedges on the side.",
+            usage: {
+              promptTokens: 1591,
+              completionTokens: 462,
+              totalTokens: 2053,
+              created: 1737408281399,
+              timeTaken: 26191,
+            },
+          },
+        ],
+        modelId: 'anthropic/claude-sonnet-4.6',
+        sessionId: 'tFWtxeAihD7pPOpdkrvqz',
+      },
+    ],
+  };
+}

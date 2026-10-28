@@ -110,7 +110,7 @@ describe('formatMessages', () => {
     );
     const getImage = spyOn(imageCache, 'get').mockResolvedValue(null);
     const encodeImage = spyOn(util, 'base64EncodeFile').mockResolvedValue('aW1hZ2U=');
-    const messages = imageAttachment.chats[0].messages;
+    const messages = imageAttachment().chats[0].messages;
 
     const formatted = await formatMessages(messages);
 
@@ -171,7 +171,7 @@ describe('formatMessages', () => {
   it('rejects when the Vision example image cannot be loaded', async () => {
     spyOn(globalThis, 'fetch').mockResolvedValue(new Response('Not found', { status: 404 }));
 
-    await expect(formatMessages(imageAttachment.chats[0].messages)).rejects.toThrow(
+    await expect(formatMessages(imageAttachment().chats[0].messages)).rejects.toThrow(
       'Failed to load image: food.jpg',
     );
   });
