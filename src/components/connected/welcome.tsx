@@ -1,22 +1,30 @@
-import { type Component, createSignal, Show } from 'solid-js';
+import { type Component, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 
 import { Button } from '~/components/ui/button';
 import { APIKeySetting } from '~/routes/settings/api-key-settings';
 import { setApiKeys } from '~/store/keys';
 import { anyKeysSet } from '~/store/selectors';
 
-import { IconArrowLeft, IconCircleCheck, IconGithub, IconKey } from '../icons/ui';
+import { IconArrowLeft, IconGithub, IconKey } from '../icons/ui';
+import { WELCOME_VARIANTS } from './welcome-variants';
 
-function BulletPoint(props: { description: string; title?: string }) {
+const VARIANT_STORAGE_KEY = 'laneway-welcome-variant';
+
+function readStoredVariant() {
+  try {
+    const stored = Number(localStorage.getItem(VARIANT_STORAGE_KEY));
+    return Number.isInteger(stored) && stored >= 0 && stored < WELCOME_VARIANTS.length
+      ? stored
+      : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function isTypingTarget(target: EventTarget | null) {
   return (
-    <li>
-      <div class="grid grid-cols-[auto_1fr] items-center gap-x-1">
-        <IconCircleCheck class="size-4 text-green-500" />
-        <span class="shrink-0 font-bold">{props.title}</span>
-        <div />
-        <div class="mb-3">{props.description}</div>
-      </div>
-    </li>
+    target instanceof HTMLElement &&
+    target.closest('input, textarea, select, [contenteditable="true"], .cm-editor') !== null
   );
 }
 
@@ -29,6 +37,27 @@ export const WelcomeContent: Component<{
   setGoogleKey: (value: string) => void;
 }> = () => {
   const [showKeys, setShowKeys] = createSignal(false);
+  const [variant, setVariant] = createSignal(readStoredVariant());
+
+  // Press v to cycle through the marketing variants, shift+v to go back. There is no on-screen
+  // control for this on purpose.
+  function handleVariantKey(event: KeyboardEvent) {
+    if (event.key.toLowerCase() !== 'v' || showKeys()) return;
+    if (event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) return;
+
+    event.preventDefault();
+    const count = WELCOME_VARIANTS.length;
+    const next = (variant() + (event.shiftKey ? -1 : 1) + count) % count;
+    setVariant(next);
+    try {
+      localStorage.setItem(VARIANT_STORAGE_KEY, String(next));
+    } catch {
+      // Ignore storage errors, the variant just will not persist.
+    }
+  }
+
+  onMount(() => document.addEventListener('keydown', handleVariantKey));
+  onCleanup(() => document.removeEventListener('keydown', handleVariantKey));
 
   const handleGetStarted = () => {
     setApiKeys('hasCompletedWelcome', true);
@@ -39,7 +68,7 @@ export const WelcomeContent: Component<{
   }
 
   return (
-    <div class="mt-16 flex flex-col gap-4">
+    <div class="mt-16 flex flex-col gap-4 px-6">
       <div class="mx-auto w-full max-w-2xl">
         <div class="mb-4 flex w-full gap-2">
           <div class="w-full">
@@ -48,36 +77,14 @@ export const WelcomeContent: Component<{
 
             <div class="overflow-visible">
               <Show when={showKeys() === false}>
-                <ul class="mb-4 flex flex-col gap-1" id="intro">
-                  <BulletPoint
-                    title="Local & Secure"
-                    description="All application data is stored locally in your browser."
-                  />
-                  <BulletPoint
-                    title="Direct Connection"
-                    description="Use your own API keys to chat with major AI providers."
-                  />
-                  <BulletPoint
-                    title="Frontier Models"
-                    description="Access frontier models without juggling multiple subscriptions."
-                  />
-                  <BulletPoint
-                    title="Cost-Effective"
-                    description="General usage costs less than an OpenAI subscription."
-                  />
-                  <BulletPoint
-                    title="Multi-Model Chats"
-                    description="Interact with and compare multiple AI models side by side."
-                  />
-                  <BulletPoint
-                    title="Powerful Extras"
-                    description="Attachments, TTS, model profiles, and multichat presets and more."
-                  />
-                  <BulletPoint
-                    title="Free & Open Source"
-                    description="No paid plans, analytics, or annoying funnels & upselling."
-                  />
-                </ul>
+                <div class="mb-6" id="intro">
+                  <For each={[variant()]}>
+                    {(index) => {
+                      const Variant = WELCOME_VARIANTS[index];
+                      return <Variant />;
+                    }}
+                  </For>
+                </div>
                 <div class="mb-4 flex justify-start gap-2">
                   <Button
                     variant="outline"
@@ -85,11 +92,11 @@ export const WelcomeContent: Component<{
                     href="https://github.com/Rkaede/laneway"
                     target="_blank"
                   >
-                    <IconGithub class="mr-2 size-4" />
+                    <IconGithub class="size-4" />
                     View on Github
                   </Button>
                   <Button onClick={handleAddKeys}>
-                    <IconKey class="mr-2 size-4" />
+                    <IconKey class="size-4" />
                     Enter API Keys
                   </Button>
                 </div>
@@ -101,7 +108,7 @@ export const WelcomeContent: Component<{
                 <div class="flex justify-between">
                   <div>
                     <Button variant="outline" onClick={() => setShowKeys(!showKeys())}>
-                      <IconArrowLeft class="mr-2 size-4" />
+                      <IconArrowLeft class="size-4" />
                       Back
                     </Button>
                   </div>
