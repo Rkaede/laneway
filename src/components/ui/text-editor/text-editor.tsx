@@ -4,12 +4,15 @@ import './text-editor.css';
 import { defaultKeymap, history, redo, undo } from '@codemirror/commands';
 import { EditorState, Prec } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
+import { isMac } from '@solid-primitives/platform';
 import { inlineSuggestion } from 'codemirror-extension-inline-suggestion';
 import { createCodeMirror, createEditorReadonly } from 'solid-codemirror';
-import { createEffect } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 
 import { store } from '~/store';
 import { getCompletion } from '~/store/actions';
+
+import { createInputKeymap } from './input-keymap';
 
 const fetchSuggestion = async (input: EditorState) => {
   // todo: move out of here and disable before this function is called
@@ -34,6 +37,23 @@ type TextEditorProps = {
 };
 
 export function TextEditor(props: TextEditorProps) {
+  const pointerQuery = window.matchMedia('(pointer: coarse)');
+  const [hasCoarsePointer, setHasCoarsePointer] = createSignal(pointerQuery.matches);
+  const handlePointerChange = (event: MediaQueryListEvent) =>
+    setHasCoarsePointer(event.matches);
+  pointerQuery.addEventListener('change', handlePointerChange);
+  onCleanup(() => pointerQuery.removeEventListener('change', handlePointerChange));
+
+  const submitShortcut = `${isMac ? '⌘' : 'Ctrl'} + Enter`;
+  const inputHint = () => {
+    if (props.mode === 'note') {
+      return `Enter for a new line. ${submitShortcut} or Shift + Enter to send.`;
+    }
+    return hasCoarsePointer()
+      ? `Enter for a new line. Use Send or ${submitShortcut} to send.`
+      : `Enter to send. Shift + Enter for a new line. ${submitShortcut} also sends.`;
+  };
+
   const { editorView, ref, createExtension } = createCodeMirror({
     onValueChange: (value) => {
       props.onInput?.(value);
@@ -65,9 +85,14 @@ export function TextEditor(props: TextEditorProps) {
     }),
   );
 
-  createEffect(() => {
-    createExtension(placeholder(props.placeholder ?? 'Write something...'));
-  });
+  createExtension(() =>
+    placeholder(
+      props.placeholder ??
+        (props.mode === 'note' || hasCoarsePointer()
+          ? 'Write something... Enter for a new line'
+          : 'Write something... Enter to send'),
+    ),
+  );
 
   createEditorReadonly(editorView, () =>
     props.disabled === undefined ? false : props.disabled,
@@ -79,7 +104,7 @@ export function TextEditor(props: TextEditorProps) {
   if (store.featureFlags.completions) {
     createExtension(inlineSuggestion({ fetchFn: fetchSuggestion, delay: 1000 }));
   }
-  createExtension(
+  createExtension(() =>
     // this doesn't work without the Prec.highest
     Prec.highest(
       keymap.of([
@@ -87,30 +112,10 @@ export function TextEditor(props: TextEditorProps) {
         { key: 'Mod-z', run: undo },
         { key: 'Mod-y', run: redo },
         { key: 'Mod-Shift-z', run: redo },
-        // submit
-        {
-          key: 'Enter',
-          run: (view) => {
-            if (props.mode === 'note') {
-              view.dispatch(view.state.replaceSelection('\n'));
-              return true;
-            }
-            props.onSubmit?.();
-            return true;
-          },
-        },
-        // new line on shift enter
-        {
-          key: 'Shift-Enter',
-          run: (view) => {
-            if (props.mode === 'note') {
-              props.onSubmit?.();
-              return true;
-            }
-            view.dispatch(view.state.replaceSelection('\n'));
-            return true;
-          },
-        },
+        ...createInputKeymap(() => props.onSubmit?.(), {
+          mode: props.mode,
+          coarsePointer: hasCoarsePointer(),
+        }),
       ]),
     ),
   );
@@ -126,9 +131,10 @@ export function TextEditor(props: TextEditorProps) {
   }, 100);
 
   // Add this extension for accessibility
-  createExtension(
+  createExtension(() =>
     EditorView.contentAttributes.of({
-      'aria-label': 'Chat message input',
+      'aria-label': props.mode === 'note' ? 'Note input' : 'Chat message input',
+      'aria-description': inputHint(),
     }),
   );
 

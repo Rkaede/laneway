@@ -32,7 +32,9 @@ for (const type of ['chat', 'note'] as const) {
     }, type);
 
     await page.getByRole('link', { name: /^Session A / }).click();
-    const editor = page.getByRole('textbox', { name: 'Chat message input' });
+    const editor = page.getByRole('textbox', {
+      name: type === 'note' ? 'Note input' : 'Chat message input',
+    });
     await expect(editor).toHaveText('Draft A');
 
     if (type === 'chat') {

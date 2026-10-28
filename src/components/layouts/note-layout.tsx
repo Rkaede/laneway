@@ -1,3 +1,4 @@
+import { isMac } from '@solid-primitives/platform';
 import { Component, For, lazy, Show } from 'solid-js';
 
 import { ChatPanel } from '~/components/chat/chat-panel';
@@ -24,21 +25,18 @@ export function NoteLayout(props: { sessionId?: string }) {
             initialValue={session.input}
             onSubmit={() => session.handleSubmit()}
             class="col-start-1 row-start-1"
-            placeholder="Use Shift + Enter to submit"
+            placeholder="Write and refine a single prompt"
             mode="note"
           />
-          {session.input === '' && (
-            <div class="col-start-1 row-start-1 mt-[-1px] ml-2 gap-0.5">
-              <div class="font-light text-muted italic">write and refine a single prompt</div>
-            </div>
-          )}
           <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 gap-0.5 place-self-end">
             <Show
               when={sessionContext.isLoading()}
               fallback={
                 <Button
                   variant="ghost"
-                  aria-label="Submit Note"
+                  aria-label="Send note"
+                  aria-keyshortcuts={`${isMac ? 'Meta' : 'Control'}+Enter Shift+Enter`}
+                  title={`Send note (${isMac ? '⌘' : 'Ctrl'} + Enter or Shift + Enter)`}
                   size="default"
                   onClick={() => session.handleSubmit()}
                 >
@@ -57,7 +55,9 @@ export function NoteLayout(props: { sessionId?: string }) {
             </Show>
           </div>
           <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 flex flex-col items-end gap-0.5 place-self-end justify-self-center">
-            <div class="text-xs text-muted">shift + enter to send</div>
+            <div class="text-xs text-muted">
+              {isMac ? '⌘' : 'Ctrl'} + Enter or Shift + Enter to send
+            </div>
           </div>
         </div>
       </div>

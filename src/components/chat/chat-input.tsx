@@ -1,7 +1,8 @@
+import { isMac } from '@solid-primitives/platform';
 import { useLocation } from '@solidjs/router';
 import { Component, createEffect, createSignal, For, lazy, Show } from 'solid-js';
 
-import { IconPlus, IconSquare } from '~/components/icons/ui';
+import { IconPlus, IconSendHorizontal, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import config from '~/config';
 import { cn } from '~/util';
@@ -123,7 +124,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
         <form
           onSubmit={(e: Event) => {
             e.preventDefault();
-            submitForm();
+            handleSubmit();
           }}
           class={cn(
             'relative flex flex-1 items-end gap-1 rounded-composer border border-composer-border bg-composer pt-0 pr-4 shadow-composer transition-[color,box-shadow] focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
@@ -163,7 +164,22 @@ export const ChatInput: Component<PromptProps> = (props) => {
             />
           </div>
 
-          <Show when={props.isLoading}>
+          <Show
+            when={props.isLoading}
+            fallback={
+              <Button
+                type="submit"
+                variant="default"
+                size="icon"
+                disabled={!props.input?.trim()}
+                title={`Send message (${isMac ? '⌘' : 'Ctrl'} + Enter)`}
+                class="my-3 size-7 shrink-0 rounded-full bg-main p-0 text-inverse transition-transform hover:scale-110"
+              >
+                <IconSendHorizontal class="size-4" />
+                <span class="sr-only">Send message</span>
+              </Button>
+            }
+          >
             <Button
               variant="default"
               size="icon"
