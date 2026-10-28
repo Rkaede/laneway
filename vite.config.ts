@@ -51,7 +51,9 @@ export default defineConfig({
     },
   },
   server: {
-    // Let the Tailscale preview URL through Vite's host check.
-    allowedHosts: ['.ts.net'],
+    // Let only the current Tailscale preview hostname through Vite's host check.
+    allowedHosts: process.env.PORTLESS_TAILSCALE_URL
+      ? [new URL(process.env.PORTLESS_TAILSCALE_URL).hostname]
+      : [],
   },
 });
