@@ -284,10 +284,10 @@ export const sessionActions: Actions = {
     name: 'Delete Session',
     keywords: [],
     icon: IconTrash,
-    fn: (context: ActionContext) => {
-      const sessionId = context.params.id;
+    fn: (context: ActionContext, options?: { sessionId?: string }) => {
+      const sessionId = options?.sessionId ?? context.params.id;
       if (!sessionId) return;
-      if (deleteSession(sessionId)) {
+      if (deleteSession(sessionId) && sessionId === context.params.id) {
         context.navigate('/');
       }
     },

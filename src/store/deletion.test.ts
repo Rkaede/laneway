@@ -95,35 +95,57 @@ describe('data deletion', () => {
 });
 
 describe('session deletion', () => {
-  it('keeps the session, messages, images, and route when confirmation is canceled', () => {
-    const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
-    const before = JSON.stringify(store);
+  it.each([undefined, { sessionId: 'delete-session' }])(
+    'keeps the session, messages, images, and route when confirmation is canceled (%j)',
+    (options) => {
+      const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
+      const before = JSON.stringify(store);
 
-    sessionActions.deleteSession.fn(context);
+      sessionActions.deleteSession.fn(context, options);
 
-    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('My session'));
-    expect(JSON.stringify(store)).toBe(before);
-    expect(removeImage).not.toHaveBeenCalled();
-    expect(navigate).not.toHaveBeenCalled();
-  });
+      expect(confirm).toHaveBeenCalledWith(expect.stringContaining('My session'));
+      expect(JSON.stringify(store)).toBe(before);
+      expect(removeImage).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    },
+  );
 
-  it('deletes only the confirmed session and its images before navigating', () => {
-    const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
-    confirm.mockReturnValue(true);
+  it.each([undefined, { sessionId: 'delete-session' }])(
+    'deletes only the confirmed active session and its images before navigating (%j)',
+    (options) => {
+      const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
+      confirm.mockReturnValue(true);
 
-    sessionActions.deleteSession.fn(context);
+      sessionActions.deleteSession.fn(context, options);
 
-    expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
-    expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
-    expect(removeImage).toHaveBeenCalledTimes(1);
-    expect(removeImage).toHaveBeenCalledWith('/delete-image');
-    expect(navigate).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenCalledWith('/');
-  });
+      expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
+      expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
+      expect(removeImage).toHaveBeenCalledTimes(1);
+      expect(removeImage).toHaveBeenCalledWith('/delete-image');
+      expect(navigate).toHaveBeenCalledTimes(1);
+      expect(navigate).toHaveBeenCalledWith('/');
+    },
+  );
+
+  it.each([{ id: 'keep-session' }, {}])(
+    'keeps the current route when deleting a different session (%j)',
+    (params) => {
+      const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
+      confirm.mockReturnValue(true);
+
+      sessionActions.deleteSession.fn({ navigate, params }, { sessionId: 'delete-session' });
+
+      expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
+      expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
+      expect(removeImage).toHaveBeenCalledWith('/delete-image');
+      expect(navigate).not.toHaveBeenCalled();
+    },
+  );
 
   it('does not prompt or navigate for a missing session', () => {
     expect(deleteSession('missing')).toBe(false);
     sessionActions.deleteSession.fn({ navigate, params: {} });
+    sessionActions.deleteSession.fn(context, { sessionId: 'missing' });
 
     expect(confirm).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();

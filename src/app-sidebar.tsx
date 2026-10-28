@@ -29,7 +29,7 @@ import {
 } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import { setStore, store } from '~/store';
-import { actions, deleteSession, renameSession, toggleSidebar } from '~/store/actions';
+import { actions, renameSession, toggleSidebar } from '~/store/actions';
 import { selectSessionById } from '~/store/selectors';
 import type { SessionProps } from '~/types';
 import { groupByDate } from '~/util';
@@ -168,6 +168,7 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
 
 function SidebarItemDropdown(props: { sessionId?: string }) {
   const navigate = useNavigate();
+  const params = useParams();
   const [open, setOpen] = createSignal(false);
   return (
     <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
@@ -188,11 +189,10 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
       <DropdownMenuContent class="w-24">
         <DropdownMenuGroup>
           <DropdownMenuItem
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={() => {
               if (!props.sessionId) return;
-              if (deleteSession(props.sessionId)) {
-                navigate('/');
-              }
+              actions.deleteSession.fn({ navigate, params }, { sessionId: props.sessionId });
             }}
           >
             Delete
