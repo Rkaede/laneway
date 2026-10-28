@@ -48,7 +48,7 @@ export function TTSSettings() {
         <SettingControl>
           <Switch
             disabled={!apiKeys?.openai}
-            checked={store.settings.tts.enabled}
+            checked={!!apiKeys?.openai && store.settings.tts.enabled}
             onChange={(value) => setStore('settings', 'tts', 'enabled', value)}
           >
             <SwitchControl>

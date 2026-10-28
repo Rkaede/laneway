@@ -2,6 +2,7 @@ import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { generateSpeech } from '~/services/tts/openai-tts';
+import { speechChunks } from '~/services/tts/speech-text';
 import { store } from '~/store';
 import { hash } from '~/util';
 
@@ -19,85 +20,88 @@ const [ttsState, setTtsState] = createStore<TTS>({
   playingId: null,
 });
 
-export function createAudio({ id, text }: { id?: string; text?: string }) {
+export function createAudio({ id, text }: { id?: string; text?: string | (() => string) }) {
   const [status, setStatus] = createSignal<AudioStatus>('idle');
   const audio = new Audio();
+  let chunks: string[] = [];
+  let chunkIndex = 0;
+  let playback = 0;
 
   const handleAudioEnd = () => {
-    setStatus('idle');
-    setTtsState({ status: 'idle', playingId: null });
-    URL.revokeObjectURL(audio.src);
+    if (status() !== 'playing') return;
+    if (++chunkIndex < chunks.length) {
+      void playChunk(playback);
+    } else {
+      stop();
+    }
+  };
+
+  const handleAudioError = (error: unknown) => {
+    stop();
+    setStatus('error');
+    console.error('Error playing audio:', error);
   };
 
   createEffect(() => {
-    if (ttsState.status === 'playing' && ttsState.playingId !== id) {
-      audio.pause();
-      audio.currentTime = 0;
-      setStatus('idle');
+    if (ttsState.status !== 'idle' && ttsState.playingId !== (id ?? null)) {
+      stop();
     }
   });
 
+  audio.addEventListener('ended', handleAudioEnd);
+  audio.addEventListener('error', handleAudioError);
   onCleanup(() => {
     audio.removeEventListener('ended', handleAudioEnd);
-    audio.pause();
-    URL.revokeObjectURL(audio.src);
+    audio.removeEventListener('error', handleAudioError);
+    stop();
     audio.src = '';
   });
 
-  async function play(service: string = 'openai') {
+  async function playChunk(currentPlayback: number) {
     const voice = store.settings.tts.openai.voice ?? 'alloy';
+    const content = chunks[chunkIndex];
+    setStatus('loading');
+    setTtsState({ status: 'loading', playingId: id ?? null });
 
-    if (!text) return;
-    audio.removeEventListener('ended', handleAudioEnd);
-
-    const hashId = hash(text + service + voice);
-
-    if (status() === 'playing') {
-      audio.pause();
-      audio.currentTime = 0;
+    try {
+      const hashId = hash(content + 'openai' + voice).toString();
+      const cache = await caches.open(TTS_CACHE_NAME);
+      const cachedResponse = await cache.match(hashId);
+      let audioBuffer;
+      if (cachedResponse) {
+        audioBuffer = await cachedResponse.arrayBuffer();
+      } else {
+        audioBuffer = await generateSpeech(content, voice);
+        await cache.put(hashId, new Response(audioBuffer));
+      }
+      if (currentPlayback !== playback) return;
+      URL.revokeObjectURL(audio.src);
+      audio.src = URL.createObjectURL(new Blob([audioBuffer], { type: 'audio/mpeg' }));
+      await audio.play();
+      if (currentPlayback !== playback) return;
+      setStatus('playing');
+      setTtsState({ status: 'playing', playingId: id ?? null });
+    } catch (error) {
+      if (currentPlayback === playback) handleAudioError(error);
     }
-
-    let audioBuffer;
-    const cache = await caches.open(TTS_CACHE_NAME);
-    const cachedResponse = await cache.match(hashId.toString());
-
-    if (cachedResponse) {
-      audioBuffer = await cachedResponse.arrayBuffer();
-    } else {
-      setStatus('loading');
-      audioBuffer = await generateSpeech(text, store.settings.tts.openai.voice);
-      await cache.put(hashId.toString(), new Response(audioBuffer));
-    }
-
-    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-    const data = URL.createObjectURL(blob);
-    audio.src = data;
-
-    audio
-      .play()
-      .then(() => {
-        setStatus('playing');
-        setTtsState({ status: 'playing', playingId: id });
-      })
-      .catch((error) => {
-        setStatus('error');
-        setTtsState({ status: 'error', playingId: null });
-        console.error('Error playing audio:', error);
-      });
-
-    audio.addEventListener('ended', handleAudioEnd);
   }
 
-  async function stop() {
-    if (status() === 'playing') {
-      try {
-        await audio.pause();
-        audio.currentTime = 0;
-        setStatus('idle');
-      } catch (error) {
-        console.error('Error pausing audio:', error);
-        setStatus('error');
-      }
+  async function play() {
+    if (status() === 'loading' || status() === 'playing') return;
+    chunks = speechChunks(typeof text === 'function' ? text() : (text ?? ''));
+    if (!chunks.length) return;
+    chunkIndex = 0;
+    await playChunk(++playback);
+  }
+
+  function stop() {
+    playback++;
+    audio.pause();
+    audio.currentTime = 0;
+    URL.revokeObjectURL(audio.src);
+    setStatus('idle');
+    if (ttsState.playingId === (id ?? null)) {
+      setTtsState({ status: 'idle', playingId: null });
     }
   }
 

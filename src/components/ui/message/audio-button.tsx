@@ -19,7 +19,7 @@ const ariaLabels = {
   idle: 'Play audio',
   playing: 'Stop audio',
   loading: 'Loading audio',
-  error: 'Audio failed to load',
+  error: 'Audio failed to load. Click to retry',
   unavailable: 'Audio unavailable - OpenAI API key required',
 } as const;
 
@@ -34,7 +34,7 @@ export function AudioButton(props: AudioButtonProps) {
         'disabled:opacity-100': props.status === 'loading',
         'bg-surface-hover': props.status === 'playing',
       }}
-      title={props.status === 'unavailable' ? 'OpenAI API key is required' : undefined}
+      title={ariaLabels[props.status]}
       aria-label={ariaLabels[props.status]}
     >
       <Switch fallback={<IconSpeaker class="size-4" />}>

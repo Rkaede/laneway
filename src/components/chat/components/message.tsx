@@ -69,14 +69,13 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
 
   const audio = createAudio({
     id: props.id,
-    text: content(),
+    text: content,
   });
 
   function handleClickTTS() {
     if (audio.status() === 'playing') {
       audio.stop();
-    }
-    if (audio.status() === 'idle') {
+    } else if (audio.status() === 'idle' || audio.status() === 'error') {
       audio.play();
     }
   }
@@ -163,7 +162,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
               }
             >
               <Tooltip>
-                <TooltipTrigger class="cursor-default">
+                <TooltipTrigger as="span" tabIndex={0} class="inline-flex cursor-default">
                   <AudioButton status="unavailable" onClick={() => handleClickTTS()} />
                 </TooltipTrigger>
                 <TooltipContent>
