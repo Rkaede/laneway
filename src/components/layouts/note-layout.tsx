@@ -1,10 +1,12 @@
 import { Component, For, lazy, Show } from 'solid-js';
 
 import { ChatPanel } from '~/components/chat/chat-panel';
+import { useSession } from '~/components/connected/session-provider';
 import { SpeedDial } from '~/components/connected/speed-dial';
-import { IconSendHorizontal } from '~/components/icons/ui';
+import { IconSendHorizontal, IconSquare } from '~/components/icons/ui';
 import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
+import { cancel } from '~/services/chat-controller';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
 import { selectChatById } from '~/store/selectors';
@@ -12,6 +14,14 @@ const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 export function NoteLayout(props: { sessionId?: string }) {
   const session = createSession(() => props.sessionId);
+  const sessionContext = useSession();
+
+  function handleCancel() {
+    for (const chatId of session.chats) {
+      const chat = store.chats.find((c) => c.id === chatId);
+      if (chat?.status === 'loading') cancel({ chatId });
+    }
+  }
 
   return (
     <div class="grid size-full min-h-0 grid-cols-2">
@@ -31,14 +41,23 @@ export function NoteLayout(props: { sessionId?: string }) {
             </div>
           )}
           <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 gap-0.5 place-self-end">
-            <Button
-              variant="ghost"
-              aria-label="Submit Note"
-              size="default"
-              onClick={() => session.handleSubmit()}
+            <Show
+              when={sessionContext.isLoading()}
+              fallback={
+                <Button
+                  variant="ghost"
+                  aria-label="Submit Note"
+                  size="default"
+                  onClick={() => session.handleSubmit()}
+                >
+                  <IconSendHorizontal class="h-4 w-4" />
+                </Button>
+              }
             >
-              <IconSendHorizontal class="h-4 w-4" />
-            </Button>
+              <Button variant="ghost" aria-label="Stop" size="default" onClick={handleCancel}>
+                <IconSquare class="h-4 w-4" fill="currentColor" />
+              </Button>
+            </Show>
           </div>
           <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 flex flex-col items-end gap-0.5 place-self-end justify-self-center">
             <div class="text-xs text-muted">shift + enter to send</div>

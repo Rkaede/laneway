@@ -196,4 +196,52 @@ describe('session submission', () => {
     expect(session.input).toBe(input);
     expect(store.chats[0].messages[0].content).toBe(input);
   });
+
+  it.each(['idle', 'canceled'] as const)(
+    'keeps a streaming note intact and allows submission after it becomes %s',
+    async (status) => {
+      const prompt = { id: 'prompt', role: 'user' as const, content: 'Original note' };
+      const latest = { id: 'reply', role: 'assistant' as const, content: 'Partial reply' };
+      const controller = new AbortController();
+      setStore('sessions', 0, 'type', 'note');
+      setStore('chats', 0, { status: 'loading', messages: [prompt], latest, controller });
+      const session = createSession(() => 'session');
+
+      await session.handleSubmit();
+
+      expect(session.input).toBe(input);
+      expect(store.chats[0].messages).toEqual([prompt]);
+      expect(store.chats[0].latest).toEqual(latest);
+      expect(store.chats[0].status).toBe('loading');
+      expect(store.chats[0].controller).toBe(controller);
+      expect(controller.signal.aborted).toBe(false);
+
+      setStore('chats', 0, { status, latest: undefined, controller: undefined });
+      await session.handleSubmit();
+
+      expect(store.chats[0].messages).toEqual([
+        { id: expect.any(String), role: 'user', content: input },
+      ]);
+      expect(store.chats[0].status).toBe('idle');
+      expect(session.input).toBe(input);
+    },
+  );
+
+  it('waits for every chat in a note before replacing its messages', async () => {
+    const prompt = { id: 'prompt', role: 'user' as const, content: 'Original note' };
+    setStore('sessions', 0, { type: 'note', chats: ['chat', 'streaming-chat'] });
+    setStore('chats', 0, 'messages', [prompt]);
+    setStore('chats', 1, {
+      id: 'streaming-chat',
+      modelId: 'no-vision',
+      status: 'loading',
+      messages: [prompt],
+    });
+    const session = createSession(() => 'session');
+
+    await session.handleSubmit();
+
+    expect(store.chats.map((chat) => chat.messages)).toEqual([[prompt], [prompt]]);
+    expect(session.input).toBe(input);
+  });
 });

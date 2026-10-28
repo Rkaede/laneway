@@ -41,6 +41,12 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
 
   async function handleSubmit() {
     if (isSubmitting) return;
+    if (
+      session().type === 'note' &&
+      store.chats.some((chat) => session().chats.includes(chat.id) && chat.status === 'loading')
+    ) {
+      return;
+    }
     isSubmitting = true;
 
     try {
