@@ -1,8 +1,9 @@
 export const OPENROUTER_URL = 'https://openrouter.ai/api/v1';
 
-// Each theme maps to a theme class, mounted on <html> by the app layout. The ids match the
-// values saved in users' settings, and unknown ids fall back to the first theme.
+// Theme ids match users' saved settings. System follows the operating system preference,
+// and unknown ids fall back to it.
 export const THEMES = [
+  { id: 'system', label: 'System', className: 'theme-system', scheme: 'light dark' },
   { id: 'light', label: 'Light', className: 'theme-default', scheme: 'light' },
   { id: 'dark', label: 'Dark', className: 'theme-default-dark', scheme: 'dark' },
 ] as const;

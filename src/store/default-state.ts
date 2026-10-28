@@ -196,7 +196,7 @@ export function createDefaultState(): State {
       openRouterUsage: 'fallback',
       sidebarOpen: true,
       generateTitles: true,
-      theme: 'dark',
+      theme: 'system',
       hasSeenWelcome: false,
       messages: {
         showAvatars: false,

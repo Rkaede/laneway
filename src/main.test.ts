@@ -82,6 +82,11 @@ it('excludes developer code and builds an installable production PWA', async () 
     expect(html).toContain(`<meta name="theme-color" content="${webManifest.theme_color}"`);
     expect(html).toContain('<link rel="icon" href="/favicon.svg"');
     expect(html).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png"');
+    expect(html).toContain('<script src="/theme-init.js"></script>');
+    expect(await Bun.file(join(directory, 'theme-init.js')).text()).toBe(
+      await Bun.file(join(import.meta.dir, '../public/theme-init.js')).text(),
+    );
+    expect(serviceWorker).toContain('url:"theme-init.js"');
 
     for (const [file, size] of [
       ['pwa-192x192.png', 192],

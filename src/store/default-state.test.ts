@@ -3,6 +3,10 @@ import { describe, expect, it, spyOn } from 'bun:test';
 import { createDefaultState } from './default-state';
 
 describe('createDefaultState', () => {
+  it('follows the system theme for new and reset stores', () => {
+    expect(createDefaultState().settings.theme).toBe('system');
+  });
+
   it('does not log session data', () => {
     const log = spyOn(console, 'log').mockImplementation(() => {});
 

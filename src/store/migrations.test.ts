@@ -30,7 +30,7 @@ describe('store migrations', () => {
       migrateStore(store, setStore);
 
       expect(store).toEqual(expected);
-      expect(store.settings.theme).toBe('dark');
+      expect(store.settings.theme).toBe('system');
     },
   );
 
@@ -53,22 +53,25 @@ describe('store migrations', () => {
     },
   );
 
-  it.each(['light', 'dark'] as const)('preserves a saved %s theme and settings', (theme) => {
-    const state = createLegacyState();
-    state.settings.theme = theme;
-    state.settings.messages = { showAvatars: true, showModelTitle: true };
-    state.settings.completions = { enabled: true, model: 'saved-model' };
-    state.featureFlags = { completions: true };
-    state.speedDial = [];
-    state.settings.noteModel = { type: 'assistant', referenceId: 'saved-assistant' };
-    state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
-    const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 1 };
-    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+  it.each(['system', 'light', 'dark'] as const)(
+    'preserves a saved %s theme and settings',
+    (theme) => {
+      const state = createLegacyState();
+      state.settings.theme = theme;
+      state.settings.messages = { showAvatars: true, showModelTitle: true };
+      state.settings.completions = { enabled: true, model: 'saved-model' };
+      state.featureFlags = { completions: true };
+      state.speedDial = [];
+      state.settings.noteModel = { type: 'assistant', referenceId: 'saved-assistant' };
+      state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
+      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 1 };
+      const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
 
-    migrateStore(store, setStore);
+      migrateStore(store, setStore);
 
-    expect(store).toEqual(expected);
-  });
+      expect(store).toEqual(expected);
+    },
+  );
 
   it('does not rerun completed migrations', () => {
     const state = createLegacyState();

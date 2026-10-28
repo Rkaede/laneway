@@ -161,7 +161,7 @@ describe('backups', () => {
     await restoreBackup(backup, current, setCurrent);
 
     expect(current.schemaVersion).toBe(1);
-    expect(current.settings.theme).toBe('dark');
+    expect(current.settings.theme).toBe('system');
     expect(current.settings.messages).toEqual(createDefaultState().settings.messages);
     expect(current.sessions).toEqual(source.sessions);
     expect(imagePart(current.chats[0].messages[0]).image.storageId).toBe('photo');
