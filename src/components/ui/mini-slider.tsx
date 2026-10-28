@@ -17,7 +17,7 @@ const Slider = <T extends ValidComponent = 'div'>(
   return (
     <SliderPrimitive.Root
       class={cn(
-        'relative flex w-full touch-none select-none flex-col items-center',
+        'relative flex w-full touch-none flex-col items-center select-none',
         local.class,
       )}
       {...others}
@@ -36,7 +36,7 @@ const SliderTrack = <T extends ValidComponent = 'div'>(
   const [local, others] = splitProps(props as SliderTrackProps, ['class']);
   return (
     <SliderPrimitive.Track
-      class={cn('relative h-1 w-full grow rounded-full bg-background-4', local.class)}
+      class={cn('relative h-1 w-full grow rounded-full bg-neutral-6', local.class)}
       {...others}
     />
   );
@@ -52,7 +52,7 @@ const SliderFill = <T extends ValidComponent = 'div'>(
   const [local, others] = splitProps(props as SliderFillProps, ['class']);
   return (
     <SliderPrimitive.Fill
-      class={cn('absolute h-full rounded-full bg-muted-foreground', local.class)}
+      class={cn('absolute h-full rounded-full bg-neutral-9', local.class)}
       {...others}
     />
   );
@@ -71,7 +71,7 @@ const SliderThumb = <T extends ValidComponent = 'span'>(
   return (
     <SliderPrimitive.Thumb
       class={cn(
-        'top-[-6px] block size-4 rounded-full border bg-accent ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        'top-[-6px] block size-4 rounded-full border border-brand bg-brand shadow-xs transition-colors focus-visible:ring-[3px] focus-visible:ring-border-focus/50 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50',
         local.class,
       )}
       {...others}

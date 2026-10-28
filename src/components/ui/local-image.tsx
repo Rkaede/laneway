@@ -35,7 +35,7 @@ export function LocalImage(props: ImageProps) {
       fallback={
         <div
           class={cn(
-            'h-32 w-64 content-center rounded-lg bg-muted p-4 text-center text-sm font-medium text-muted-foreground shadow-sm',
+            'h-32 w-64 content-center rounded-card bg-surface-sunken p-4 text-center text-sm font-medium text-muted shadow-xs',
             props.class,
           )}
         >

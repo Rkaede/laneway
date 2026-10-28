@@ -3,12 +3,12 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { Component, ComponentProps } from 'solid-js';
 import { splitProps } from 'solid-js';
 
-const shortcutVariants = cva('ml-auto text-xs text-muted-foreground font-medium', {
+const shortcutVariants = cva('ml-auto text-xs font-medium text-muted', {
   variants: {
     variant: {
       default: '',
-      ghost: 'bg-transparent hover:bg-accent hover:text-accent-foreground',
-      solid: 'bg-muted text-muted-foreground px-1 py-0.5 rounded-md font-semibold',
+      ghost: 'bg-transparent hover:bg-surface-hover hover:text-main',
+      solid: 'rounded-tag bg-surface-sunken px-1 py-0.5 font-semibold text-muted',
     },
   },
   defaultVariants: {

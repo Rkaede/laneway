@@ -10,26 +10,20 @@ import WifiIcon from 'lucide-solid/icons/wifi';
 import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
 import { mergeProps, Show, splitProps } from 'solid-js';
 
-const tagVariants = cva('inline-flex items-center gap-1 rounded-full text-xs font-medium', {
+const tagVariants = cva('inline-flex items-center gap-1 rounded-badge text-xs font-medium', {
   variants: {
     variant: {
-      assistant:
-        'bg-orange-50 text-fuchsia-700 border-fuchsia-200 dark:bg-fuchsia-950 dark:text-fuchsia-300 dark:border-fuchsia-800',
-      free: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800',
-      model:
-        'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-950 dark:text-slate-300 dark:border-slate-800',
-      new: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
-      online:
-        'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
-      preset:
-        'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800',
-      reasoning:
-        'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950 dark:text-sky-300 dark:border-sky-800',
-      vision:
-        'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800',
+      assistant: 'border-important-border bg-important-subtle text-important-subtle-fg',
+      free: 'border-success-border bg-success-subtle text-success-subtle-fg',
+      model: 'border-neutral-border bg-neutral-subtle text-neutral-subtle-fg',
+      new: 'border-warning-border bg-warning-subtle text-warning-subtle-fg',
+      online: 'border-active-border bg-active-subtle text-active-subtle-fg',
+      preset: 'border-brand-border bg-brand-subtle text-brand-subtle-fg',
+      reasoning: 'border-info-border bg-info-subtle text-info-subtle-fg',
+      vision: 'border-confirmed-border bg-confirmed-subtle text-confirmed-subtle-fg',
     },
     subtle: {
-      true: 'bg-transparent dark:bg-transparent p-0',
+      true: 'bg-transparent p-0',
       false: 'border px-2 py-0.5',
     },
   },

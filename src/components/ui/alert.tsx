@@ -9,13 +9,15 @@ import { splitProps } from 'solid-js';
 import { cn } from '~/util';
 
 const alertVariants = cva(
-  'relative w-full rounded-lg border px-4 py-3 text-sm [&:has(svg)]:pl-11 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground bg-background',
+  'relative w-full rounded-card border px-4 py-3 text-sm [&:has(svg)]:pl-11 [&>svg]:absolute [&>svg]:top-4 [&>svg]:left-4 [&>svg]:text-main [&>svg+div]:translate-y-[-3px]',
   {
     variants: {
       variant: {
-        default: 'bg-background text-foreground',
-        destructive: 'border-red-300 dark:border-red-300 [&>svg]:text-red-300',
-        warning: 'border-yellow-200 dark:border-yellow-200 [&>svg]:text-yellow-200',
+        default: 'bg-surface-raised text-main',
+        destructive:
+          'border-danger-border bg-danger-subtle text-danger-subtle-fg [&>svg]:text-danger-subtle-fg',
+        warning:
+          'border-warning-border bg-warning-subtle text-warning-subtle-fg [&>svg]:text-warning-subtle-fg',
       },
     },
     defaultVariants: {
@@ -50,7 +52,7 @@ export const Alert = <T extends ValidComponent = 'div'>(
 export const AlertTitle = (props: ComponentProps<'div'>) => {
   const [local, rest] = splitProps(props, ['class']);
 
-  return <div class={cn('font-medium leading-5 tracking-tight', local.class)} {...rest} />;
+  return <div class={cn('leading-5 font-medium tracking-tight', local.class)} {...rest} />;
 };
 
 export const AlertDescription = (props: ComponentProps<'div'>) => {

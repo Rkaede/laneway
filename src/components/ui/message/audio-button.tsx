@@ -32,7 +32,7 @@ export function AudioButton(props: AudioButtonProps) {
       disabled={props.status === 'loading' || props.status === 'unavailable'}
       classList={{
         'disabled:opacity-100': props.status === 'loading',
-        'bg-muted/50': props.status === 'playing',
+        'bg-surface-hover': props.status === 'playing',
       }}
       title={props.status === 'unavailable' ? 'OpenAI API key is required' : undefined}
       aria-label={ariaLabels[props.status]}

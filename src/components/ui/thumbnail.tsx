@@ -34,10 +34,10 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
         <img
           src={props.file}
           alt={props.alt}
-          class="size-full max-h-16 overflow-hidden rounded-md border border-background-4 bg-muted object-cover object-left-top"
+          class="size-full max-h-16 overflow-hidden rounded-md border border-border-emphasis bg-surface-sunken object-cover object-left-top"
         />
         {props.onRemove && (
-          <div class="absolute right-[2px] top-0 z-20">
+          <div class="absolute top-0 right-[2px] z-20">
             <button
               type="button"
               aria-label="Remove image"
@@ -48,8 +48,8 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
               }}
               class={cn(
                 'relative z-30 translate-x-[40%] translate-y-[-40%]',
-                'rounded-full border border-background-4 bg-background-3 p-0.5 text-foreground',
-                'transition-colors hover:scale-105 hover:border-red-500 hover:bg-red-500',
+                'rounded-full border border-border-emphasis bg-surface-overlay p-0.5 text-main',
+                'transition-colors hover:scale-105 hover:border-danger hover:bg-danger hover:text-danger-fg',
                 'opacity-0 group-hover:opacity-100',
               )}
             >

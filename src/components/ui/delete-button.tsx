@@ -12,7 +12,7 @@ export const DeleteButton: Component<DeleteButtonProps> = (props) => {
     <Button
       size="icon"
       variant="ghost"
-      class="size-6 justify-self-end rounded-full p-0 hover:bg-destructive"
+      class="size-6 justify-self-end rounded-full p-0 hover:bg-danger hover:text-danger-fg"
       onClick={props.onClick}
     >
       <IconX class="size-4" />

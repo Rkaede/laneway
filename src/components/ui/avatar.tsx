@@ -7,13 +7,13 @@ import { cn } from '~/util';
 import { ModelIcon } from '../connected';
 
 const avatarVariants = cva(
-  'flex shrink-0 select-none items-center justify-center rounded-full border border-background-3 bg-background',
+  'flex shrink-0 items-center justify-center rounded-full border border-border bg-surface-raised select-none',
   {
     variants: {
       variant: {
-        primary: 'shadow-sm',
+        primary: 'shadow-xs',
         flat: 'shadow-none',
-        light: 'bg-background text-background-foreground',
+        light: 'bg-surface-raised text-main',
       },
       size: {
         sm: 'size-6',

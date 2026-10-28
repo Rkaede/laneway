@@ -16,15 +16,15 @@ interface StatsPopoverProps {
 
 export function StatsPopoverContent(props: StatsPopoverProps) {
   return (
-    <ul class="grid grid-cols-1 gap-3 whitespace-nowrap text-xs">
+    <ul class="grid grid-cols-1 gap-3 text-xs whitespace-nowrap">
       <li class="grid gap-0.5">
-        <span class="text-muted-foreground">Time Taken</span>
+        <span class="text-muted">Time Taken</span>
         <span class="font-medium">
           {props.stats?.timeTaken ? formatResponseTime(props.stats?.timeTaken) : '-'}
         </span>
       </li>
       <li class="grid gap-0.5">
-        <span class="text-muted-foreground">Tokens</span>
+        <span class="text-muted">Tokens</span>
         <span class="font-medium">
           {props.stats?.promptTokens &&
           props.stats?.completionTokens &&
@@ -39,7 +39,7 @@ export function StatsPopoverContent(props: StatsPopoverProps) {
         </span>
       </li>
       <li class="grid gap-0.5">
-        <span class="text-muted-foreground">Created</span>
+        <span class="text-muted">Created</span>
         <span class="font-medium">
           {props.stats?.created ? formatDateLong(new Date(props.stats?.created)) : '-'}
         </span>

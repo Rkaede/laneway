@@ -9,14 +9,14 @@ import { icons } from './badge';
 const iconBadgeVariants = cva('inline-flex items-center transition-colors', {
   variants: {
     variant: {
-      assistant: 'text-fuchsia-600 dark:text-fuchsia-400',
-      free: 'text-emerald-600 dark:text-emerald-400',
-      model: 'text-slate-600 dark:text-slate-400',
-      new: 'text-amber-600 dark:text-amber-400',
-      online: 'text-green-600 dark:text-green-400',
-      preset: 'text-indigo-600 dark:text-indigo-400',
-      reasoning: 'text-sky-600  dark:text-sky-400',
-      vision: 'text-purple-600 dark:text-purple-400',
+      assistant: 'text-important-subtle-fg',
+      free: 'text-success-subtle-fg',
+      model: 'text-neutral-subtle-fg',
+      new: 'text-warning-subtle-fg',
+      online: 'text-active-subtle-fg',
+      preset: 'text-brand-subtle-fg',
+      reasoning: 'text-info-subtle-fg',
+      vision: 'text-confirmed-subtle-fg',
     },
   },
   defaultVariants: {

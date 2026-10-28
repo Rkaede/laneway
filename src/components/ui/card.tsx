@@ -5,11 +5,11 @@ import { splitProps } from 'solid-js';
 
 import { cn } from '~/util';
 
-const cardVariants = cva('rounded-xl border bg-card text-card-foreground shadow', {
+const cardVariants = cva('rounded-card border bg-surface-raised text-main shadow-sm', {
   variants: {
     variant: {
       default: '',
-      solid: 'hover:border-background-3',
+      solid: 'hover:border-border-emphasis',
     },
     button: {
       true: 'cursor-pointer',
@@ -43,13 +43,13 @@ export const CardHeader = (props: ComponentProps<'div'>) => {
 export const CardTitle: ParentComponent<ComponentProps<'h1'>> = (props) => {
   const [local, rest] = splitProps(props, ['class']);
 
-  return <h1 class={cn('font-semibold leading-none tracking-tight', local.class)} {...rest} />;
+  return <h1 class={cn('leading-none font-semibold tracking-tight', local.class)} {...rest} />;
 };
 
 export const CardDescription: ParentComponent<ComponentProps<'h3'>> = (props) => {
   const [local, rest] = splitProps(props, ['class']);
 
-  return <h3 class={cn('text-sm text-muted-foreground', local.class)} {...rest} />;
+  return <h3 class={cn('text-sm text-muted', local.class)} {...rest} />;
 };
 
 export const CardContent = (props: ComponentProps<'div'>) => {

@@ -5,10 +5,7 @@ export type LabelProps = JSX.HTMLAttributes<HTMLLabelElement>;
 
 export const Label: Component<LabelProps> = (props) => {
   return (
-    <label
-      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      {...props}
-    />
+    <label class="peer- text-sm leading-none font-medium peer-disabled:opacity-70" {...props} />
   );
 };
 
