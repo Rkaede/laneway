@@ -64,12 +64,14 @@ html {
   width: 100%;
 }
 
-.flex-col {
-  min-height: 0;
-}
+@layer base {
+  .flex-col {
+    min-height: 0;
+  }
 
-.flex {
-  min-width: 0;
+  .flex {
+    min-width: 0;
+  }
 }
 
 .stack {
