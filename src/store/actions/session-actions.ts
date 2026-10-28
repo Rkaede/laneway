@@ -217,8 +217,10 @@ export function deleteSession(sessionId: string) {
 
 export function renameSession(sessionId: string, title: string) {
   const session = store.sessions.find((s) => s.id === sessionId);
-  if (!session) return;
-  setStore('sessions', (s) => s.id === sessionId, 'title', title);
+  const trimmedTitle = title.trim();
+  if (!session || !trimmedTitle) return false;
+  setStore('sessions', (s) => s.id === sessionId, 'title', trimmedTitle);
+  return true;
 }
 
 export async function autonameChat(sessionId: string, title: string) {

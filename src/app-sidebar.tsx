@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
-import { type Component, createEffect, createSignal, For, Show } from 'solid-js';
+import { type Component, createEffect, createSignal, For, on, Show } from 'solid-js';
 
 import {
   IconBox,
@@ -221,11 +221,17 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
   const [title, setTitle] = createSignal('');
   const session = selectSessionById(() => props.sessionId);
 
-  createEffect(() => {
-    if (session()) {
-      setTitle(session()?.title ?? '');
-    }
-  });
+  createEffect(
+    on(
+      () => props.sessionId,
+      () => setTitle(session()?.title ?? ''),
+    ),
+  );
+
+  function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    if (renameSession(props.sessionId, title())) closeDialog();
+  }
 
   function closeDialog() {
     setStore('dialogs', 'renameSession', 'sessionId', undefined);
@@ -239,7 +245,7 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
 
   return (
     <Dialog open={props.sessionId !== undefined} onOpenChange={handleOnOpenChange}>
-      <DialogContent>
+      <DialogContent as="form" onSubmit={handleSubmit}>
         <DialogHeader>
           <DialogTitle>Rename Chat Session</DialogTitle>
         </DialogHeader>
@@ -256,17 +262,12 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
           </div>
         </DialogDescription>
         <DialogFooter>
-          <Button
-            onClick={() => {
-              const _session = session();
-              if (title() === '' || !_session) return;
-              renameSession(_session.id, title());
-              closeDialog();
-            }}
-          >
+          <Button type="submit" disabled={!title().trim() || !session()}>
             Rename
           </Button>
-          <Button onClick={closeDialog}>Cancel</Button>
+          <Button type="button" onClick={closeDialog}>
+            Cancel
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
