@@ -8,9 +8,10 @@ own API keys, and all data stays in the browser.
 - Use Bun for everything. There is no pnpm or npm lockfile.
 - Lint with oxlint (`bun run lint`) and format with oxfmt (`bun run format`). ESLint and Prettier
   are gone, but keep the `eslint-plugin-*` devDependencies: oxlint loads them as JS plugins.
-- `bun run validate` formats, typechecks, lints and runs the unit tests.
-- Unit tests are `*.test.ts` files. `*.spec.ts` files are Playwright tests, run with
-  `bun run test:e2e`. A bare `bun test src` picks up the specs and fails on them.
+- `bun run validate` checks formatting, typechecks, lints and runs the unit tests without changing
+  any files. Use `bun run format` and `bun run lint:fix` to apply fixes.
+- Unit tests are `*.test.ts` files, run with `bun test`. Playwright tests are `*.e2e.ts` files, run
+  with `bun run test:e2e`; that needs `bunx playwright install chromium` and a free port 5173.
 - Commit messages follow `type: description` (conventional commits). The commit-msg hook in
   `scripts/verify-commit.js` rejects anything else.
 
@@ -42,7 +43,7 @@ The design system lives in `src/styles/`, with `src/styles/loom.css` as its entr
 
 ## AI SDK
 
-The app uses AI SDK 7 (`ai`, `@ai-sdk/openai`, `@ai-sdk/google`).
+The app uses AI SDK 7 (`ai`, `@ai-sdk/openai`).
 
 - Create OpenAI and OpenRouter models with `provider.chat(modelId)`. The default Responses API
   stores conversations server-side and is not supported by OpenRouter.
