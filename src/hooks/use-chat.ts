@@ -13,6 +13,7 @@ import { append, cancel } from '~/services/chat-controller';
 
 type UseChat = {
   chat: ChatProps;
+  readOnly?: () => boolean | undefined;
 };
 
 type ChatStore = {
@@ -21,7 +22,7 @@ type ChatStore = {
   cancel: () => void;
 };
 
-export function useChat({ chat }: UseChat) {
+export function useChat({ chat, readOnly }: UseChat) {
   const assistant = selectAssistantById(() => chat.assistantId);
   const modelFromAssistant = selectModelById(() => assistant()?.modelId);
   const modelFromChat = selectModelById(() => chat.modelId);
@@ -63,6 +64,7 @@ export function useChat({ chat }: UseChat) {
       cancel({ chatId: chat.id });
     },
     append: async () => {
+      if (readOnly?.()) return;
       append({ chatId: chat.id, streamFn });
     },
   });
@@ -70,7 +72,12 @@ export function useChat({ chat }: UseChat) {
   // Automatically sends new user messages to the AI model, checking for vision capabilities if
   // images are present and prepending any system prompt from the assistant
   createEffect(() => {
-    if (chat.error || model()?.provider === undefined || !isApiKeyConfigured()) {
+    if (
+      readOnly?.() ||
+      chat.error ||
+      model()?.provider === undefined ||
+      !isApiKeyConfigured()
+    ) {
       return;
     }
 

@@ -47,6 +47,28 @@ afterEach(() => {
 });
 
 describe('chat API keys', () => {
+  it('does not send read-only chats even when a key is configured', async () => {
+    setModels([
+      {
+        id: 'model',
+        title: 'Model',
+        creator: { id: 'c', name: 'c', website: '', icon: '' },
+        created: 0,
+        provider: [{ id: 'openai', modelId: 'provider-model', primary: true }],
+      },
+    ]);
+    setApiKeys('openai', 'test-key');
+    const chat = useChat({ chat: store.chats[0], readOnly: () => true });
+
+    runEffect();
+    await chat.append([prompt]);
+
+    expect(chat.isApiKeyConfigured()).toBe(true);
+    expect(append).not.toHaveBeenCalled();
+    expect(store.chats[0].status).toBe('idle');
+    expect(store.chats[0].messages).toEqual([prompt]);
+  });
+
   it.each(['openai', 'openrouter'] as const)(
     'waits for a %s key before starting a request',
     (provider) => {

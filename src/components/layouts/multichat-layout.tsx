@@ -103,17 +103,26 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
           )}
         </Show>
       </div>
-      <ChatInput
-        hasVision
-        input={session()?.input ?? store.draftSession.input ?? ''}
-        isLoading={sessionContext.isLoading()}
-        onInput={handleInput}
-        onSubmit={handleSubmit}
-        onFileSelect={handleFileSelect}
-        onRemoveFile={handleRemoveFile}
-        onCancel={sessionContext.cancelChats}
-        attachments={attachments()}
-      />
+      <Show
+        when={session()?.created !== -1}
+        fallback={
+          <p class="px-4 py-4 text-center text-sm text-muted">
+            This example is read-only. Start a new chat to send messages.
+          </p>
+        }
+      >
+        <ChatInput
+          hasVision
+          input={session()?.input ?? store.draftSession.input ?? ''}
+          isLoading={sessionContext.isLoading()}
+          onInput={handleInput}
+          onSubmit={handleSubmit}
+          onFileSelect={handleFileSelect}
+          onRemoveFile={handleRemoveFile}
+          onCancel={sessionContext.cancelChats}
+          attachments={attachments()}
+        />
+      </Show>
     </div>
   );
 };

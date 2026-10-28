@@ -112,6 +112,7 @@ export function addMessageToSessionChats(
 ) {
   const sessionId = inputSessionId ?? createSessionFromDraft();
   const session = store.sessions.find((s) => s.id === sessionId);
+  if (session?.created === -1) return sessionId;
 
   if (session) {
     for (const chatId of session.chats) {

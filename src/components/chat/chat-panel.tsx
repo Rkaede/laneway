@@ -22,7 +22,7 @@ type ChatPanelProps = {
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
   const navigate = useNavigate();
-  const chat = useChat({ chat: props.chat });
+  const chat = useChat({ chat: props.chat, readOnly: () => props.isExample });
 
   return (
     <div
@@ -47,7 +47,11 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           <Show when={props.chat}>
             <For each={props.chat.messages}>
               {(message) => (
-                <Message {...message} model={chat.model()} tts={store.settings.tts.enabled} />
+                <Message
+                  {...message}
+                  model={chat.model()}
+                  tts={!props.isExample && store.settings.tts.enabled}
+                />
               )}
             </For>
           </Show>
@@ -68,7 +72,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             <AlertNoVision />
           </Show>
 
-          <Show when={!chat.isApiKeyConfigured()}>
+          <Show when={!props.isExample && !chat.isApiKeyConfigured()}>
             <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
           </Show>
 

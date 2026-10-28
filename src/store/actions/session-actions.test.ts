@@ -48,6 +48,21 @@ beforeEach(() => {
 });
 
 describe('addMessageToSessionChats', () => {
+  it('leaves example messages and request state unchanged', () => {
+    const message: MessageProps = { id: 'example', role: 'assistant', content: 'Example' };
+    const error = { name: 'Error', message: 'Previous error' };
+    setStore('sessions', 0, 'created', -1);
+    setStore('chats', 0, { messages: [message], status: 'error', error });
+
+    const sessionId = addMessageToSessionChats(imageMessage, 'session');
+    addMessageToSessionChats({ id: 'text', role: 'user', content: 'Hello' }, 'session');
+
+    expect(sessionId).toBe('session');
+    expect(store.chats[0].messages).toEqual([message]);
+    expect(store.chats[0].status).toBe('error');
+    expect(store.chats[0].error).toEqual(error);
+  });
+
   it('adds image messages to a vision assistant chat', () => {
     addMessageToSessionChats(imageMessage, 'session');
 
