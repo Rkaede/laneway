@@ -37,9 +37,9 @@ export async function createMessage(
   const imageCacheFiles: { filename: string; storageId: string }[] = [];
   if (attachments) {
     for (const file of attachments) {
-      const name = `${file.name}_${Date.now()}`;
-      imageCacheFiles.push({ filename: file.name, storageId: name });
-      await imageCache.add(name, file);
+      const storageId = nanoid();
+      imageCacheFiles.push({ filename: file.name, storageId });
+      await imageCache.add(storageId, file);
     }
   }
 

@@ -94,6 +94,34 @@ describe('createMessage', () => {
     expect(Array.isArray(msg!.content)).toBe(true);
   });
 
+  it('uses unique URL-safe storage IDs while preserving attachment filenames', async () => {
+    spyOn(Date, 'now').mockReturnValue(123);
+    const addImage = spyOn(imageCache, 'add');
+    const files = ['photo#1.png', 'photo?2.png', 'photo#1.png'].map(
+      (name) => new File(['image'], name, { type: 'image/png' }),
+    );
+
+    const msg = await createMessage('hello', files, {
+      chatIds: ['chat-vision'],
+      draft: true,
+    });
+
+    const storageIds = addImage.mock.calls.map(([storageId]) => storageId);
+    expect(storageIds).toHaveLength(files.length);
+    expect(new Set(storageIds).size).toBe(files.length);
+    for (const [index, storageId] of storageIds.entries()) {
+      expect(storageId).toMatch(/^[A-Za-z0-9_-]+$/);
+      expect(addImage).toHaveBeenNthCalledWith(index + 1, storageId, files[index]);
+    }
+    expect(msg?.content).toEqual([
+      ...files.map((file, index) => ({
+        type: 'image' as const,
+        image: { filename: file.name, storageId: storageIds[index] },
+      })),
+      { type: 'text', text: 'hello' },
+    ]);
+  });
+
   it.each([true, false])(
     'rejects images for a non-vision assistant (draft: %s)',
     async (draft) => {
