@@ -26,6 +26,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   const session = () => selectedSession();
   const [attachments, setAttachments] = createSignal<File[] | undefined>();
   const sessionContext = useSession();
+  let isSubmitting = false;
 
   function handleInput(value: string) {
     setSessionInput(value, props.sessionId);
@@ -40,30 +41,37 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   }
 
   async function handleSubmit() {
-    const _attachments = attachments();
-    const _isDraft = session()?.id === undefined;
-    const inputValue = session()?.input ?? store.draftSession.input;
+    if (isSubmitting) return;
+    isSubmitting = true;
 
-    if (inputValue === '' || inputValue === undefined) return;
-    setSessionInput('', props.sessionId);
+    try {
+      const _attachments = attachments();
+      const _isDraft = session()?.id === undefined;
+      const inputValue = session()?.input ?? store.draftSession.input;
 
-    const _sessionChats = (session() ? session()?.chats : store.draftSession.chats) || [];
-    const message = await createMessage(inputValue, _attachments, {
-      chatIds: _sessionChats,
-      draft: _isDraft,
-    });
+      if (inputValue === '' || inputValue === undefined) return;
 
-    if (!message) return;
-    const id = addMessageToSessionChats(message, props.sessionId);
+      const _sessionChats = (session() ? session()?.chats : store.draftSession.chats) || [];
+      const message = await createMessage(inputValue, _attachments, {
+        chatIds: _sessionChats,
+        draft: _isDraft,
+      });
 
-    if (!props.sessionId) {
-      navigate(`/session/${id}`);
-      if (store.settings.generateTitles) {
-        autonameChat(id, inputValue);
+      if (!message) return;
+      setSessionInput('', props.sessionId);
+      const id = addMessageToSessionChats(message, props.sessionId);
+
+      if (!props.sessionId) {
+        navigate(`/session/${id}`);
+        if (store.settings.generateTitles) {
+          autonameChat(id, inputValue);
+        }
       }
-    }
 
-    setAttachments(undefined);
+      setAttachments(undefined);
+    } finally {
+      isSubmitting = false;
+    }
   }
 
   return (

@@ -25,6 +25,7 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
     draft: !sessionId?.(),
     chatIds: session().chats,
   });
+  let isSubmitting = false;
 
   function handleInput(value: string) {
     setSessionInput(value, sessionId?.());
@@ -39,30 +40,37 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
   }
 
   async function handleSubmit() {
-    const _input = session().input;
-    if (_input === '' || _input === undefined) return;
+    if (isSubmitting) return;
+    isSubmitting = true;
 
-    if (session().type !== 'note') {
-      setSessionInput('', sessionId?.());
-    }
+    try {
+      const _input = session().input;
+      if (_input === '' || _input === undefined) return;
 
-    const message = await createMessage(_input, sessionStore.attachments, {
-      chatIds: sessionStore.chatIds,
-      draft: sessionStore.draft,
-    });
+      const message = await createMessage(_input, sessionStore.attachments, {
+        chatIds: sessionStore.chatIds,
+        draft: sessionStore.draft,
+      });
 
-    if (!message) return;
+      if (!message) return;
 
-    const id = addMessageToSessionChats(message, sessionId?.(), session().type);
-
-    if (!sessionId?.()) {
-      navigate(`/session/${id}`);
-      if (store.settings.generateTitles) {
-        autonameChat(id, _input);
+      if (session().type !== 'note') {
+        setSessionInput('', sessionId?.());
       }
-    }
 
-    setSessionStore('attachments', []);
+      const id = addMessageToSessionChats(message, sessionId?.(), session().type);
+
+      if (!sessionId?.()) {
+        navigate(`/session/${id}`);
+        if (store.settings.generateTitles) {
+          autonameChat(id, _input);
+        }
+      }
+
+      setSessionStore('attachments', []);
+    } finally {
+      isSubmitting = false;
+    }
   }
 
   const hook = mergeProps(session, sessionStore, {
