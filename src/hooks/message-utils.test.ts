@@ -128,12 +128,49 @@ describe('createMessage', () => {
     expect(msg).toBeUndefined();
   });
 
-  it('rejects images when a mixed session includes a non-vision assistant', async () => {
-    const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
-      chatIds: ['chat-vision', 'chat-assistant-no-vision'],
-      draft: true,
-    });
+  it.each([true, false])(
+    'creates image messages for mixed sessions (draft: %s)',
+    async (draft) => {
+      for (const vision of [false, undefined]) {
+        setModels(1, 'vision', vision);
 
-    expect(msg).toBeUndefined();
-  });
+        for (const chatIds of [
+          ['chat-no-vision', 'chat-vision'],
+          ['chat-vision', 'chat-assistant-no-vision'],
+          ['chat-assistant-no-vision', 'chat-assistant-vision'],
+          ['chat-assistant-vision', 'chat-no-vision'],
+        ]) {
+          const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+            chatIds,
+            draft,
+          });
+
+          expect(msg?.content).toEqual([
+            { type: 'image', image: { filename: 'a.png', storageId: expect.any(String) } },
+            { type: 'text', text: 'hello' },
+          ]);
+        }
+      }
+    },
+  );
+
+  it.each([true, false])(
+    'rejects images when no target chat has confirmed vision support (draft: %s)',
+    async (draft) => {
+      setModels(0, 'vision', undefined);
+
+      for (const chatIds of [
+        [],
+        ['chat-no-vision', 'chat-assistant-no-vision'],
+        ['chat-no-vision', 'chat-assistant-vision'],
+      ]) {
+        const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+          chatIds,
+          draft,
+        });
+
+        expect(msg).toBeUndefined();
+      }
+    },
+  );
 });

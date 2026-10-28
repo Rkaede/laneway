@@ -15,8 +15,8 @@ export interface MessageContext {
  * Create a user message, caching any image attachments and validating vision
  * support across the target chats.
  *
- * Returns `undefined` if attachments are provided but any chat's model lacks
- * vision capabilities.
+ * Returns `undefined` if attachments are provided but no target chat's model has
+ * confirmed vision support.
  */
 export async function createMessage(
   input: string,
@@ -24,15 +24,14 @@ export async function createMessage(
   context: MessageContext,
 ): Promise<MessageProps | undefined> {
   if (attachments && attachments.length > 0) {
-    for (const chatId of context.chatIds) {
+    const supportsVision = context.chatIds.some((chatId) => {
       const chat = context.draft
         ? store.draftChats.find((c) => c.id === chatId)
         : store.chats.find((c) => c.id === chatId);
       const model = getChatModel(chat, store.assistants, models);
-      if (model?.vision !== true) {
-        return undefined;
-      }
-    }
+      return model?.vision === true;
+    });
+    if (!supportsVision) return undefined;
   }
 
   const imageCacheFiles: { filename: string; storageId: string }[] = [];
