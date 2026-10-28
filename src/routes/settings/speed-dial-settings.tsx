@@ -24,7 +24,7 @@ import { Section } from './shared';
 export const SpeedDial: Component = () => {
   const addSpeedDialItem = () => {
     if (store.speedDial.length >= 6) return; // Prevent adding more than 6 items
-    const defaultItem = models.at(0);
+    const defaultItem = models.find((model) => !model.deprecated);
     const newItem: SpeedDialItem = {
       id: nanoid(),
       type: 'model',

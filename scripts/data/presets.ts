@@ -9,7 +9,7 @@ export const presets: PresetProps[] = [
     templateId: 'flagship-models',
     chats: [
       {
-        modelId: 'openai/gpt-5.4-chat',
+        modelId: 'openai/gpt-5.4',
         status: 'idle',
       },
       {
@@ -55,11 +55,11 @@ export const presets: PresetProps[] = [
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-3.7-sonnet',
+        modelId: 'anthropic/claude-sonnet-4.6',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-pro-preview-03-25',
+        modelId: 'google/gemini-2.5-pro',
         status: 'idle',
       },
     ],

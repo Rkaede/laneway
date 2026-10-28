@@ -132,9 +132,9 @@ export function createDefaultState(): State {
         title: 'Flagship models',
       },
       {
-        id: 'claude-3.7-sonnet-dial',
+        id: 'claude-sonnet-4.6-dial',
         type: 'model',
-        referenceId: 'anthropic/claude-3.7-sonnet',
+        referenceId: 'anthropic/claude-sonnet-4.6',
         sessionType: 'chat',
         title: 'Best of the vibecheck',
       },

@@ -47,7 +47,7 @@ export function story(): Example {
         ],
       },
       {
-        modelId: 'anthropic/claude-3.5-sonnet',
+        modelId: 'anthropic/claude-sonnet-4.6',
         id: 'ZmpJjHxzpK64XbOLzhMWG',
         created: 1737349542103,
         status: 'idle',
@@ -151,7 +151,7 @@ export const imageAttachment: Example = {
           },
         },
       ],
-      modelId: 'anthropic/claude-3.5-sonnet',
+      modelId: 'anthropic/claude-sonnet-4.6',
       sessionId: 'tFWtxeAihD7pPOpdkrvqz',
     },
   ],

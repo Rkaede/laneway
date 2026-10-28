@@ -35,6 +35,7 @@ export const providers = {
 export const modelsByCreator = () =>
   models.reduce(
     (acc, model) => {
+      if (model.deprecated) return acc;
       const group = acc.find((g) => g.title === model.creator?.name);
       if (!group) {
         acc.push({ title: model.creator.name, models: [model] });

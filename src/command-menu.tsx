@@ -96,13 +96,15 @@ export function CommandMenu() {
     },
     {
       heading: 'New note with model...',
-      items: models.map((model) => ({
-        id: `n-${model.id}`,
-        type: 'model',
-        title: model.title,
-        sessionType: 'note',
-        referenceId: model.id,
-      })),
+      items: models
+        .filter((model) => !model.deprecated)
+        .map((model) => ({
+          id: `n-${model.id}`,
+          type: 'model',
+          title: model.title,
+          sessionType: 'note',
+          referenceId: model.id,
+        })),
     },
     {
       heading: 'New note with assistant...',
