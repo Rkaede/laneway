@@ -8,6 +8,8 @@ import { afterAll, afterEach, beforeEach, describe, expect, it, mock, spyOn } fr
 import type { JSX } from 'solid-js';
 import { JsxEmit, ModuleKind, ScriptTarget, transpileModule } from 'typescript';
 
+import { iconsMock } from '../../test/icons-mock';
+
 const solid: typeof import('solid-js') = await import(
   import.meta.resolve('solid-js/dist/solid.js')
 );
@@ -18,7 +20,10 @@ await Bun.write(
   stubs,
   `export const useLocation = () => ({ pathname: '/' });
 export const Button = () => null;
-export const IconPlus = Button, IconSquare = Button, Thumbnail = Button;
+export const Thumbnail = Button;
+${Object.keys(iconsMock())
+  .map((name) => `export const ${name} = Button;`)
+  .join('\n')}
 `,
 );
 
