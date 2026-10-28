@@ -11,6 +11,7 @@ import { selectRouteSession } from '~/store/selectors';
 import { anyKeysSet } from '~/store/selectors';
 
 import { NotFound } from './not-found';
+import { parseSessionType } from './session-query';
 
 export function Session() {
   const params = useParams();
@@ -21,12 +22,12 @@ export function Session() {
   createEffect(() => {
     const modelId =
       typeof searchParams.model === 'string' ? searchParams.model : searchParams.model?.[0];
-    const type = searchParams.type as 'chat' | 'note';
+    const type = parseSessionType(searchParams.type);
 
     // Only update draft session if we're on the root route and have a model param
     if (!params.id && modelId) {
       newDraftSession({
-        sessionType: type || 'chat',
+        sessionType: type,
         referenceId: modelId,
         type: 'model',
       });
