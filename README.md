@@ -23,6 +23,11 @@ Head over to <https://laneway.app> to use the app directly.
 
 ## Building and Running Locally
 
+Both `bun run dev` and `bun run build` fetch model data from
+<https://openrouter.ai/api/v1/models>, so they need network access to `openrouter.ai`.
+For offline development or builds, save a copy of the raw API response as `models.json`
+in the repository root; the scripts use this file instead of fetching.
+
 ### Installation
 
 1. Clone the repository:
@@ -41,13 +46,22 @@ Head over to <https://laneway.app> to use the app directly.
 3. Run the app:
 
    ```
-  bun run dev
-  ```
+   bun run dev
+   ```
 
 4. Set up your API keys:
    - Open the app and go to the Settings page
    - Enter your API keys for the providers you want to use (OpenAI, OpenRouter)
    - Direct OpenAI access supports selected models and TTS. Gemini and GPT-5.x models require OpenRouter.
+
+### Production Build
+
+Build the app into `dist/`, then preview it locally:
+
+```bash
+bun run build
+bun run preview
+```
 
 ### Running Tests
 
@@ -59,8 +73,20 @@ bun test
 
 Unit tests use `*.test.ts`; Playwright tests use `*.e2e.ts` so Bun does not discover them.
 
-To run end-to-end tests with Playwright:
+Install Playwright's Chromium browser, then run the end-to-end tests:
 
 ```bash
+bunx playwright install chromium
 bun run test:e2e
 ```
+
+### Comparing Models
+
+Compare the configured model catalogue with recent OpenRouter models:
+
+```bash
+bun scripts/compare-models.ts
+```
+
+The script reports missing models without modifying the catalogue. It uses the same
+OpenRouter endpoint or local `models.json` described above.
