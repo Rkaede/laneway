@@ -19,16 +19,28 @@ if (process.env.CF_PAGES === '1') {
     ? process.env.CF_PAGES_COMMIT_SHA.slice(0, 7)
     : 'unknown';
 } else {
-  const branchName = execSync('git branch --show-current').toString().trimEnd();
-  const commitHash = execSync('git rev-parse --short HEAD').toString().trimEnd();
+  try {
+    const branchName = execSync('git branch --show-current', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trimEnd();
+    const commitHash = execSync('git rev-parse --short HEAD', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trimEnd();
 
-  process.env.VITE_GIT_BRANCH_NAME = branchName;
-  process.env.VITE_GIT_COMMIT_HASH = commitHash;
+    process.env.VITE_GIT_BRANCH_NAME = branchName || 'unknown';
+    process.env.VITE_GIT_COMMIT_HASH = commitHash;
+  } catch {
+    process.env.VITE_GIT_BRANCH_NAME = 'unknown';
+    process.env.VITE_GIT_COMMIT_HASH = 'unknown';
+  }
 }
 
 process.env.VITE_APP_BUILD_DATE = new Date().toISOString();
 process.env.VITE_APP_VERSION = packageJson.version;
-process.env.VITE_APP_LICENSE = packageJson.license;
 
 export default defineConfig({
   plugins: [
@@ -64,10 +76,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'src'),
-      // https://christopher.engineering/en/blog/lucide-icons-with-vite-dev-server/
-      'lucide-solid/icons': fileURLToPath(
-        new URL('./node_modules/lucide-solid/dist/source/icons', import.meta.url),
-      ),
     },
   },
   server: {

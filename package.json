@@ -5,7 +5,7 @@
   "packageManager": "bun@1.3.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development bun scripts/generate-data.ts && vite --force",
+    "dev": "NODE_ENV=development bun scripts/generate-data.ts && vite",
     "build": "bun scripts/generate-data.ts && bun run typecheck && bunx vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
