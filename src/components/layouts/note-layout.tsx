@@ -16,7 +16,7 @@ export function NoteLayout(props: { sessionId?: string }) {
   return (
     <div class="grid size-full min-h-0 grid-cols-2">
       <div class="">
-        <div class="grid h-full bg-background-2 p-3">
+        <div class="grid h-full bg-surface-sunken p-3">
           <TextEditor
             onInput={(value) => setSessionInput(value, props.sessionId)}
             initialValue={session.input}
@@ -26,13 +26,11 @@ export function NoteLayout(props: { sessionId?: string }) {
             mode="note"
           />
           {session.input === '' && (
-            <div class="col-start-1 row-start-1 ml-2 mt-[-1px] gap-0.5">
-              <div class="font-light italic text-muted-foreground">
-                write and refine a single prompt
-              </div>
+            <div class="col-start-1 row-start-1 mt-[-1px] ml-2 gap-0.5">
+              <div class="font-light text-muted italic">write and refine a single prompt</div>
             </div>
           )}
-          <div class="z-10 col-start-1 row-start-1 mb-0 mr-0.5 mt-1 gap-0.5 place-self-end">
+          <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 gap-0.5 place-self-end">
             <Button
               variant="ghost"
               aria-label="Submit Note"
@@ -42,8 +40,8 @@ export function NoteLayout(props: { sessionId?: string }) {
               <IconSendHorizontal class="h-4 w-4" />
             </Button>
           </div>
-          <div class="z-10 col-start-1 row-start-1 mb-0 mr-0.5 mt-1 flex flex-col items-end gap-0.5 place-self-end justify-self-center">
-            <div class="text-xs text-muted-foreground">shift + enter to send</div>
+          <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 flex flex-col items-end gap-0.5 place-self-end justify-self-center">
+            <div class="text-xs text-muted">shift + enter to send</div>
           </div>
         </div>
       </div>

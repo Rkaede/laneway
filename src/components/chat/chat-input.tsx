@@ -83,7 +83,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
   return (
     <div class="relative mx-auto w-full max-w-[800px]">
       <Show when={props.attachments && props.attachments.length > 0}>
-        <div class="absolute left-2 top-0 ml-[50px] flex w-full -translate-y-full gap-2 py-2">
+        <div class="absolute top-0 left-2 ml-[50px] flex w-full -translate-y-full gap-2 py-2">
           <For each={props.attachments || []}>
             {(file) => (
               <Thumbnail
@@ -123,7 +123,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             submitForm();
           }}
           class={cn(
-            'relative grid flex-1 rounded-[22px] border border-input bg-background-2 px-4 pt-0',
+            'relative grid flex-1 rounded-[22px] border border-border-emphasis bg-surface-input px-4 pt-0 transition-[color,box-shadow] focus-within:border-border-focus focus-within:ring-[3px] focus-within:ring-border-focus/50',
             props.class,
           )}
         >
@@ -138,7 +138,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             <Button
               variant="default"
               size="icon"
-              class="absolute bottom-0 right-0 m-1.5 mb-[5px] size-7 rounded-full bg-foreground text-background transition-transform hover:scale-110"
+              class="absolute right-0 bottom-0 m-1.5 mb-[5px] size-7 rounded-full bg-main text-inverse transition-transform hover:scale-110"
               onClick={props.onCancel}
             >
               <IconSquare class="size-3" fill="currentColor" />

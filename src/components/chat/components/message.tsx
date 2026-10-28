@@ -20,7 +20,7 @@ const Markdown = lazy(() => import('~/components/ui/markdown'));
 
 const ModelTitle: ParentComponent = (props) => {
   return (
-    <div class="mb-1 flex items-center gap-1 px-1 text-assistant-foreground/80">
+    <div class="mb-1 flex items-center gap-1 px-1 text-agent-fg/80">
       <span class="text-xs font-semibold">{props.children}</span>
     </div>
   );
@@ -136,7 +136,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
                     sourceType={part.image.sourceType}
                     onClick={() => handleImageClick(part, imageIndex)}
                     class={cn(
-                      'mt-4 w-full max-w-64 rounded-lg shadow-sm',
+                      'mt-4 w-full max-w-64 rounded-lg shadow-xs',
                       'cursor-pointer transition-all duration-200 ease-out will-change-transform hover:scale-[1.01] hover:shadow-lg',
                     )}
                   />
@@ -184,11 +184,11 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
 const MessageContainer: ParentComponent<MessageProps> = (props) => {
   return (
     <div
-      class="max-w-full rounded-xl px-4 py-2.5"
+      class="max-w-full rounded-xl py-bubble-y"
       classList={{
         'gap-2 flex items-start': store.settings.messages.showAvatars,
-        'self-start bg-assistant text-assistant-foreground': props.role === 'assistant',
-        'self-end bg-user text-user-foreground': props.role === 'user',
+        'self-start bg-agent px-agent-x text-agent-fg': props.role === 'assistant',
+        'self-end bg-user px-bubble-x text-user-fg': props.role === 'user',
       }}
     >
       {props.children}
