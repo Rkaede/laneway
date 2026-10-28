@@ -14,6 +14,7 @@ import {
 } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { CollectionEmptyState } from '~/components/ui/collection-empty-state';
 import {
   Dialog,
   DialogContent,
@@ -130,7 +131,17 @@ export default function Assistants() {
       </div>
 
       <div class="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        <For each={filteredAssistants()}>
+        <For
+          each={filteredAssistants()}
+          fallback={
+            <CollectionEmptyState
+              name="assistants"
+              description="Create an assistant or add one from the Assistant Library."
+              searchTerm={searchTerm()}
+              onClearSearch={() => setSearchTerm('')}
+            />
+          }
+        >
           {(assistant) => (
             <AssistantCard
               assistant={assistant}

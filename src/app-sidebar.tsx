@@ -108,6 +108,12 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
           </Button>
         </div>
         <div class="flex-1 overflow-auto border-b" inert={!props.open}>
+          <Show when={store.sessions.length === 0}>
+            <div role="status" class="px-4 py-6 text-sm text-muted">
+              <p>No chats or notes yet.</p>
+              <p class="mt-1">Start a chat or note using the buttons above.</p>
+            </div>
+          </Show>
           <For each={Object.entries(groups())}>
             {([title, sessions]) => {
               return <SessionGroup sessions={sessions} title={title as GroupTitle} />;

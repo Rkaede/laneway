@@ -18,6 +18,7 @@ import { DeleteButton } from '~/components/ui';
 import { Avatar } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { CollectionEmptyState } from '~/components/ui/collection-empty-state';
 import {
   Dialog,
   DialogContent,
@@ -141,7 +142,17 @@ export default function Presets() {
       </div>
 
       <div class="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        <For each={filteredPresets()}>
+        <For
+          each={filteredPresets()}
+          fallback={
+            <CollectionEmptyState
+              name="presets"
+              description="Create a preset or add one from the Preset Library."
+              searchTerm={searchTerm()}
+              onClearSearch={() => setSearchTerm('')}
+            />
+          }
+        >
           {(preset) => (
             <PresetCard
               preset={preset}
