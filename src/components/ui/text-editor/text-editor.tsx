@@ -128,6 +128,7 @@ export function TextEditor(props: TextEditorProps) {
     });
     if (view?.hasFocus) clearInterval(timer);
   }, 100);
+  onCleanup(() => clearInterval(timer));
 
   // Add this extension for accessibility
   createExtension(() =>
