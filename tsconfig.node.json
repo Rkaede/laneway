@@ -1,11 +1,16 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": true
+    "types": ["bun", "node"],
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts", "scripts/**/*.ts", "src/types.ts"]
+  "include": [
+    "vite.config.ts",
+    "scripts/**/*.ts",
+    "src/**/*.test.ts",
+    "src/**/*.e2e.ts",
+    "src/**/*.d.ts",
+    "src/test"
+  ],
+  "exclude": []
 }

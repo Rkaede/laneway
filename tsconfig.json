@@ -4,6 +4,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -27,5 +28,6 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src", "src/types.ts"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.e2e.ts", "src/test"]
 }

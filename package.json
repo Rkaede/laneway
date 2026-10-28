@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development bun scripts/generate-data.ts && vite --force",
-    "build": "bun scripts/generate-data.ts && bunx tsc && bunx vite build",
+    "build": "bun scripts/generate-data.ts && bun run typecheck && bunx vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
     "format": "oxfmt src",
@@ -14,7 +14,7 @@
     "lint:fix": "oxlint src --fix",
     "test": "bun test",
     "test:e2e": "playwright test",
-    "typecheck": "bunx tsc --noEmit",
+    "typecheck": "bunx tsc --noEmit && bunx tsc --noEmit -p tsconfig.node.json",
     "validate": "bun run format && bun run typecheck && bun run lint:fix && bun run test"
   },
   "dependencies": {

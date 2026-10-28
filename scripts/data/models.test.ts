@@ -33,6 +33,7 @@ describe('generateModels catalogue', () => {
 
     expect(routerOnlyModels.length).toBeGreaterThan(0);
     for (const model of routerOnlyModels) {
+      if (model.id === undefined) throw new Error('Expected a model ID');
       expect(model.provider).toEqual([{ id: 'openrouter', modelId: model.id, primary: false }]);
     }
     expect(modelsBase.find((model) => model.id === 'openai/gpt-4.1')?.provider).toContainEqual({
