@@ -34,6 +34,7 @@ import { PageTitle, SectionDescription } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
 import { setStore, store } from '~/store';
 import { addAssistant, deleteAssistant } from '~/store/actions';
+import { validateAssistant } from '~/store/editor-validation';
 import { selectModelById } from '~/store/selectors';
 import type { AssistantProps } from '~/types';
 import { clone } from '~/util';
@@ -261,6 +262,7 @@ const AssistantGalleryDialog: Component<{
           <For each={props.galleryAssistants}>
             {(assistant) => {
               const isAdded = () => store.assistants.some((a) => a.templateId === assistant.id);
+              const validationError = () => validateAssistant(assistant, store.assistants);
               return (
                 <Card>
                   <CardHeader>
@@ -277,7 +279,8 @@ const AssistantGalleryDialog: Component<{
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isAdded()}
+                        disabled={isAdded() || !!validationError()}
+                        title={validationError()}
                         onClick={() => {
                           props.onAddFromGallery(assistant);
                         }}
@@ -320,7 +323,7 @@ const AssistantCard: Component<{
     <Card variant="solid" onClick={handleCardClick}>
       <CardHeader class="flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="flex items-center gap-2 text-lg font-semibold">
-          <div>{props.assistant.title ?? 'Untitled'}</div>
+          <div>{props.assistant.title?.trim() || 'Untitled'}</div>
           <Show when={model()?.icon}>
             <ModelIcon modelId={model()?.id} class="mr-1 h-4 w-4" />
           </Show>
@@ -366,12 +369,21 @@ function AssistantDetails(props: {
   const [localAssistant, setLocalAssistant] = createStore<AssistantProps>(
     clone(props.initialAssistant),
   );
+  const validationError = () =>
+    validateAssistant(
+      localAssistant,
+      store.assistants,
+      props.isNewAssistant ? undefined : props.initialAssistant.id,
+    );
 
   function handleSave() {
+    if (validationError()) return;
+
+    const assistant = { ...localAssistant, title: localAssistant.title.trim() };
     if (props.isNewAssistant) {
-      addAssistant(localAssistant);
+      addAssistant(assistant);
     } else {
-      setStore('assistants', (a) => a.id === props.initialAssistant.id, localAssistant);
+      setStore('assistants', (a) => a.id === props.initialAssistant.id, assistant);
     }
     props.onClose();
   }
@@ -394,12 +406,19 @@ function AssistantDetails(props: {
           onSubtitleChange={(value) => setLocalAssistant('subtitle', value)}
           onSystemPromptChange={(value) => setLocalAssistant('systemPrompt', value)}
         />
+        <Show when={validationError()}>
+          {(error) => (
+            <p role="alert" class="mt-2 text-sm text-danger">
+              {error()}
+            </p>
+          )}
+        </Show>
       </div>
       <DialogFooter class="pt-6">
         <Button variant="outline" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={!hasChanges()}>
+        <Button onClick={handleSave} disabled={!hasChanges() || !!validationError()}>
           Save
         </Button>
       </DialogFooter>

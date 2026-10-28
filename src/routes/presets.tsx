@@ -45,6 +45,7 @@ import { Input } from '~/components/ui/input';
 import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
+import { validatePreset } from '~/store/editor-validation';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';
@@ -207,7 +208,7 @@ const PresetCard: Component<{
     <Card variant="solid" onClick={handleCardClick}>
       <CardHeader class="flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="flex items-center gap-2 text-lg font-semibold">
-          <div>{props.preset.presetTitle}</div>
+          <div>{props.preset.presetTitle?.trim() || 'Untitled'}</div>
         </CardTitle>
         <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
           <DropdownMenuTrigger
@@ -358,6 +359,7 @@ const PresetGalleryDialog: Component<{
           <For each={props.presets}>
             {(preset) => {
               const isAdded = () => store.presets.some((p) => p.templateId === preset.id);
+              const validationError = () => validatePreset(preset, store.presets);
               return (
                 <Card>
                   <CardHeader>
@@ -383,7 +385,8 @@ const PresetGalleryDialog: Component<{
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isAdded()}
+                        disabled={isAdded() || !!validationError()}
+                        title={validationError()}
                         onClick={() => {
                           props.onAddFromGallery(preset);
                         }}
@@ -417,12 +420,21 @@ const PresetDetails: Component<{
 }> = (props) => {
   const [localPreset, setLocalPreset] = createStore<PresetProps>(clone(props.initialPreset));
   const [presets] = createResource(fetchPresets);
+  const validationError = () =>
+    validatePreset(
+      localPreset,
+      store.presets,
+      props.isNewPreset ? undefined : props.initialPreset.id,
+    );
 
   function handleSave() {
+    if (validationError()) return;
+
+    const preset = { ...localPreset, presetTitle: localPreset.presetTitle!.trim() };
     if (props.isNewPreset) {
-      addPreset(localPreset, presets());
+      addPreset(preset, presets());
     } else {
-      setStore('presets', (p) => p.id === props.initialPreset.id, localPreset);
+      setStore('presets', (p) => p.id === props.initialPreset.id, preset);
     }
     props.onClose();
   }
@@ -442,6 +454,13 @@ const PresetDetails: Component<{
               onInput={(e) => setLocalPreset('presetTitle', e.target.value)}
             />
           </TextField>
+          <Show when={validationError()}>
+            {(error) => (
+              <p role="alert" class="mt-2 text-sm text-danger">
+                {error()}
+              </p>
+            )}
+          </Show>
         </div>
         <div class="mb-4">
           <SettingTitle>Description</SettingTitle>
@@ -484,7 +503,10 @@ const PresetDetails: Component<{
         <Button variant="outline" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={!hasChanges() || !localPreset.chats?.length}>
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges() || !localPreset.chats?.length || !!validationError()}
+        >
           Save
         </Button>
       </DialogFooter>
