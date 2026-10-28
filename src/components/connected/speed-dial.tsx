@@ -114,6 +114,7 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
               <SpeedDialOption
                 title={record().title}
                 subtitle={record().subtitle}
+                showSubtitle
                 tags={record().tags}
                 sessionType={item.sessionType}
                 models={record().models}
