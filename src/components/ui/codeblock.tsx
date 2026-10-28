@@ -108,7 +108,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
       class="codeblock group/toolbar w-full overflow-hidden rounded-card border border-code-border bg-code-bar font-sans shadow-code"
       ref={ref}
     >
-      <div class="flex w-full items-center justify-between px-4 py-0.5 pr-2 text-code-bar-fg">
+      <div class="screenshot-hide flex w-full items-center justify-between px-4 py-0.5 pr-2 text-code-bar-fg">
         <span class="text-xs font-medium lowercase">{props.language}</span>
         <div class="flex items-center gap-1">
           <Button
