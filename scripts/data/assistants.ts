@@ -11,19 +11,19 @@ export const assistants: AssistantProps[] = [
     ...prompts.codingSeaBodybuilder3943,
   },
   {
-    id: 'concise-responses-gpt-4o',
+    id: 'concise-responses',
     title: 'Concise Responses',
     subtitle: 'General purpose',
     modelId: 'openai/gpt-5',
-    templateId: 'concise-responses-gpt-4o',
+    templateId: 'concise-responses',
     ...prompts.succinct,
   },
   {
-    id: 'flashcards-gpt-4o',
+    id: 'flashcards',
     title: 'Flashcard Creator',
     subtitle: 'Transform text into memorable cards',
     modelId: 'openai/gpt-5-mini',
-    templateId: 'flashcards-gpt-4o',
+    templateId: 'flashcards',
     ...prompts.flashcards,
   },
 ];

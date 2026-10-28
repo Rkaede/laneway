@@ -13,5 +13,14 @@ export function deserializeChatStore(serialized: string) {
     if (chat.status === 'loading') chat.status = 'canceled';
   }
 
+  for (const assistant of state.assistants) {
+    if (assistant.templateId === 'concise-responses-gpt-4o') {
+      assistant.templateId = 'concise-responses';
+    }
+    if (assistant.templateId === 'flashcards-gpt-4o') {
+      assistant.templateId = 'flashcards';
+    }
+  }
+
   return state;
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
+import { assistants } from '../../scripts/data/assistants';
 import { deserializeChatStore, serializeChatStore } from './chat-persistence';
 import { createDefaultState } from './default-state';
 
@@ -63,6 +64,59 @@ describe('chat persistence', () => {
       expect(restored.chats[0].status).toBe(status);
       expect(restored.chats[0].controller).toBeUndefined();
       expect(restored.chats[0].error).toEqual(state.chats[0].error);
+    },
+  );
+
+  it.each([
+    ['concise-responses-gpt-4o', 'concise-responses'],
+    ['flashcards-gpt-4o', 'flashcards'],
+  ])(
+    'migrates the %s template link without changing saved assistants or references',
+    (oldId, newId) => {
+      const state = createDefaultState();
+      const assistantId = 'saved-assistant';
+      state.assistants = [
+        {
+          id: assistantId,
+          templateId: oldId,
+          title: 'Custom title',
+          modelId: 'openai/gpt-4o',
+          systemPrompt: 'Custom prompt',
+        },
+      ];
+      state.chats[0].assistantId = assistantId;
+      state.draftChats[0].assistantId = assistantId;
+      state.presets[0].chats = [{ assistantId, status: 'idle' }];
+      state.speedDial = [{ id: 'assistant-dial', type: 'assistant', referenceId: assistantId }];
+      state.settings.defaultSession = { type: 'assistant', id: assistantId };
+      state.settings.noteModel = { type: 'assistant', referenceId: assistantId };
+
+      const restored = deserializeChatStore(serializeChatStore(state));
+
+      expect(restored).toEqual({
+        ...state,
+        assistants: [{ ...state.assistants[0], templateId: newId }],
+      });
+      expect(assistants.find((assistant) => assistant.id === newId)?.templateId).toBe(newId);
+      expect(assistants.some((assistant) => assistant.id === oldId)).toBe(false);
+      expect(deserializeChatStore(serializeChatStore(restored))).toEqual(restored);
+    },
+  );
+
+  it.each([undefined, 'custom-template', 'concise-responses', 'flashcards'])(
+    'preserves the %s template link',
+    (templateId) => {
+      const state = createDefaultState();
+      state.assistants = [
+        {
+          id: 'saved-assistant',
+          title: 'Saved assistant',
+          modelId: 'custom-model',
+          templateId,
+        },
+      ];
+
+      expect(deserializeChatStore(serializeChatStore(state))).toEqual(state);
     },
   );
 });
