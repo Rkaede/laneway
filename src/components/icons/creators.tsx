@@ -1,3 +1,5 @@
+import { createUniqueId } from 'solid-js';
+
 import type { SVGAttributes } from '~/types';
 
 // https://github.com/gilbarbara/logos
@@ -23,6 +25,8 @@ export function Perplexity(props: SVGAttributes) {
 }
 
 export function OpenRouter(props: SVGAttributes) {
+  const id = createUniqueId();
+
   return (
     <svg
       width="100%"
@@ -35,7 +39,7 @@ export function OpenRouter(props: SVGAttributes) {
       {...props}
     >
       <title>OpenRouter</title>
-      <g clip-path="url(#clip0_205_3)">
+      <g clip-path={`url(#${id}-clip)`}>
         <path
           d="M3 248.945C18 248.945 76 236 106 219C136 202 136 202 198 158C276.497 102.293 332 120.945 423 120.945"
           stroke-width="90"
@@ -48,7 +52,7 @@ export function OpenRouter(props: SVGAttributes) {
         <path d="M508 376.445L354.25 287.678L354.25 465.213L508 376.445Z" />
       </g>
       <defs>
-        <clipPath id="clip0_205_3">
+        <clipPath id={`${id}-clip`}>
           <rect width="512" height="512" fill="white" />
         </clipPath>
       </defs>
@@ -57,6 +61,8 @@ export function OpenRouter(props: SVGAttributes) {
 }
 
 export function Meta(props: SVGAttributes) {
+  const id = createUniqueId();
+
   return (
     <svg viewBox="0 0 256 171" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
       <title>Meta</title>
@@ -66,7 +72,7 @@ export function Meta(props: SVGAttributes) {
           y1="55.9337491%"
           x2="89.143574%"
           y2="58.6936324%"
-          id="linearGradient-1"
+          id={`${id}-gradient-1`}
         >
           <stop stop-color="#0064E1" offset="0%" />
           <stop stop-color="#0064E1" offset="40%" />
@@ -78,7 +84,7 @@ export function Meta(props: SVGAttributes) {
           y1="82.782443%"
           x2="54.3150272%"
           y2="39.3067715%"
-          id="linearGradient-2"
+          id={`${id}-gradient-2`}
         >
           <stop stop-color="#0082FB" offset="0%" />
           <stop stop-color="#0064E0" offset="100%" />
@@ -91,11 +97,11 @@ export function Meta(props: SVGAttributes) {
         />
         <path
           d="M21.8021978,33.2062874 C34.4793434,13.665322 52.7739602,0 73.7571289,0 C85.9090277,0 97.9897065,3.59660593 110.604535,13.8967868 C124.403394,25.1584365 139.110307,43.702323 157.458339,74.2645709 L164.037279,85.2324384 C179.919321,111.690638 188.955348,125.302546 194.243427,131.721241 C201.04493,139.964946 205.807762,142.422034 211.994992,142.422034 C227.690082,142.422034 231.607178,128 231.607178,111.494784 L256,110.72917 C256,127.982195 252.599249,140.659341 246.81263,150.674642 C241.221867,160.360551 230.325219,170.037557 211.994992,170.037557 C200.599805,170.037557 190.504382,167.562665 179.340659,157.03102 C170.758659,148.947559 160.725553,134.587843 153.007094,121.679232 L130.047573,83.3273056 C118.527751,64.0801224 107.960495,49.7293087 101.844485,43.230491 C95.2655446,36.2420364 86.8081792,27.802476 73.3120045,27.802476 C62.3886493,27.802476 53.1122548,35.4675198 45.3492836,47.192099 L21.8021978,33.2062874 Z"
-          fill="url(#linearGradient-1)"
+          fill={`url(#${id}-gradient-1)`}
         />
         <path
           d="M73.3120045,27.802476 C62.3886493,27.802476 53.1122548,35.4675198 45.3492836,47.192099 C34.3725136,63.7596328 27.6511337,88.4373348 27.6511337,112.135763 C27.6511337,121.910697 29.7966337,129.415496 32.6009181,133.955766 L9.02712477,149.481708 C2.97343163,139.412992 0,126.201697 0,111.147587 C0,83.7724301 7.51370149,55.2399499 21.8021978,33.2062874 C34.4793434,13.665322 52.7739602,0 73.7571289,0 L73.3120045,27.802476 Z"
-          fill="url(#linearGradient-2)"
+          fill={`url(#${id}-gradient-2)`}
         />
       </g>
     </svg>
@@ -346,6 +352,8 @@ export function DeepSeek(props: SVGAttributes) {
 }
 
 export function Aperture(props: SVGAttributes) {
+  const id = createUniqueId();
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -355,22 +363,27 @@ export function Aperture(props: SVGAttributes) {
       {...props}
     >
       <defs>
-        <clipPath id="e">
+        <clipPath id={`${id}-e`}>
           <path transform="rotate(-45,15,-69)" d="m-128-212h143v143h-143z" />
         </clipPath>
-        <clipPath id="d">
+        <clipPath id={`${id}-d`}>
           <circle r="125.5" />
         </clipPath>
       </defs>
-      <g transform="rotate(-11.25)" clip-path="url(#d)">
-        <g id="b">
-          <g id="c">
-            <path id="a" d="m-128-212h143v143h-143z" clip-path="url(#e)" fill="#888" />
-            <use transform="rotate(180)" href="#a" />
+      <g transform="rotate(-11.25)" clip-path={`url(#${id}-d)`}>
+        <g id={`${id}-b`}>
+          <g id={`${id}-c`}>
+            <path
+              id={`${id}-a`}
+              d="m-128-212h143v143h-143z"
+              clip-path={`url(#${id}-e)`}
+              fill="#888"
+            />
+            <use transform="rotate(180)" href={`#${id}-a`} />
           </g>
-          <use transform="rotate(90)" href="#c" />
+          <use transform="rotate(90)" href={`#${id}-c`} />
         </g>
-        <use transform="rotate(45)" href="#b" />
+        <use transform="rotate(45)" href={`#${id}-b`} />
       </g>
     </svg>
   );
