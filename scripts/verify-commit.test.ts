@@ -19,7 +19,7 @@ async function runVerifier(message: string, cwd = directory) {
     encoding: 'utf-8',
   }).trim();
   await writeFile(resolve(cwd, messagePath), message);
-  const child = Bun.spawn(['node', join(import.meta.dir, 'verify-commit.js')], {
+  const child = Bun.spawn(['bun', join(import.meta.dir, 'verify-commit.js')], {
     cwd,
     stdout: 'pipe',
     stderr: 'pipe',
@@ -35,9 +35,13 @@ async function runVerifier(message: string, cwd = directory) {
 describe('verify-commit', () => {
   it.each([
     'fix: correct a bug',
+    'feat!: change the public API',
+    'feat(chat)!: change the public API',
     'test(models): cover catalogue references [BT4]',
     'revert: feat(chat): add streaming',
+    'revert: feat(chat)!: change the public API',
     '\n  docs: update setup\n\nExplain the change in the body.\n',
+    `fix: correct a bug\r\n\r\n${'Long body. '.repeat(10)}`,
   ])('accepts a conventional message: %s', async (message) => {
     const result = await runVerifier(message);
 
@@ -51,13 +55,37 @@ describe('verify-commit', () => {
     'Update documentation',
     'unknown: add something',
     'fix:',
+    'fix:\ncorrect a bug',
     'fix(chat):missing space',
+    'feat(chat)!!: change the public API',
+    `fix(chat): ${'a'.repeat(51)}): short`,
   ])('rejects a malformed message: %s', async (message) => {
     const result = await runVerifier(message);
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('ERROR invalid commit message format.');
     expect(result.stderr).toContain('Proper commit message format is required');
+  });
+
+  it.each(['fix', 'fix(chat)', 'feat!', 'feat(chat)!', 'revert: feat(chat)!'])(
+    'limits the description to 50 characters: %s',
+    async (prefix) => {
+      expect((await runVerifier(`${prefix}: ${'a'.repeat(50)}`)).exitCode).toBe(0);
+      expect((await runVerifier(`${prefix}: ${'a'.repeat(51)}`)).exitCode).toBe(1);
+    },
+  );
+
+  it.each([
+    "Merge branch 'next'",
+    "Merge remote-tracking branch 'origin/next'",
+    'Merge pull request #123 from corey/feature/chat',
+    `Merge branch '${'long-branch-name-'.repeat(5)}'\n\nExplain the merge.`,
+  ])('accepts a merge message: %s', async (message) => {
+    const result = await runVerifier(message);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
   });
 
   it.each([

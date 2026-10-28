@@ -70,7 +70,7 @@
     "workbox-window": "^7.4.1"
   },
   "simple-git-hooks": {
-    "commit-msg": "node scripts/verify-commit.js"
+    "commit-msg": "bun scripts/verify-commit.js"
   },
   "overrides": {
     "brace-expansion": "^2.0.3",
