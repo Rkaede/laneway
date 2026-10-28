@@ -53,6 +53,7 @@ export const uiActions: Actions = {
     name: 'Toggle Completions',
     keywords: ['completions', 'show', 'hide'],
     icon: IconPencilLine,
+    available: () => store.featureFlags.completions,
     fn: () => {
       setStore('settings', 'completions', 'enabled', (enabled) => !enabled);
     },

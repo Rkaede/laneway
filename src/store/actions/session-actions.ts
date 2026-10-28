@@ -307,6 +307,7 @@ export const sessionActions: Actions = {
     name: 'Delete Session',
     keywords: [],
     icon: IconTrash,
+    available: ({ params }) => store.sessions.some((session) => session.id === params.id),
     fn: (context: ActionContext, options?: { sessionId?: string }) => {
       const sessionId = options?.sessionId ?? context.params.id;
       if (!sessionId) return;

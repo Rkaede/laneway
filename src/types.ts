@@ -159,6 +159,7 @@ export interface Action {
   keywords: string[];
   shortcut?: string;
   icon: Component;
+  available?: (context: ActionContext) => boolean;
   fn: (context: ActionContext, options?: Record<string, unknown>) => void;
 }
 

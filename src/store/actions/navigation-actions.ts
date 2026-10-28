@@ -51,6 +51,7 @@ export const navigationActions: Actions = {
     name: 'Latest Session',
     keywords: ['navigate', 'latest'],
     icon: IconListRestart,
+    available: () => store.sessions.length > 0,
     fn: (context: ActionContext) => {
       if (store.sessions.length === 0) return;
       const latest = [...store.sessions].sort((a, b) => b.created - a.created)[0];

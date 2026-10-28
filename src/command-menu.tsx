@@ -39,12 +39,16 @@ export function CommandMenu() {
   });
 
   const keyMap: Record<string, (e: KeyboardEvent) => void> = {};
-  const actionArray = () => Object.values(actions);
+  const actionArray = () =>
+    Object.values(actions).filter((action) => action.available?.({ navigate, params }) ?? true);
 
-  for (const action of actionArray()) {
+  for (const action of Object.values(actions)) {
     if (action.shortcut) {
       keyMap[action.shortcut] = (event: KeyboardEvent) => {
-        if (shouldIgnoreShortcut(event)) {
+        if (
+          shouldIgnoreShortcut(event) ||
+          action.available?.({ navigate, params, event }) === false
+        ) {
           return;
         }
         event.preventDefault();
@@ -122,7 +126,7 @@ export function CommandMenu() {
       : 0;
   }
 
-  tinykeys(window, keyMap);
+  onCleanup(tinykeys(window, keyMap));
 
   return (
     <CommandDialog open={open()} onOpenChange={setOpen} filter={caseInsensitiveFilter}>
@@ -179,12 +183,17 @@ export function CommandMenu() {
                           <IconLayoutGrid class="mr-2 size-4" />
                         </Match>
                         <Match when={item.type === 'assistant'}>
-                          <Show when={item.referenceId}>
-                            {(modelId) => <ModelIcon modelId={modelId()} class="mr-2 size-4" />}
-                          </Show>
+                          <ModelIcon
+                            modelId={
+                              store.assistants.find(
+                                (assistant) => assistant.id === item.referenceId,
+                              )?.modelId
+                            }
+                            class="mr-2 size-4"
+                          />
                         </Match>
                         <Match when={item.type === 'model'}>
-                          <ModelIcon modelId={item.id} class="mr-2 size-4" />
+                          <ModelIcon modelId={item.referenceId} class="mr-2 size-4" />
                         </Match>
                       </Switch>
                     </span>
