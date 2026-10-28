@@ -38,8 +38,9 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
           <span class="truncate">{props.children}</span>
         </div>
         <Show when={props.isLoading}>
-          <div class="flex h-6 shrink-0 items-center">
-            <IconLoaderCircle class="size-4 animate-spin" />
+          <div role="status" class="flex h-6 shrink-0 items-center">
+            <IconLoaderCircle class="size-4 animate-spin motion-reduce:hidden" />
+            <span class="sr-only text-xs motion-reduce:not-sr-only">Loading…</span>
           </div>
         </Show>
         <Show when={props.dropdown && props.isLoading !== true}>

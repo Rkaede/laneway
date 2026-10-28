@@ -32,6 +32,7 @@ export function AudioButton(props: AudioButtonProps) {
       disabled={props.status === 'loading' || props.status === 'unavailable'}
       classList={{
         'disabled:opacity-100': props.status === 'loading',
+        'motion-reduce:w-auto motion-reduce:px-2': props.status === 'loading',
         'bg-surface-hover': props.status === 'playing',
       }}
       title={ariaLabels[props.status]}
@@ -60,7 +61,8 @@ export function AudioButton(props: AudioButtonProps) {
           <IconVolumeOff class="size-4" />
         </Match>
         <Match when={props.status === 'loading'}>
-          <IconLoaderCircle class="size-4 animate-spin" />
+          <IconLoaderCircle class="size-4 animate-spin motion-reduce:hidden" />
+          <span class="hidden text-xs motion-reduce:inline">Loading…</span>
         </Match>
         <Match when={props.status === 'error'}>
           <IconVolumeX class="size-4" />
