@@ -19,13 +19,18 @@ export const Popover = (props: PopoverRootProps) => {
 type popoverContentProps<T extends ValidComponent = 'div'> = ParentProps<
   PopoverContentProps<T> & {
     class?: string;
+    showCloseButton?: boolean;
   }
 >;
 
 export const PopoverContent = <T extends ValidComponent = 'div'>(
   props: PolymorphicProps<T, popoverContentProps<T>>,
 ) => {
-  const [local, rest] = splitProps(props as popoverContentProps, ['class', 'children']);
+  const [local, rest] = splitProps(props as popoverContentProps, [
+    'class',
+    'children',
+    'showCloseButton',
+  ]);
 
   return (
     <PopoverPrimitive.Portal>
@@ -37,19 +42,21 @@ export const PopoverContent = <T extends ValidComponent = 'div'>(
         {...rest}
       >
         {local.children}
-        <PopoverPrimitive.CloseButton class="absolute top-3 right-3 rounded-sm opacity-70 transition-[opacity,box-shadow] hover:bg-surface-hover hover:opacity-100 focus:outline-hidden focus-visible:ring-[3px] focus-visible:ring-border-focus/50 disabled:pointer-events-none">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M18 6L6 18M6 6l12 12"
-            />
-          </svg>
-          <span class="sr-only">Close</span>
-        </PopoverPrimitive.CloseButton>
+        {local.showCloseButton && (
+          <PopoverPrimitive.CloseButton class="absolute top-3 right-3 rounded-sm opacity-70 transition-[opacity,box-shadow] hover:bg-surface-hover hover:opacity-100 focus:outline-hidden focus-visible:ring-[3px] focus-visible:ring-border-focus/50 disabled:pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18 6L6 18M6 6l12 12"
+              />
+            </svg>
+            <span class="sr-only">Close</span>
+          </PopoverPrimitive.CloseButton>
+        )}
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );

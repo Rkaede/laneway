@@ -59,7 +59,7 @@ export function StatsPopover(props: StatsPopoverProps) {
       >
         <IconChartNoAxesColumn class="size-4" />
       </Button>
-      <PopoverContent class="w-auto p-3 pr-9" aria-label="Message statistics">
+      <PopoverContent showCloseButton class="w-auto p-3 pr-9" aria-label="Message statistics">
         <StatsPopoverContent {...props} />
       </PopoverContent>
     </Popover>
