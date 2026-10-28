@@ -58,6 +58,8 @@ import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';
 
+import { addPresetChat, removePresetChat } from './preset-chats';
+
 const fetchPresets = async () => {
   const response = await fetch('/presets.json');
   return response.json();
@@ -545,7 +547,7 @@ const AssistantList: Component<{
     const addChat = (chat: { assistantId?: string; modelId?: string }) =>
       props.setLocalPreset((prev) => ({
         ...prev,
-        chats: [...(prev.chats || []), { ...chat, messages: [], status: 'idle' }],
+        chats: addPresetChat(prev.chats || [], chat),
       }));
 
     if (type === 'assistant') {
@@ -557,14 +559,11 @@ const AssistantList: Component<{
     }
   }
 
-  function handleDelete(id?: string) {
-    if (id) {
-      props.setLocalPreset((prev) => ({
-        ...prev,
-        chats:
-          prev.chats?.filter((chat) => chat.assistantId !== id && chat.modelId !== id) || [],
-      }));
-    }
+  function handleDelete(index: number) {
+    props.setLocalPreset((prev) => ({
+      ...prev,
+      chats: removePresetChat(prev.chats || [], index),
+    }));
   }
 
   return (
@@ -583,12 +582,12 @@ const AssistantList: Component<{
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-2">
           <Show when={props.localPreset.chats}>
             <For each={props.localPreset.chats}>
-              {(chat) => (
+              {(chat, index) => (
                 <Assistant
                   assistantId={chat.assistantId}
                   modelId={chat.modelId}
                   presetId={props.presetId}
-                  onDelete={() => handleDelete(chat.assistantId || chat.modelId)}
+                  onDelete={() => handleDelete(index())}
                 />
               )}
             </For>
