@@ -1,6 +1,6 @@
 import type { Mock } from 'bun:test';
 import { afterAll, afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
-import { createRoot } from 'solid-js';
+import * as solid from 'solid-js';
 
 const originalSelf = Object.getOwnPropertyDescriptor(globalThis, 'self');
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
@@ -17,8 +17,12 @@ class TestAudio extends EventTarget {
   pause = mock(() => {});
 }
 
-let element: TestAudio;
+const element = new TestAudio();
+const createElement = mock(function () {
+  return element;
+});
 let dispose: () => void;
+const disposals: (() => void)[] = [];
 const responses = new Map<string, Response>();
 const cache = {
   match: mock(async (key: string) => responses.get(key)?.clone()),
@@ -34,10 +38,11 @@ function restoreGlobal(name: string, descriptor?: PropertyDescriptor) {
   else Reflect.deleteProperty(globalThis, name);
 }
 
-function setup(text: string | (() => string) = '**Hello**') {
-  return createRoot((cleanup) => {
+function setup(text: string | (() => string) = '**Hello**', id = 'speech-test') {
+  return solid.createRoot((cleanup) => {
     dispose = cleanup;
-    return createAudio({ id: 'speech-test', text });
+    disposals.push(cleanup);
+    return createAudio({ id, text });
   });
 }
 
@@ -46,12 +51,14 @@ beforeEach(() => {
   cache.match.mockClear();
   cache.put.mockClear();
   openCache.mockReset().mockResolvedValue(cache);
-  element = new TestAudio();
+  element.src = '';
+  element.currentTime = 0;
+  element.play.mockReset().mockResolvedValue(undefined);
+  element.pause.mockClear();
+  createElement.mockClear();
   Object.defineProperty(globalThis, 'Audio', {
     configurable: true,
-    value: function () {
-      return element;
-    },
+    value: createElement,
   });
   Object.defineProperty(globalThis, 'caches', {
     configurable: true,
@@ -63,7 +70,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  dispose();
+  for (const cleanup of disposals) cleanup();
+  disposals.length = 0;
   mock.restore();
   restoreGlobal('Audio', originalAudio);
   restoreGlobal('caches', originalCaches);
@@ -73,6 +81,95 @@ afterEach(() => {
 afterAll(() => restoreGlobal('self', originalSelf));
 
 describe('createAudio', () => {
+  it('does not create audio elements or effects for idle messages', () => {
+    const createEffect = spyOn(solid, 'createEffect');
+    const addListener = spyOn(element, 'addEventListener');
+    for (let index = 0; index < 50; index++) setup('Hello', `message-${index}`);
+
+    expect(createElement).not.toHaveBeenCalled();
+    expect(createEffect).not.toHaveBeenCalled();
+    expect(addListener).not.toHaveBeenCalled();
+    expect(fetchSpeech).not.toHaveBeenCalled();
+  });
+
+  it('does not create a player when there is no speech to play', async () => {
+    const audio = setup('');
+
+    await audio.play();
+
+    expect(createElement).not.toHaveBeenCalled();
+    expect(audio.status()).toBe('idle');
+  });
+
+  it.each([
+    ['first', 'second'],
+    ['same', 'same'],
+  ])('shares one player when switching from %s to %s', async (firstId, secondId) => {
+    const first = setup('First message', firstId);
+    const disposeFirst = dispose;
+    await first.play();
+    const created = createElement.mock.calls.length;
+    const second = setup('Second message', secondId);
+
+    await second.play();
+
+    expect(createElement).toHaveBeenCalledTimes(created);
+    expect(first.status()).toBe('idle');
+    expect(second.status()).toBe('playing');
+    expect(second.ttsState.playingId).toBe(secondId);
+    const source = element.src;
+    element.pause.mockClear();
+    first.stop();
+    disposeFirst();
+    expect(element.pause).not.toHaveBeenCalled();
+    expect(element.src).toBe(source);
+    expect(second.status()).toBe('playing');
+
+    element.dispatchEvent(new Event('ended'));
+    expect(second.status()).toBe('idle');
+    expect(second.ttsState.playingId).toBeNull();
+  });
+
+  it('ignores a speech request that completes after another message starts', async () => {
+    const first = setup('First message', 'first');
+    const pending = Promise.withResolvers<Response>();
+    fetchSpeech.mockReturnValueOnce(pending.promise);
+    const playing = first.play();
+    await Bun.sleep(0);
+    const second = setup('Second message', 'second');
+    await second.play();
+    const source = element.src;
+
+    pending.resolve(new Response(new Uint8Array([1, 2, 3])));
+    await playing;
+
+    expect(element.play).toHaveBeenCalledTimes(1);
+    expect(element.src).toBe(source);
+    expect(first.status()).toBe('idle');
+    expect(second.status()).toBe('playing');
+    expect(second.ttsState.playingId).toBe('second');
+  });
+
+  it('releases playback resources and listeners when the active message is disposed', async () => {
+    const audio = setup();
+    const addListener = spyOn(element, 'addEventListener');
+    const removeListener = spyOn(element, 'removeEventListener');
+    const revokeUrl = spyOn(URL, 'revokeObjectURL');
+    await audio.play();
+    const source = element.src;
+
+    dispose();
+
+    expect(element.pause).toHaveBeenCalledTimes(1);
+    expect(element.src).toBe('');
+    expect(revokeUrl).toHaveBeenCalledWith(source);
+    expect(removeListener.mock.calls).toEqual(addListener.mock.calls);
+    expect(audio.status()).toBe('idle');
+    expect(audio.ttsState.playingId).toBeNull();
+    element.dispatchEvent(new Event('error'));
+    expect(audio.status()).toBe('idle');
+  });
+
   it('plays generated speech when Cache Storage is unavailable', async () => {
     Reflect.deleteProperty(globalThis, 'caches');
     fetchSpeech.mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3])));
