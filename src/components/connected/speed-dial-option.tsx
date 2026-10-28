@@ -46,8 +46,8 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
   return (
     <button
       class={cn(
-        'relative flex max-w-60 flex-col justify-between gap-3 rounded-2xl border border-input bg-background-main p-3 text-left text-sm text-card-foreground shadow-sm',
-        'group hover:border-foreground/30 hover:bg-background',
+        'relative flex max-w-60 flex-col justify-between gap-3 rounded-card border border-border-emphasis bg-surface-raised p-3 text-left text-sm text-main shadow-xs',
+        'group hover:border-border-focus hover:bg-surface-hover',
         local.class,
       )}
       onClick={() => local.onClick?.()}
@@ -55,7 +55,7 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
     >
       <div class="w-full">
         <div class="flex items-center gap-1">
-          <div class="flex flex-1 items-center gap-1 overflow-hidden truncate font-medium">
+          <div class="flex flex-1 items-center gap-1 truncate overflow-hidden font-medium">
             {local.title}
           </div>
           <div class="">
@@ -77,9 +77,7 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
           </div>
         </div>
         <Show when={local.showSubtitle}>
-          {local.subtitle && (
-            <div class="mt-1 text-xs text-muted-foreground">{local.subtitle}</div>
-          )}
+          {local.subtitle && <div class="mt-1 text-xs text-muted">{local.subtitle}</div>}
         </Show>
       </div>
       <div class="flex w-full items-end justify-between gap-2">

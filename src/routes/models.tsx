@@ -19,7 +19,7 @@ type SortableHeaderProps = {
 
 const SortableHeader: ParentComponent<SortableHeaderProps> = (props) => (
   <th
-    class={`cursor-pointer border-b px-2 py-1.5 text-left`}
+    class={`cursor-pointer border-b px-2 py-2 text-left text-xs font-medium text-muted hover:text-main`}
     classList={{
       'text-center': props.align === 'center',
       'text-right': props.align === 'right',
@@ -89,7 +89,7 @@ export default function ModelList() {
           be out of date.
         </SectionDescription>
       </div>
-      <div class="container mx-auto">
+      <div class="container mx-auto shrink-0 overflow-hidden rounded-card border">
         <table class="w-full border-collapse text-sm">
           <thead>
             <tr class="border-b">
@@ -160,8 +160,8 @@ export default function ModelList() {
           <tbody>
             <For each={sortedModels()}>
               {(model) => (
-                <tr class="border-b">
-                  <td class="px-2 py-1.5">
+                <tr class="border-b border-border-secondary hover:bg-surface-hover">
+                  <td class="px-2 py-2">
                     <div class="flex items-center gap-2">
                       <Avatar variant="flat">
                         <ModelIcon modelId={model.id} class="size-5" />
@@ -171,7 +171,7 @@ export default function ModelList() {
                       </a>
                     </div>
                   </td>
-                  <td class="px-2 py-1.5 pl-3">
+                  <td class="px-2 py-2 pl-3">
                     <div class="flex flex-col">
                       <div class="flex items-center gap-2">
                         <span class="font-semibold">{model.title}</span>
@@ -183,7 +183,7 @@ export default function ModelList() {
                       </div>
                     </div>
                   </td>
-                  <td class="px-2 py-1.5 text-right">
+                  <td class="px-2 py-2 text-right tabular-nums">
                     {new Date(model.created * 1000).toLocaleDateString(undefined, {
                       year: 'numeric',
                       month: 'short',
@@ -192,18 +192,18 @@ export default function ModelList() {
                       {model.tags?.includes('new') && <IconBadge variant="new" class="ml-1" />}
                     </div>
                   </td>
-                  <td class="px-2 py-1.5 pr-7 text-right">
+                  <td class="px-2 py-2 pr-7 text-right tabular-nums">
                     {model.contextLength ? model.contextLength.toLocaleString() : 'N/A'}
                   </td>
-                  <td class="px-2 py-1.5 pr-7 text-right">
+                  <td class="px-2 py-2 pr-7 text-right tabular-nums">
                     {model.maxCompletionTokens
                       ? model.maxCompletionTokens.toLocaleString()
                       : 'N/A'}
                   </td>
-                  <td class="py-1.5 pl-2 pr-7 text-right">
+                  <td class="py-2 pr-7 pl-2 text-right tabular-nums">
                     {formatPrice(model.pricing?.prompt)}
                   </td>
-                  <td class="px-2 py-1.5 pr-7 text-right">
+                  <td class="px-2 py-2 pr-7 text-right tabular-nums">
                     {formatPrice(model.pricing?.completion)}
                   </td>
                 </tr>

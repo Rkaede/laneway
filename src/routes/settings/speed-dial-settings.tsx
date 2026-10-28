@@ -79,9 +79,7 @@ export const SpeedDial: Component = () => {
       <div class="flex flex-col gap-4">
         <Show
           when={store.speedDial.length > 0}
-          fallback={
-            <div class="text-center text-gray-500">No speed dial items configured.</div>
-          }
+          fallback={<div class="text-center text-muted">No speed dial items configured.</div>}
         >
           <For each={store.speedDial}>
             {(item, index) => (
@@ -146,7 +144,7 @@ export const SpeedDial: Component = () => {
                     variant="ghost"
                     onClick={() => removeSpeedDialItem(item.id)}
                     size="icon"
-                    class="hover:bg-destructive"
+                    class="hover:bg-danger"
                   >
                     <IconTrash class="size-4" />
                   </Button>
@@ -162,7 +160,7 @@ export const SpeedDial: Component = () => {
             variant="ghost"
             disabled={store.speedDial.length >= 6}
           >
-            <IconPlus class="mr-2 h-5 w-5" />
+            <IconPlus class="h-5 w-5" />
             Add New
           </Button>
         </div>

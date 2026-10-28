@@ -66,9 +66,9 @@ function ImageCache() {
               alt="Cached image"
               class="h-auto max-w-32 rounded-lg shadow-md"
             />
-            <p class="mt-2 w-full truncate text-center text-xs text-gray-500">{image.url}</p>
+            <p class="mt-2 w-full truncate text-center text-xs text-muted">{image.url}</p>
             <button
-              class="mt-2 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+              class="mt-2 rounded-button bg-danger px-2 py-1 text-xs text-danger-fg hover:bg-danger-hover"
               onClick={() => deleteImage(image.url)}
             >
               Delete

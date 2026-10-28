@@ -40,7 +40,7 @@ export const ProviderCombobox: Component<ProviderComboboxProps> = (props) => {
       <Button
         as={PopoverTrigger}
         variant="outline"
-        class="w-full items-center justify-between text-left hover:bg-input"
+        class="w-full items-center justify-between text-left"
       >
         <span class="flex-1">
           <Show when={selectedProvider()} fallback={'Select a provider...'}>
@@ -51,7 +51,7 @@ export const ProviderCombobox: Component<ProviderComboboxProps> = (props) => {
             )}
           </Show>
         </span>
-        <IconChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <IconChevronsUpDown class="h-4 w-4 shrink-0 opacity-50" />
       </Button>
       <PopoverContent class="p-0" style={{ width: 'var(--kb-popper-anchor-width)' }}>
         <Command>
@@ -71,7 +71,7 @@ export const ProviderCombobox: Component<ProviderComboboxProps> = (props) => {
                     <span class="">{providers[provider.id]}</span>
                     <IconCheck
                       class={cn(
-                        'ml-2 h-4 w-4 text-green-500',
+                        'ml-2 size-4 text-success',
                         props.value === provider.id ? 'opacity-100' : 'opacity-0',
                       )}
                     />

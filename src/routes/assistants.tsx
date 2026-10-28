@@ -103,8 +103,8 @@ export default function Assistants() {
       </div>
 
       <div class="flex items-center justify-between gap-4">
-        <div class="relative flex-grow">
-          <IconSearch class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        <div class="relative grow">
+          <IconSearch class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted" />
           <Input
             type="text"
             placeholder="Search..."
@@ -119,11 +119,11 @@ export default function Assistants() {
             onClick={() => setIsGalleryOpen(true)}
             class="whitespace-nowrap"
           >
-            <IconGallery class="mr-2 h-5 w-5" />
+            <IconGallery class="h-5 w-5" />
             Assistant Library
           </Button>
           <Button onClick={handleAdd} class="whitespace-nowrap">
-            <IconPlus class="mr-2 h-5 w-5" />
+            <IconPlus class="h-5 w-5" />
             Create New
           </Button>
         </div>
@@ -261,7 +261,7 @@ const AssistantGalleryDialog: Component<{
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p class="text-sm text-muted-foreground">{assistant.subtitle}</p>
+                    <p class="text-sm text-muted">{assistant.subtitle}</p>
                     <div class="mt-4 flex justify-end">
                       <Button
                         variant="outline"
@@ -274,7 +274,7 @@ const AssistantGalleryDialog: Component<{
                         {isAdded() ? (
                           <div class="flex items-center gap-1">
                             <div class="text-sm">Added</div>
-                            <IconCheck class="size-4 text-green-500" />
+                            <IconCheck class="size-4 text-success" />
                           </div>
                         ) : (
                           'Add'
@@ -317,7 +317,7 @@ const AssistantCard: Component<{
         <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
           <DropdownMenuTrigger
             as={Button}
-            class="flex size-6 items-center justify-center rounded-md p-0 text-white hover:bg-background-4"
+            class="flex size-6 items-center justify-center rounded-md p-0 text-muted hover:bg-surface-hover hover:text-main"
             data-open={open()}
             variant="ghost"
             size="icon"
@@ -340,7 +340,7 @@ const AssistantCard: Component<{
         </DropdownMenu>
       </CardHeader>
       <CardContent class="flex-1">
-        <p class="mb-2 line-clamp-2 text-sm text-muted-foreground">
+        <p class="mb-2 line-clamp-2 text-sm text-muted">
           {props.assistant.subtitle || 'No description'}
         </p>
       </CardContent>

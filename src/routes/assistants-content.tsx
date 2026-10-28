@@ -24,7 +24,7 @@ const GalleryAssistantCard: Component<{
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p class="text-sm text-muted-foreground">{props.assistant.subtitle}</p>
+        <p class="text-sm text-muted">{props.assistant.subtitle}</p>
         <div class="mt-4 flex justify-end">
           <Button
             variant="outline"
@@ -35,7 +35,7 @@ const GalleryAssistantCard: Component<{
             {isAdded() ? (
               <div class="flex items-center gap-1">
                 <div class="text-sm">Added</div>
-                <IconCheck class="size-4 text-green-500" />
+                <IconCheck class="size-4 text-success" />
               </div>
             ) : (
               'Add'

@@ -14,12 +14,12 @@ type ModelIconProps = {
 } & VariantProps<typeof modelCardVariants>;
 
 const modelCardVariants = cva(
-  'rounded-full border border-transparent p-1 text-foreground hover:bg-muted',
+  'rounded-full border border-transparent p-1 text-main hover:bg-surface-hover',
   {
     variants: {
       variant: {
         default: '',
-        light: 'bg-background-2 group-hover:bg-background-2 hover:!bg-background-3',
+        light: 'bg-surface-hover group-hover:bg-surface-hover hover:bg-surface-pressed!',
       },
     },
     defaultVariants: {
@@ -58,33 +58,33 @@ const ModelCardContent: ParentComponent<{ model: ModelProps }> = (props) => {
       <Separator />
       <div class="grid gap-4">
         <div class="flex items-start gap-2">
-          <MaximizeIcon class="mt-0.5 h-4 w-4 text-primary" />
+          <MaximizeIcon class="mt-0.5 size-4 text-main" />
           <div>
             <p class="text-sm font-semibold">Max Tokens</p>
             <div class="grid grid-cols-[auto_1fr] gap-x-2">
               <div>input: </div>
-              <Tokens tokens={props.model.contextLength} class="text-muted-foreground" />
+              <Tokens tokens={props.model.contextLength} class="text-muted" />
               <div>output: </div>
-              <Tokens tokens={props.model.maxCompletionTokens} class="text-muted-foreground" />
+              <Tokens tokens={props.model.maxCompletionTokens} class="text-muted" />
             </div>
           </div>
         </div>
         <div class="flex items-start gap-2">
-          <DollarSignIcon class="mt-0.5 h-4 w-4 text-primary" />
+          <DollarSignIcon class="mt-0.5 size-4 text-main" />
           <div>
             <p class="text-sm font-semibold">Pricing</p>
             <div class="grid grid-cols-[auto_1fr] gap-x-2">
               <div>input: </div>
-              <Price pricing={props.model.pricing.prompt} class="text-muted-foreground" />
+              <Price pricing={props.model.pricing.prompt} class="text-muted" />
               <div>output: </div>
-              <Price pricing={props.model.pricing.completion} class="text-muted-foreground" />
+              <Price pricing={props.model.pricing.completion} class="text-muted" />
             </div>
           </div>
         </div>
       </div>
       <Separator />
 
-      <div class="text-right text-muted-foreground">
+      <div class="text-right text-muted">
         Released:{' '}
         {new Date(props.model.created * 1000).toLocaleDateString(undefined, {
           year: 'numeric',

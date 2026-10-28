@@ -62,23 +62,23 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
       <Button as={PopoverTrigger} variant="combobox" class={cn(props.class)}>
         <Show
           when={selectedItem()?.type === 'preset'}
-          fallback={<ModelIcon modelId={modelId()} class="mr-2 size-4" />}
+          fallback={<ModelIcon modelId={modelId()} class="size-4" />}
         >
-          <IconLayoutGrid class="mr-2 size-4" />
+          <IconLayoutGrid class="size-4" />
         </Show>
         <span class="flex-1">
           {props.value ? (
             <span class="flex items-baseline gap-1">
               <span>{selectedItem()?.title}</span>
               {props.showType && (
-                <span class="text-xs text-muted-foreground">({selectedItem()?.type})</span>
+                <span class="text-xs text-muted">({selectedItem()?.type})</span>
               )}
             </span>
           ) : (
             'Select item...'
           )}
         </span>
-        <IconChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <IconChevronsUpDown class="h-4 w-4 shrink-0 opacity-50" />
       </Button>
       <PopoverContent class="p-0" style={{ width: 'var(--kb-popper-anchor-width)' }}>
         <Command
@@ -107,7 +107,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                       <span>{assistant.title}</span>
                       <IconCheck
                         class={cn(
-                          'ml-2 h-4 w-4 text-green-500',
+                          'ml-2 size-4 text-success',
                           props.value?.id === assistant.id ? 'opacity-100' : 'opacity-0',
                         )}
                       />
@@ -140,7 +140,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                           <span>{model.title}</span>
                           <IconCheck
                             class={cn(
-                              'ml-2 h-4 w-4 text-green-500',
+                              'ml-2 size-4 text-success',
                               props.value?.id === model.id ? 'opacity-100' : 'opacity-0',
                             )}
                           />
@@ -167,7 +167,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                       <span>{preset.presetTitle}</span>
                       <IconCheck
                         class={cn(
-                          'ml-2 h-4 w-4 text-green-500',
+                          'ml-2 size-4 text-success',
                           props.value?.id === preset.id ? 'opacity-100' : 'opacity-0',
                         )}
                       />

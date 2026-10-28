@@ -30,7 +30,7 @@ export const Section: ParentComponent<SectionProps> = (props) => {
 
 const SectionContent: ParentComponent = (props) => (
   <Card class="">
-    <CardContent class="flex flex-col gap-8 pb-8 pt-6">{props.children}</CardContent>
+    <CardContent class="flex flex-col gap-8 pt-6 pb-8">{props.children}</CardContent>
   </Card>
 );
 

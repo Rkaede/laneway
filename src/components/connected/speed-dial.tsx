@@ -137,7 +137,7 @@ export const SpeedDial: Component<SpeedDialProps> = (props) => {
           }}
         </For>
       </div>
-      <div class="self-center text-xs text-muted-foreground">
+      <div class="self-center text-xs text-muted">
         <Shortcut variant="solid">$mod+K</Shortcut> for more options.
       </div>
     </div>

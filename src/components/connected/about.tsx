@@ -54,12 +54,12 @@ const About: Component = () => {
               when={isCopied()}
               fallback={
                 <>
-                  <IconCopy class="mr-2 h-4 w-4" />
+                  <IconCopy class="h-4 w-4" />
                   Copy build info
                 </>
               }
             >
-              <IconCheck class="mr-2 h-4 w-4" />
+              <IconCheck class="h-4 w-4" />
               Copied!
             </Show>
           </Button>

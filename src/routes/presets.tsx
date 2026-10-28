@@ -114,8 +114,8 @@ export default function Presets() {
       </div>
 
       <div class="flex items-center justify-between gap-4">
-        <div class="relative flex-grow">
-          <IconSearch class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        <div class="relative grow">
+          <IconSearch class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted" />
           <Input
             type="text"
             placeholder="Search..."
@@ -130,11 +130,11 @@ export default function Presets() {
             onClick={() => setIsGalleryOpen(true)}
             class="whitespace-nowrap"
           >
-            <IconGallery class="mr-2 h-5 w-5" />
+            <IconGallery class="h-5 w-5" />
             Preset Library
           </Button>
           <Button onClick={handleAdd} class="whitespace-nowrap">
-            <IconPlus class="mr-2 h-5 w-5" />
+            <IconPlus class="h-5 w-5" />
             Add New
           </Button>
         </div>
@@ -201,7 +201,7 @@ const PresetCard: Component<{
         <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
           <DropdownMenuTrigger
             as={Button}
-            class="flex size-6 items-center justify-center rounded-md p-0 text-white hover:bg-background-4"
+            class="flex size-6 items-center justify-center rounded-md p-0 text-muted hover:bg-surface-hover hover:text-main"
             data-open={open()}
             variant="ghost"
             size="icon"
@@ -241,7 +241,7 @@ const PresetCard: Component<{
             }}
           </For>
         </div>
-        <p class="mb-2 line-clamp-2 text-sm text-muted-foreground">
+        <p class="mb-2 line-clamp-2 text-sm text-muted">
           {props.preset.presetDescription || 'No description'}
         </p>
       </CardContent>
@@ -368,7 +368,7 @@ const PresetGalleryDialog: Component<{
                         }}
                       </For>
                     </div>
-                    <p class="text-sm text-muted-foreground">{preset.presetDescription}</p>
+                    <p class="text-sm text-muted">{preset.presetDescription}</p>
 
                     <div class="mt-4 flex justify-end">
                       <Button
@@ -382,7 +382,7 @@ const PresetGalleryDialog: Component<{
                         {isAdded() ? (
                           <div class="flex items-center gap-1">
                             <div class="text-sm">Added</div>
-                            <IconCheck class="size-4 text-green-500" />
+                            <IconCheck class="size-4 text-success" />
                           </div>
                         ) : (
                           'Add'
@@ -461,7 +461,7 @@ const PresetDetails: Component<{
               onInput={(e) => setLocalPreset('input', e.currentTarget.value)}
             />
           </TextField>
-          <div class="mt-1 text-xs text-muted-foreground">
+          <div class="mt-1 text-xs text-muted">
             Example: <i>Improve the write of the following. Give 5 options</i>
           </div>
         </div>
@@ -559,11 +559,11 @@ const Assistant: Component<{
       : selectModelById(() => props.modelId)();
 
   return (
-    <div class="inline-flex items-center gap-2 rounded-lg border border-input py-1 pl-2 pr-2">
+    <div class="inline-flex items-center gap-2 rounded-lg border border-border-emphasis py-1 pr-2 pl-2">
       <ModelIcon class="size-6" modelId={model()?.id} />
       <div class="flex-1">
         <div>{assistant()?.title ?? model()?.title ?? 'Unknown'}</div>
-        <div class="text-xs text-muted-foreground">
+        <div class="text-xs text-muted">
           {(props.assistantId ? model()?.title : 'Model') ?? 'Unknown Model'}
         </div>
       </div>
