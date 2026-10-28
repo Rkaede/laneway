@@ -339,10 +339,8 @@ const AssistantCard: Component<{
           <DropdownMenuContent class="w-36">
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={(e: MouseEvent) => {
-                  e.stopPropagation();
-                  props.onDelete();
-                }}
+                onClick={(e: MouseEvent) => e.stopPropagation()}
+                onSelect={props.onDelete}
               >
                 Delete
               </DropdownMenuItem>

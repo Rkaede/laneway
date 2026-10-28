@@ -196,7 +196,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
         <DropdownMenuGroup>
           <DropdownMenuItem
             onMouseDown={(e) => e.stopPropagation()}
-            onClick={() => {
+            onSelect={() => {
               if (!props.sessionId) return;
               actions.deleteSession.fn({ navigate, params }, { sessionId: props.sessionId });
             }}
@@ -204,7 +204,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
             Delete
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => {
+            onSelect={() => {
               if (!props.sessionId) return;
               setStore('dialogs', 'renameSession', 'sessionId', props.sessionId);
             }}
