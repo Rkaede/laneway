@@ -7,7 +7,8 @@ import { PageTitle, SectionDescription } from '~/components/ui';
 import { Avatar } from '~/components/ui';
 import { IconBadge } from '~/components/ui/icon-badge';
 import { models } from '~/store/models';
-import type { ModelProps } from '~/types';
+
+import { compareModels } from './model-sort';
 
 type SortableHeaderProps = {
   column: string;
@@ -39,37 +40,11 @@ export default function ModelList() {
   const [sortColumn, setSortColumn] = createSignal<string>('creator');
   const [sortDirection, setSortDirection] = createSignal<'ASC' | 'DESC' | undefined>('ASC');
 
-  const sortedModels = createMemo(() => {
-    const _sortColumn = sortColumn();
-
-    return [...models]
+  const sortedModels = createMemo(() =>
+    [...models]
       .filter((model) => !model.deprecated)
-      .sort((a, b) => {
-        if (_sortColumn === '') return 0;
-
-        let aValue, bValue;
-
-        if (_sortColumn === 'pricing-context') {
-          aValue = a.pricing?.prompt;
-          bValue = b.pricing?.prompt;
-        } else if (_sortColumn === 'pricing-output') {
-          aValue = a.pricing?.completion;
-          bValue = b.pricing?.completion;
-        } else if (_sortColumn === 'creator') {
-          aValue = a.creator.name;
-          bValue = b.creator.name;
-        } else {
-          aValue = a[_sortColumn as keyof ModelProps];
-          bValue = b[_sortColumn as keyof ModelProps];
-        }
-
-        if (aValue === undefined || bValue === undefined) return 0;
-
-        if (aValue < bValue) return sortDirection() === 'ASC' ? -1 : 1;
-        if (aValue > bValue) return sortDirection() === 'ASC' ? 1 : -1;
-        return 0;
-      });
-  });
+      .sort((a, b) => compareModels(a, b, sortColumn(), sortDirection())),
+  );
 
   const handleSort = (column: string) => {
     if (sortColumn() === column) {
@@ -81,7 +56,7 @@ export default function ModelList() {
   };
 
   return (
-    <div class="flex h-full w-full flex-col gap-8 overflow-auto px-10 py-6">
+    <div class="flex h-full w-full flex-col gap-8 overflow-auto px-10 py-6 [contain:inline-size]">
       <div>
         <PageTitle>Models</PageTitle>
         <SectionDescription>
@@ -89,7 +64,7 @@ export default function ModelList() {
           be out of date.
         </SectionDescription>
       </div>
-      <div class="container mx-auto shrink-0 overflow-hidden rounded-card border">
+      <div class="container mx-auto shrink-0 overflow-x-auto rounded-card border">
         <table class="w-full border-collapse text-sm">
           <thead>
             <tr class="border-b">
@@ -188,9 +163,6 @@ export default function ModelList() {
                       year: 'numeric',
                       month: 'short',
                     })}
-                    <div class="inline-block w-4">
-                      {model.tags?.includes('new') && <IconBadge variant="new" class="ml-1" />}
-                    </div>
                   </td>
                   <td class="px-2 py-2 pr-7 text-right tabular-nums">
                     {model.contextLength ? model.contextLength.toLocaleString() : 'N/A'}
