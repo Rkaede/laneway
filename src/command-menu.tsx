@@ -12,6 +12,7 @@ import {
   CommandShortcut,
 } from '~/components/ui/command';
 
+import { shouldIgnoreShortcut } from './command-shortcuts';
 import { ModelIcon } from './components/connected/model-icon';
 import { IconLayoutGrid } from './components/icons/ui';
 import { store } from './store';
@@ -43,13 +44,7 @@ export function CommandMenu() {
   for (const action of actionArray()) {
     if (action.shortcut) {
       keyMap[action.shortcut] = (event: KeyboardEvent) => {
-        // if we're using an input, don't trigger the action
-        if (
-          event.target instanceof HTMLInputElement ||
-          event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLSelectElement ||
-          (event.target instanceof HTMLElement && event.target.closest('.cm-editor'))
-        ) {
+        if (shouldIgnoreShortcut(event)) {
           return;
         }
         event.preventDefault();
