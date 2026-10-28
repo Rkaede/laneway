@@ -68,7 +68,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             <AlertNoVision />
           </Show>
 
-          <Show when={!chat.isApiKeyConfigured() && props.isExample !== true}>
+          <Show when={!chat.isApiKeyConfigured()}>
             <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
           </Show>
 

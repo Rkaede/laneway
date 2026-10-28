@@ -42,7 +42,7 @@ export function useChat({ chat }: UseChat) {
     const providerId = provider()?.id;
 
     if (!providerId) return false;
-    return !!apiKeys?.[providerId];
+    return !!apiKeys?.[providerId]?.trim();
   };
 
   const streamFn = async (abortSignal: AbortSignal) => {
@@ -70,7 +70,7 @@ export function useChat({ chat }: UseChat) {
   // Automatically sends new user messages to the AI model, checking for vision capabilities if
   // images are present and prepending any system prompt from the assistant
   createEffect(() => {
-    if (chat.error || model()?.provider === undefined) {
+    if (chat.error || model()?.provider === undefined || !isApiKeyConfigured()) {
       return;
     }
 
