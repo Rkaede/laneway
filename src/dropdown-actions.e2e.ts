@@ -14,10 +14,10 @@ for (const input of ['Enter', 'Space', 'click'] as const) {
     await page.goto('/');
     const session = page.getByRole('link', { name: /^Multi-chat / });
     await session.hover();
-    await session.getByRole('button', { name: 'Session actions' }).click();
+    await session.getByRole('button', { name: 'Chat or note actions' }).click();
     await selectItem(page.getByRole('menuitem', { name: 'Rename', exact: true }));
 
-    const dialog = page.getByRole('dialog', { name: 'Rename Chat Session' });
+    const dialog = page.getByRole('dialog', { name: 'Rename Chat' });
     await expect(dialog).toBeVisible();
     await dialog.getByRole('textbox').fill('Renamed session');
     await dialog.getByRole('button', { name: 'Rename', exact: true }).click();
@@ -28,7 +28,7 @@ for (const input of ['Enter', 'Space', 'click'] as const) {
     await page.goto('/');
     const session = page.getByRole('link', { name: /^Multi-chat / });
     await session.hover();
-    await session.getByRole('button', { name: 'Session actions' }).click();
+    await session.getByRole('button', { name: 'Chat or note actions' }).click();
     page.once('dialog', (dialog) => dialog.accept());
     await selectItem(page.getByRole('menuitem', { name: 'Delete', exact: true }));
     await expect(session).toHaveCount(0);
