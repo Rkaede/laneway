@@ -67,7 +67,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
           <IconLayoutGrid class="size-4" />
         </Show>
         <span class="flex-1">
-          {props.value ? (
+          {selectedItem() ? (
             <span class="flex items-baseline gap-1">
               <span>{selectedItem()?.title}</span>
               {props.showType && (
@@ -130,7 +130,7 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
                       {(model) => (
                         <CommandItem
                           value={model.id}
-                          keywords={[model.title]}
+                          keywords={[model.title, group.title]}
                           onSelect={(currentValue) => {
                             props.onSelect({ referenceId: currentValue, type: 'model' });
                             setOpen(false);
