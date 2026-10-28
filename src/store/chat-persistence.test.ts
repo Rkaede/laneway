@@ -5,6 +5,39 @@ import { deserializeChatStore, serializeChatStore } from './chat-persistence';
 import { createDefaultState, defaults } from './default-state';
 
 describe('chat persistence', () => {
+  it('omits dialogs without closing them in memory', () => {
+    const state = createDefaultState();
+    state.dialogs.renameSession.sessionId = state.sessions[0].id;
+    state.dialogs.about.open = true;
+
+    const saved = JSON.parse(serializeChatStore(state));
+
+    expect(saved).not.toHaveProperty('dialogs');
+    expect(state.dialogs.renameSession).toEqual({
+      open: false,
+      sessionId: state.sessions[0].id,
+    });
+    expect(state.dialogs.about.open).toBe(true);
+    expect(saved.sessions).toEqual(state.sessions);
+    expect(saved.settings).toEqual(state.settings);
+  });
+
+  it.each(['legacy', 'current'])('restores %s saves with closed dialogs', (format) => {
+    const state = createDefaultState();
+    state.dialogs.renameSession.sessionId = state.sessions[0].id;
+    state.dialogs.about.open = true;
+    const serialized = format === 'legacy' ? JSON.stringify(state) : serializeChatStore(state);
+
+    const restored = deserializeChatStore(serialized);
+
+    expect(restored).toEqual({ ...state, dialogs: defaults.dialogs });
+    restored.dialogs.renameSession.sessionId = 'another-session';
+    restored.dialogs.about.open = true;
+    expect(deserializeChatStore(serialized).dialogs).toEqual(defaults.dialogs);
+    expect(defaults.dialogs.renameSession.sessionId).toBeUndefined();
+    expect(defaults.dialogs.about.open).toBe(false);
+  });
+
   it('omits controllers without changing a running request in memory', () => {
     const state = createDefaultState();
     const controller = new AbortController();

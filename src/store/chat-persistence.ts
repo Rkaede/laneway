@@ -1,11 +1,14 @@
 import { type createDefaultState, defaults } from './default-state';
 
 export function serializeChatStore(state: ReturnType<typeof createDefaultState>) {
-  return JSON.stringify(state, (key, value) => (key === 'controller' ? undefined : value));
+  return JSON.stringify({ ...state, dialogs: undefined }, (key, value) =>
+    key === 'controller' ? undefined : value,
+  );
 }
 
 export function deserializeChatStore(serialized: string) {
   const state: ReturnType<typeof createDefaultState> = JSON.parse(serialized);
+  state.dialogs = structuredClone(defaults.dialogs);
 
   for (const chat of [...state.chats, ...state.draftChats]) {
     delete chat.controller;

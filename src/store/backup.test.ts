@@ -176,7 +176,9 @@ describe('backups', () => {
     const data = JSON.parse(await file.text());
 
     expect(omittedImages).toBe(1);
-    expect(data.state).toEqual(JSON.parse(JSON.stringify(source)));
+    const savedState = JSON.parse(JSON.stringify(source));
+    delete savedState.dialogs;
+    expect(data.state).toEqual(savedState);
     expect(Object.keys(data.images)).toEqual(['store:draft']);
     const backup = parseBackup(await file.text());
     images.clear();
