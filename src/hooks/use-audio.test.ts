@@ -73,6 +73,19 @@ afterEach(() => {
 afterAll(() => restoreGlobal('self', originalSelf));
 
 describe('createAudio', () => {
+  it('plays generated speech when Cache Storage is unavailable', async () => {
+    Reflect.deleteProperty(globalThis, 'caches');
+    fetchSpeech.mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3])));
+    const audio = setup();
+
+    await audio.play();
+
+    expect(audio.status()).toBe('playing');
+    expect(element.play).toHaveBeenCalledTimes(1);
+    expect(fetchSpeech).toHaveBeenCalledTimes(1);
+    expect(openCache).not.toHaveBeenCalled();
+  });
+
   it.each(['request', 'cache', 'playback'] as const)(
     'leaves loading after a %s failure and allows retry',
     async (failure) => {

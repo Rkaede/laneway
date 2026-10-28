@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
 // Prevent fetch errors when importing modules that fetch data at load time
 (globalThis as any).fetch = async () => Response.json([]);
 (globalThis as any).self = {};
 
 const { createMessage } = await import('./message-utils');
+const { imageCache } = await import('../services/image-cache');
 const { setModels } = await import('../store/models');
 const { setStore, store } = await import('../store');
 
 beforeEach(() => {
+  spyOn(imageCache, 'add').mockResolvedValue(undefined);
   setModels([
     {
       id: 'vision',
@@ -53,6 +55,8 @@ beforeEach(() => {
   ]);
   setStore('chats', [...store.draftChats]);
 });
+
+afterEach(() => mock.restore());
 
 describe('createMessage', () => {
   it('returns undefined when a chat model lacks vision', async () => {

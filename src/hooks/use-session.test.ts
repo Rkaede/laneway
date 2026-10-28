@@ -158,6 +158,7 @@ describe('session submission', () => {
   );
 
   it('clears chat text and attachments after accepting an image', async () => {
+    spyOn(imageCache, 'add').mockResolvedValue(undefined);
     setModels(0, 'vision', true);
     const session = createSession(() => 'session');
     session.handleFileSelect(new File(['image'], 'photo.png', { type: 'image/png' }));

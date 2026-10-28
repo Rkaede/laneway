@@ -65,14 +65,15 @@ export function createAudio({ id, text }: { id?: string; text?: string | (() => 
 
     try {
       const hashId = hash(content + 'openai' + voice).toString();
-      const cache = await caches.open(TTS_CACHE_NAME);
-      const cachedResponse = await cache.match(hashId);
+      const cache =
+        typeof caches === 'undefined' ? undefined : await caches.open(TTS_CACHE_NAME);
+      const cachedResponse = await cache?.match(hashId);
       let audioBuffer;
       if (cachedResponse) {
         audioBuffer = await cachedResponse.arrayBuffer();
       } else {
         audioBuffer = await generateSpeech(content, voice);
-        await cache.put(hashId, new Response(audioBuffer));
+        await cache?.put(hashId, new Response(audioBuffer));
       }
       if (currentPlayback !== playback) return;
       URL.revokeObjectURL(audio.src);
