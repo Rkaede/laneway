@@ -117,12 +117,12 @@ export function TextEditor(props: TextEditorProps) {
 
   // focus the editor when the component is mounted
   const timer = setInterval(() => {
-    editorView()?.focus();
-    const endPos = editorView()?.state.doc.length;
-    editorView()?.dispatch({
-      selection: { anchor: endPos },
+    const view = editorView();
+    view?.focus();
+    view?.dispatch({
+      selection: { anchor: view.state.doc.length },
     });
-    if (editorView()?.hasFocus) clearInterval(timer);
+    if (view?.hasFocus) clearInterval(timer);
   }, 100);
 
   // Add this extension for accessibility

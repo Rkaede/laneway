@@ -1,7 +1,8 @@
-import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import { clone } from '~/util';
+
+import { makePersistedStore } from './persisted';
 
 type APIKeys = {
   openai?: string;
@@ -19,7 +20,7 @@ const defaultState = {
 
 // the warning given by the rule here is not helpful in this case
 
-export const [apiKeys, setApiKeys] = makePersisted(createStore<APIKeys>(clone(defaultState)), {
+export const [apiKeys, setApiKeys] = makePersistedStore(createStore<APIKeys>(clone(defaultState)), {
   name: 'laneway-api-keys',
 });
 

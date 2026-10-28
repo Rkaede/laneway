@@ -1,11 +1,11 @@
-import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import { imageCache } from '~/services/image-cache';
 
 import { createDefaultState, defaults } from './default-state';
+import { makePersistedStore } from './persisted';
 
-export const [store, setStore] = makePersisted(createStore(createDefaultState()), {
+export const [store, setStore] = makePersistedStore(createStore(createDefaultState()), {
   name: 'chat-store',
 });
 

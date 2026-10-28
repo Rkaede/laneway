@@ -1,7 +1,8 @@
-import { makePersisted } from '@solid-primitives/storage';
 import { createStore } from 'solid-js/store';
 
 import type { ModelProps } from '~/types';
+
+import { makePersistedStore } from './persisted';
 
 // NOTE: we're moving data to be external from the application code
 // - This is a test to see if it improves performance. We'll need to test this and look at
@@ -17,7 +18,7 @@ function fetchModels() {
 }
 
 // the warning given by the rule here is not helpful in this case
-export const [models, setModels] = makePersisted(createStore<ModelProps[]>([]), {
+export const [models, setModels] = makePersistedStore(createStore<ModelProps[]>([]), {
   name: 'laneway-models',
 });
 
