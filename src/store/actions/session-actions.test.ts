@@ -13,8 +13,13 @@ const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([])
 const { setStore, store } = await import('..');
 const { setApiKeys } = await import('../keys');
 const { setModels } = await import('../models');
-const { addMessageToSessionChats, autonameChat, getCompletion, renameSession } =
-  await import('./session-actions');
+const {
+  addMessageToSessionChats,
+  autonameChat,
+  getCompletion,
+  newDraftSession,
+  renameSession,
+} = await import('./session-actions');
 const llm = await import('~/services/llm');
 fetchMock.mockRestore();
 
@@ -48,6 +53,22 @@ beforeEach(() => {
   setStore('chats', [
     { id: 'chat', assistantId: 'assistant-vision', status: 'idle', messages: [] },
   ]);
+});
+
+describe('newDraftSession', () => {
+  it.each(['model', 'assistant'] as const)('titles %s drafts by session type', (type) => {
+    const referenceId = type === 'model' ? 'vision' : 'assistant-vision';
+
+    newDraftSession({ type, referenceId });
+
+    expect(store.draftSession.type).toBe('chat');
+    expect(store.draftSession.title).toBe('Untitled Chat');
+
+    newDraftSession({ sessionType: 'note', type, referenceId });
+
+    expect(store.draftSession.type).toBe('note');
+    expect(store.draftSession.title).toBe('Untitled Note');
+  });
 });
 
 describe('addMessageToSessionChats', () => {

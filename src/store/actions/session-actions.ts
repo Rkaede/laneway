@@ -87,7 +87,7 @@ export function newDraftSession({
 
   setStore('draftSession', {
     id: nanoid(),
-    title: 'Untitled Note',
+    title: sessionType === 'note' ? 'Untitled Note' : 'Untitled Chat',
     type: sessionType,
     chats: [chatId],
     created: Date.now(),
