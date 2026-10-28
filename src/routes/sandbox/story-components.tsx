@@ -11,5 +11,5 @@ export const Cell: ParentComponent = (props) => {
 };
 
 export const CellHeader: ParentComponent = (props) => {
-  return <div class="text-foreground-subtle text-xs">{props.children}</div>;
+  return <div class="text-xs text-muted">{props.children}</div>;
 };

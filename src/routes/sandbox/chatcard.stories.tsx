@@ -20,7 +20,7 @@ export function Default() {
         <AvatarGroup>
           <Avatar modelId="openai/gpt-4o" size="sm" />
           <Avatar modelId="anthropic/claude-3.5-sonnet" size="sm" />
-          <Avatar modelId="google/gemini-flash-1.5" size="sm" />
+          <Avatar modelId="google/gemini-2.5-flash" size="sm" />
         </AvatarGroup>
       </SpeedDialOption>
     </div>

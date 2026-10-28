@@ -1,7 +1,6 @@
 import { createSignal } from 'solid-js';
 
 import createAnimatedText from '~/hooks/create-animated-text';
-import { stillAlive } from '~/services/llm-mock';
 
 export function Basic() {
   const [text] = createSignal('Hello world! This is an animated text example.');
@@ -21,7 +20,7 @@ export function Changing() {
     'And finally this message appears.',
   ];
   const [text, setText] = createSignal(texts[0]);
-  const animatedText = createAnimatedText(() => stillAlive, { type: 'word' });
+  const animatedText = createAnimatedText(text, { type: 'word' });
 
   const appendText = () => {
     setText(text() + '\n' + texts[0]);

@@ -8,7 +8,7 @@ export function Default() {
         <ModelIcon class="size-5" modelId="openai/gpt-4o" />
       </Avatar>
       <Avatar>
-        <ModelIcon class="size-5" modelId="google/gemini-flash-1.5" />
+        <ModelIcon class="size-5" modelId="google/gemini-2.5-flash" />
       </Avatar>
       <Avatar>
         <ModelIcon class="size-5" modelId="anthropic/claude-3.5-sonnet" />
@@ -24,7 +24,7 @@ export function Group() {
         <ModelIcon class="size-5" modelId="openai/gpt-4o" />
       </Avatar>
       <Avatar>
-        <ModelIcon class="size-5" modelId="google/gemini-flash-1.5" />
+        <ModelIcon class="size-5" modelId="google/gemini-2.5-flash" />
       </Avatar>
       <Avatar>
         <ModelIcon class="size-5" modelId="anthropic/claude-3.5-sonnet" />
