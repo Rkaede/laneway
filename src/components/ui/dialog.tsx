@@ -29,7 +29,7 @@ const DialogOverlay = <T extends ValidComponent = 'div'>(
   return (
     <DialogPrimitive.Overlay
       class={cn(
-        'data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0 fixed inset-0 z-50 bg-background-3/90',
+        'fixed inset-0 z-50 bg-scrim data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:animate-in data-[expanded]:fade-in-0',
         props.class,
       )}
       {...rest}
@@ -57,14 +57,14 @@ const DialogContent = <T extends ValidComponent = 'div'>(
       <DialogOverlay />
       <DialogPrimitive.Content
         class={cn(
-          'data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0 data-[closed]:zoom-out-95 data-[expanded]:zoom-in-95 data-[closed]:slide-out-to-left-1/2 data-[closed]:slide-out-to-top-[48%] data-[expanded]:slide-in-from-left-1/2 data-[expanded]:slide-in-from-top-[48%] fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background-main p-6 shadow-lg duration-200 sm:rounded-lg',
+          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-surface-overlay p-6 shadow-lg duration-200 data-[closed]:animate-out data-[closed]:fade-out-0 data-[closed]:zoom-out-95 data-[closed]:slide-out-to-left-1/2 data-[closed]:slide-out-to-top-[48%] data-[expanded]:animate-in data-[expanded]:fade-in-0 data-[expanded]:zoom-in-95 data-[expanded]:slide-in-from-left-1/2 data-[expanded]:slide-in-from-top-[48%] sm:rounded-modal',
           props.class,
         )}
         {...rest}
       >
         {props.children}
         {props.showCloseButton && (
-          <DialogPrimitive.CloseButton class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[expanded]:bg-accent data-[expanded]:text-muted-foreground">
+          <DialogPrimitive.CloseButton class="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:bg-surface-hover hover:opacity-100 focus:outline-hidden focus-visible:ring-[3px] focus-visible:ring-border-focus/50 disabled:pointer-events-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ const DialogTitle = <T extends ValidComponent = 'h2'>(
   const [, rest] = splitProps(props as DialogTitleProps, ['class']);
   return (
     <DialogPrimitive.Title
-      class={cn('text-lg font-semibold leading-none tracking-tight', props.class)}
+      class={cn('text-lg leading-none font-semibold tracking-tight', props.class)}
       {...rest}
     />
   );
@@ -132,10 +132,7 @@ const DialogDescription = <T extends ValidComponent = 'p'>(
 ) => {
   const [, rest] = splitProps(props as DialogDescriptionProps, ['class']);
   return (
-    <DialogPrimitive.Description
-      class={cn('text-sm text-muted-foreground', props.class)}
-      {...rest}
-    />
+    <DialogPrimitive.Description class={cn('text-sm text-muted', props.class)} {...rest} />
   );
 };
 

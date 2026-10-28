@@ -12,7 +12,7 @@ const Command: Component<ParentProps<CommandPrimitive.CommandRootProps>> = (prop
   return (
     <CommandPrimitive.CommandRoot
       class={cn(
-        'flex size-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground blur-none',
+        'flex size-full flex-col overflow-hidden rounded-card bg-surface-overlay text-main blur-none',
         local.class,
       )}
       {...others}
@@ -32,7 +32,7 @@ const CommandDialog: Component<
       <DialogContent class="overflow-hidden p-0">
         <Command
           filter={props.filter}
-          class="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5"
+          class="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5"
         >
           {local.children}
         </Command>
@@ -61,7 +61,7 @@ const CommandInput: Component<VoidProps<CommandPrimitive.CommandInputProps>> = (
       </svg>
       <CommandPrimitive.CommandInput
         class={cn(
-          'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+          'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-placeholder disabled:opacity-50',
           local.class,
         )}
         {...others}
@@ -75,7 +75,7 @@ const CommandList: Component<ParentProps<CommandPrimitive.CommandListProps>> = (
 
   return (
     <CommandPrimitive.CommandList
-      class={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', local.class)}
+      class={cn('max-h-[300px] overflow-x-hidden overflow-y-auto', local.class)}
       {...others}
     />
   );
@@ -98,7 +98,7 @@ const CommandGroup: Component<ParentProps<CommandPrimitive.CommandGroupProps>> =
   return (
     <CommandPrimitive.CommandGroup
       class={cn(
-        'overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground',
+        'overflow-hidden p-1 text-main [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted',
         local.class,
       )}
       {...others}
@@ -112,7 +112,10 @@ const CommandSeparator: Component<VoidProps<CommandPrimitive.CommandSeparatorPro
   const [local, others] = splitProps(props, ['class']);
 
   return (
-    <CommandPrimitive.CommandSeparator class={cn('h-px bg-border', local.class)} {...others} />
+    <CommandPrimitive.CommandSeparator
+      class={cn('h-px bg-border-secondary', local.class)}
+      {...others}
+    />
   );
 };
 
@@ -123,7 +126,7 @@ const CommandItem: Component<ParentProps<CommandPrimitive.CommandItemProps>> = (
     <CommandPrimitive.CommandItem
       cmdk-item=""
       class={cn(
-        'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        'relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm font-menu outline-hidden select-none aria-selected:bg-surface-hover aria-selected:text-main data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
         local.class,
       )}
       {...others}
@@ -137,7 +140,7 @@ const CommandShortcut: Component<ComponentProps<'span'>> = (props) => {
   return (
     <span
       class={cn(
-        'ml-auto rounded bg-foreground/80 px-1.5 py-0.5 text-center text-xs font-semibold tracking-widest text-background-3',
+        'ml-auto rounded-tag bg-surface-sunken px-1.5 py-0.5 text-center text-xs font-semibold tracking-widest text-muted',
         local.class,
       )}
       {...others}

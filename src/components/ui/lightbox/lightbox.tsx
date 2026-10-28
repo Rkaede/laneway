@@ -58,13 +58,13 @@ export const Lightbox: Component<LightboxProps> = (props) => {
 
   const renderThumbnails = () => {
     return (
-      <div class="fixed inset-x-0 bottom-0 z-40 overflow-hidden bg-gradient-to-b from-black/0 to-black/60">
-        <div class="mx-auto mb-6 mt-6 flex h-14 justify-center gap-4">
+      <div class="fixed inset-x-0 bottom-0 z-40 overflow-hidden bg-linear-to-b from-transparent to-media-backdrop">
+        <div class="mx-auto mt-6 mb-6 flex h-14 justify-center gap-4">
           <For each={props.images}>
             {(image, index) => {
               return (
                 <button
-                  class={`relative inline-block shrink-0 transform-gpu overflow-hidden focus:outline-none ${index() === currentIndex() ? 'z-20 rounded-md shadow shadow-black/50' : 'z-10 rounded-md'}`}
+                  class={`relative inline-block shrink-0 transform-gpu overflow-hidden focus:outline-hidden ${index() === currentIndex() ? 'z-20 rounded-md shadow-md' : 'z-10 rounded-md'}`}
                   style={{
                     width: '75px',
                     height: '56px',
@@ -128,11 +128,11 @@ export const Lightbox: Component<LightboxProps> = (props) => {
           role="dialog"
           aria-modal="true"
         >
-          <div class="fixed inset-0 bg-black/90 backdrop-blur-2xl" aria-hidden="true" />
+          <div class="fixed inset-0 bg-media-backdrop backdrop-blur-2xl" aria-hidden="true" />
 
-          <div class="absolute right-0 top-0 flex items-center gap-2 p-3 text-white">
+          <div class="absolute top-0 right-0 flex items-center gap-2 p-3 text-on-media">
             <button
-              class="z-50 rounded-full bg-gray-700/50 p-2 text-white backdrop-blur-lg transition"
+              class="z-50 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
               onClick={handleClose}
               aria-label="Close lightbox"
             >
@@ -185,7 +185,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
               <div class="relative aspect-[3/2] max-h-full w-full">
                 <Show when={props.images.length > 1}>
                   <button
-                    class="absolute left-3 top-[calc(50%-16px)] rounded-full bg-gray-700/50 p-2 text-white backdrop-blur-lg transition"
+                    class="absolute top-[calc(50%-16px)] left-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
                     style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handlePrevious}
                     aria-label="Previous image"
@@ -210,7 +210,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
 
                 <Show when={props.images.length > 1}>
                   <button
-                    class="absolute right-3 top-[calc(50%-16px)] rounded-full bg-gray-700/50 p-2 text-white backdrop-blur-lg transition"
+                    class="absolute top-[calc(50%-16px)] right-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
                     style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handleNext}
                     aria-label="Next image"

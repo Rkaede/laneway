@@ -28,7 +28,7 @@ const DropdownMenuContent = <T extends ValidComponent = 'div'>(
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         class={cn(
-          'animate-content-hide data-[expanded]:animate-content-show z-50 min-w-32 origin-[var(--kb-menu-content-transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md',
+          'z-50 min-w-32 origin-[var(--kb-menu-content-transform-origin)] overflow-hidden rounded-card border bg-surface-overlay p-1 text-main shadow-md data-[closed]:animate-out data-[closed]:fade-out-0 data-[closed]:zoom-out-95 data-[expanded]:animate-in data-[expanded]:fade-in-0 data-[expanded]:zoom-in-95',
           props.class,
         )}
         {...rest}
@@ -49,7 +49,7 @@ const DropdownMenuItem = <T extends ValidComponent = 'div'>(
   return (
     <DropdownMenuPrimitive.Item
       class={cn(
-        'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm font-menu outline-hidden transition-colors select-none focus:bg-surface-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-hover',
         props.class,
       )}
       {...rest}
@@ -85,7 +85,7 @@ const DropdownMenuSeparator = <T extends ValidComponent = 'hr'>(
   const [, rest] = splitProps(props as DropdownMenuSeparatorProps, ['class']);
   return (
     <DropdownMenuPrimitive.Separator
-      class={cn('-mx-1 my-1 h-px bg-muted', props.class)}
+      class={cn('-mx-1 my-1 h-px bg-border-secondary', props.class)}
       {...rest}
     />
   );
@@ -104,7 +104,7 @@ const DropdownMenuSubTrigger = <T extends ValidComponent = 'div'>(
   return (
     <DropdownMenuPrimitive.SubTrigger
       class={cn(
-        'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent',
+        'flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm font-menu outline-hidden select-none focus:bg-surface-hover data-[expanded]:bg-surface-hover data-[highlighted]:bg-surface-hover',
         props.class,
       )}
       {...rest}
@@ -138,7 +138,7 @@ const DropdownMenuSubContent = <T extends ValidComponent = 'div'>(
   return (
     <DropdownMenuPrimitive.SubContent
       class={cn(
-        'animate-in z-50 min-w-32 origin-[var(--kb-menu-content-transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md',
+        'z-50 min-w-32 origin-[var(--kb-menu-content-transform-origin)] animate-in overflow-hidden rounded-card border bg-surface-overlay p-1 text-main shadow-md',
         props.class,
       )}
       {...rest}
@@ -159,13 +159,13 @@ const DropdownMenuCheckboxItem = <T extends ValidComponent = 'div'>(
   return (
     <DropdownMenuPrimitive.CheckboxItem
       class={cn(
-        'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'relative flex cursor-default items-center rounded-sm py-1.5 pr-2 pl-8 text-sm font-menu outline-hidden transition-colors select-none focus:bg-surface-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-hover',
         props.class,
       )}
       {...rest}
     >
       <span class="absolute left-2 flex size-3.5 items-center justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
+        <DropdownMenuPrimitive.ItemIndicator class="text-brand">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -215,13 +215,13 @@ const DropdownMenuRadioItem = <T extends ValidComponent = 'div'>(
   return (
     <DropdownMenuPrimitive.RadioItem
       class={cn(
-        'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'relative flex cursor-default items-center rounded-sm py-1.5 pr-2 pl-8 text-sm font-menu outline-hidden transition-colors select-none focus:bg-surface-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-hover',
         props.class,
       )}
       {...rest}
     >
       <span class="absolute left-2 flex size-3.5 items-center justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
+        <DropdownMenuPrimitive.ItemIndicator class="text-brand">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
