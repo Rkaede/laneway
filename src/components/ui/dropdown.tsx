@@ -85,7 +85,7 @@ const DropdownMenuSeparator = <T extends ValidComponent = 'hr'>(
   const [, rest] = splitProps(props as DropdownMenuSeparatorProps, ['class']);
   return (
     <DropdownMenuPrimitive.Separator
-      class={cn('-mx-1 my-1 h-px bg-border-secondary', props.class)}
+      class={cn('-mx-1 my-1 h-px border-0 bg-border-secondary', props.class)}
       {...rest}
     />
   );
