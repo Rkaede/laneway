@@ -16,7 +16,7 @@ export { default as DollarSignIcon } from 'lucide-solid/icons/dollar-sign';
 export { default as IconDownload } from 'lucide-solid/icons/download';
 export { default as IconEyeOff } from 'lucide-solid/icons/eye-off';
 export { default as IconFileSliders } from 'lucide-solid/icons/file-sliders';
-export { default as IconGithub } from 'lucide-solid/icons/github';
+export { IconGithub } from './github';
 export { default as IconGlobe } from 'lucide-solid/icons/globe';
 export { default as IconImageDownload } from 'lucide-solid/icons/image-down';
 export { default as IconImages } from 'lucide-solid/icons/images';
