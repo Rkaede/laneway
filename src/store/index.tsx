@@ -25,5 +25,6 @@ export const deleteData = () => {
   }
   setStore(createDefaultState());
   imageCache.clearAll();
+  if (typeof caches !== 'undefined') caches.delete('laneway-tts-cache');
   return true;
 };

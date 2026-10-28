@@ -11,12 +11,19 @@ const { imageCache } = await import('../services/image-cache');
 fetchMock.mockRestore();
 
 const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+const originalCaches = Object.getOwnPropertyDescriptor(globalThis, 'caches');
+const deleteCache = mock(async (_name: string) => true);
 const confirm = mock(() => false);
 const navigate = mock(() => {});
 const context = { navigate, params: { id: 'delete-session' } };
 
 beforeEach(() => {
   Object.defineProperty(globalThis, 'window', { configurable: true, value: { confirm } });
+  Object.defineProperty(globalThis, 'caches', {
+    configurable: true,
+    value: { delete: deleteCache },
+  });
+  deleteCache.mockClear();
   confirm.mockReset();
   confirm.mockReturnValue(false);
   navigate.mockClear();
@@ -59,10 +66,15 @@ afterEach(() => {
   } else {
     Reflect.deleteProperty(globalThis, 'window');
   }
+  if (originalCaches) {
+    Object.defineProperty(globalThis, 'caches', originalCaches);
+  } else {
+    Reflect.deleteProperty(globalThis, 'caches');
+  }
 });
 
 describe('data deletion', () => {
-  it('keeps data and images when confirmation is canceled', () => {
+  it('keeps data and caches when confirmation is canceled', () => {
     const clearImages = spyOn(imageCache, 'clearAll').mockResolvedValue(undefined);
     const before = JSON.stringify(store);
 
@@ -72,10 +84,11 @@ describe('data deletion', () => {
     expect(confirm).toHaveBeenCalledWith(expect.stringContaining('cannot be undone'));
     expect(JSON.stringify(store)).toBe(before);
     expect(clearImages).not.toHaveBeenCalled();
+    expect(deleteCache).not.toHaveBeenCalled();
     expect(apiKeys.openai).toBe('saved-key');
   });
 
-  it('resets data and clears images only after confirmation, keeping API keys', () => {
+  it('resets data and clears caches only after confirmation, keeping API keys', () => {
     const clearImages = spyOn(imageCache, 'clearAll').mockResolvedValue(undefined);
     confirm.mockReturnValue(true);
 
@@ -84,6 +97,22 @@ describe('data deletion', () => {
     expect(store.sessions.some((session) => session.id === 'delete-session')).toBe(false);
     expect(store.chats.some((chat) => chat.id === 'delete-chat')).toBe(false);
     expect(clearImages).toHaveBeenCalledTimes(1);
+    expect(deleteCache).toHaveBeenCalledTimes(1);
+    expect(deleteCache).toHaveBeenCalledWith('laneway-tts-cache');
+    expect(apiKeys.openai).toBe('saved-key');
+  });
+
+  it('still deletes data when Cache Storage is unavailable', () => {
+    Reflect.deleteProperty(globalThis, 'caches');
+    const clearImages = spyOn(imageCache, 'clearAll').mockResolvedValue(undefined);
+    confirm.mockReturnValue(true);
+
+    expect(deleteData()).toBe(true);
+
+    expect(store.sessions.some((session) => session.id === 'delete-session')).toBe(false);
+    expect(store.chats.some((chat) => chat.id === 'delete-chat')).toBe(false);
+    expect(clearImages).toHaveBeenCalledTimes(1);
+    expect(deleteCache).not.toHaveBeenCalled();
     expect(apiKeys.openai).toBe('saved-key');
   });
 });
