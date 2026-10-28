@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, For, Show } from 'solid-js';
+import { type Component, createEffect, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
 
 import { LocalImage } from '~/components/ui/local-image';
@@ -140,7 +140,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
       };
 
       window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+      onCleanup(() => window.removeEventListener('keydown', handleKeyDown));
     }
   });
 
