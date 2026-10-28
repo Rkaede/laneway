@@ -364,7 +364,11 @@ const PresetGalleryDialog: Component<{
       <DialogContent class="max-w-5xl">
         <DialogHeader class="flex flex-row items-center justify-between">
           <DialogTitle>Preset Library</DialogTitle>
-          <Button variant="close" onClick={() => props.onOpenChange(false)}>
+          <Button
+            variant="toolbar"
+            class="size-10 rounded-full p-0"
+            onClick={() => props.onOpenChange(false)}
+          >
             <IconX class="h-4 w-4" />
             <span class="sr-only">Close</span>
           </Button>
