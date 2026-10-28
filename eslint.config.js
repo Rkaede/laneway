@@ -24,6 +24,8 @@ export default [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'solid/reactivity': 'off',
+      // Solid assigns `let ref;` variables through the JSX `ref={ref}` attribute
+      'no-unassigned-vars': 'off',
     },
   },
 ];
