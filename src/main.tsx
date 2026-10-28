@@ -11,9 +11,13 @@ import { AppError } from './components/connected/app-error';
 import { NotFound } from './routes/not-found';
 import { Session } from './routes/session';
 
-const SandboxLayout = lazy(() => import('./routes/sandbox/sandbox-layout'));
-const StoryPage = lazy(() => import('./routes/sandbox/story-page'));
-const Debug = lazy(() => import('./routes/debug'));
+const SandboxLayout = import.meta.env.DEV
+  ? lazy(() => import('./routes/sandbox/sandbox-layout'))
+  : undefined;
+const StoryPage = import.meta.env.DEV
+  ? lazy(() => import('./routes/sandbox/story-page'))
+  : undefined;
+const Debug = import.meta.env.DEV ? lazy(() => import('./routes/debug')) : undefined;
 const Settings = lazy(() => import('./routes/settings/settings'));
 const Assistants = lazy(() => import('./routes/assistants'));
 const Presets = lazy(() => import('./routes/presets'));
@@ -29,7 +33,7 @@ if (root) {
           {/* Main app routes with AppLayout */}
           <Route path="/" component={AppLayout}>
             <Route path="/session/:id" component={Session} />
-            <Route path="/debug" component={Debug} />
+            {import.meta.env.DEV && <Route path="/debug" component={Debug} />}
             <Route path="/settings" component={Settings} />
             <Route path="/models" component={ModelList} />
             <Route path="/presets" component={Presets} />
@@ -39,17 +43,19 @@ if (root) {
           </Route>
 
           {/* Sandbox routes with SandboxLayout */}
-          <Route path="/sandbox" component={SandboxLayout}>
-            <Route path="/:story" component={StoryPage} />
-            <Route
-              path="/"
-              component={() => (
-                <div class="flex h-full items-center justify-center text-muted">
-                  Select a story from the sidebar
-                </div>
-              )}
-            />
-          </Route>
+          {import.meta.env.DEV && (
+            <Route path="/sandbox" component={SandboxLayout}>
+              <Route path="/:story" component={StoryPage} />
+              <Route
+                path="/"
+                component={() => (
+                  <div class="flex h-full items-center justify-center text-muted">
+                    Select a story from the sidebar
+                  </div>
+                )}
+              />
+            </Route>
+          )}
         </Router>
       </ErrorBoundary>
     ),
