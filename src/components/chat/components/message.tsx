@@ -1,4 +1,4 @@
-import { type Component, lazy, type ParentComponent, Show } from 'solid-js';
+import { type Component, type ParentComponent, Show } from 'solid-js';
 import { createSignal } from 'solid-js';
 
 import { ModelIcon } from '~/components/connected';
@@ -6,6 +6,7 @@ import { IconBan, IconUser } from '~/components/icons/ui';
 import { Avatar, Tag } from '~/components/ui';
 import { Lightbox } from '~/components/ui/lightbox/lightbox';
 import { LocalImage } from '~/components/ui/local-image';
+import Markdown from '~/components/ui/markdown';
 import { AudioButton } from '~/components/ui/message/audio-button';
 import { CopyButton } from '~/components/ui/message/copy-button';
 import { StatsPopover } from '~/components/ui/stats-popover';
@@ -15,8 +16,6 @@ import { store } from '~/store/index';
 import { apiKeys } from '~/store/keys';
 import type { ImagePart, MessageProps, TextPart } from '~/types';
 import { cn } from '~/util';
-
-const Markdown = lazy(() => import('~/components/ui/markdown'));
 
 const ModelTitle: ParentComponent = (props) => {
   return (
