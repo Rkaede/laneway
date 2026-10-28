@@ -3,7 +3,7 @@ import { ModelProps } from '../../../src/types';
 export const google: Partial<ModelProps>[] = [
   {
     id: 'google/gemini-2.0-flash-001',
-    title: 'Gemini Flash 2.0',
+    title: 'Gemini 2.0 Flash',
   },
   {
     id: 'google/gemini-2.0-flash-lite-001',

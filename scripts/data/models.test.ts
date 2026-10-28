@@ -42,6 +42,21 @@ describe('generateModels catalogue', () => {
     });
   });
 
+  it.each([
+    { id: 'anthropic/claude-sonnet-4', title: 'Claude Sonnet 4' },
+    { id: 'deepseek/deepseek-chat-v3-0324', title: 'DeepSeek V3 0324' },
+    { id: 'deepseek/deepseek-chat-v3-0324:free', title: 'DeepSeek V3 0324 (free)' },
+    { id: 'google/gemini-2.0-flash-001', title: 'Gemini 2.0 Flash' },
+  ])('uses a consistent curated title for $id', async ({ id, title }) => {
+    spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({ data: [{ ...routerModel(id), name: 'Provider: upstream title' }] }),
+    );
+
+    const model = (await generateModels()).find((model) => model.id === id);
+
+    expect(model?.title).toBe(title);
+  });
+
   it('keeps missing and deprecated models for saved references and warns about them', async () => {
     spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({
