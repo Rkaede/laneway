@@ -3,11 +3,70 @@ import * as fs from 'fs';
 
 import { createDefaultState } from '../../src/store/default-state';
 import { assistants } from './assistants';
-import { generateModels, modelsBase } from './models';
+import { fetchModels, generateModels, modelsBase } from './models';
 import { presets } from './presets';
 
 afterEach(() => {
   mock.restore();
+});
+
+describe('fetchModels', () => {
+  const data = { data: [{ id: 'openai/gpt-4o' }] };
+
+  beforeEach(() => {
+    spyOn(console, 'info').mockImplementation(() => {});
+    spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  it('prefers the local catalogue without making a network request', async () => {
+    spyOn(fs, 'existsSync').mockReturnValue(true);
+    spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(data));
+    const fetch = spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Unexpected fetch'));
+
+    expect(await fetchModels()).toEqual(data);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid local JSON without falling back to the network', async () => {
+    spyOn(fs, 'existsSync').mockReturnValue(true);
+    spyOn(fs, 'readFileSync').mockReturnValue('{');
+    const fetch = spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Unexpected fetch'));
+
+    await expect(fetchModels()).rejects.toBeInstanceOf(SyntaxError);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
+      'Error reading local models.json:',
+      expect.any(SyntaxError),
+    );
+  });
+
+  it('fetches the OpenRouter catalogue when there is no local copy', async () => {
+    spyOn(fs, 'existsSync').mockReturnValue(false);
+    const fetch = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json(data));
+
+    expect(await fetchModels()).toEqual(data);
+    expect(fetch).toHaveBeenCalledWith('https://openrouter.ai/api/v1/models');
+  });
+
+  it.each([
+    { name: 'HTTP errors', response: () => new Response(null, { status: 503 }) },
+    { name: 'invalid remote JSON', response: () => new Response('{') },
+  ])('rejects $name', async ({ response }) => {
+    spyOn(fs, 'existsSync').mockReturnValue(false);
+    spyOn(globalThis, 'fetch').mockResolvedValue(response());
+
+    await expect(fetchModels()).rejects.toBeInstanceOf(Error);
+    expect(console.error).toHaveBeenCalledWith('Error fetching models:', expect.any(Error));
+  });
+
+  it('propagates network failures', async () => {
+    spyOn(fs, 'existsSync').mockReturnValue(false);
+    const error = new Error('Offline');
+    spyOn(globalThis, 'fetch').mockRejectedValue(error);
+
+    await expect(fetchModels()).rejects.toBe(error);
+    expect(console.error).toHaveBeenCalledWith('Error fetching models:', error);
+  });
 });
 
 describe('generateModels catalogue', () => {

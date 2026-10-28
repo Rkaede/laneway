@@ -10,18 +10,11 @@ import WifiIcon from 'lucide-solid/icons/wifi';
 import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
 import { mergeProps, Show, splitProps } from 'solid-js';
 
+import { roleColorVariants } from './role-colors';
+
 const tagVariants = cva('inline-flex items-center gap-1 rounded-badge text-xs font-medium', {
   variants: {
-    variant: {
-      assistant: 'border-important-border bg-important-subtle text-important-subtle-fg',
-      free: 'border-success-border bg-success-subtle text-success-subtle-fg',
-      model: 'border-neutral-border bg-neutral-subtle text-neutral-subtle-fg',
-      new: 'border-warning-border bg-warning-subtle text-warning-subtle-fg',
-      online: 'border-active-border bg-active-subtle text-active-subtle-fg',
-      preset: 'border-brand-border bg-brand-subtle text-brand-subtle-fg',
-      reasoning: 'border-info-border bg-info-subtle text-info-subtle-fg',
-      vision: 'border-confirmed-border bg-confirmed-subtle text-confirmed-subtle-fg',
-    },
+    variant: roleColorVariants('border', 'background', 'text'),
     subtle: {
       true: 'bg-transparent p-0',
       false: 'border px-2 py-0.5',
@@ -33,15 +26,7 @@ const tagVariants = cva('inline-flex items-center gap-1 rounded-badge text-xs fo
   },
 });
 
-type BadgeVariant =
-  | 'free'
-  | 'reasoning'
-  | 'new'
-  | 'vision'
-  | 'online'
-  | 'preset'
-  | 'model'
-  | 'assistant';
+type BadgeVariant = NonNullable<VariantProps<typeof tagVariants>['variant']>;
 
 export type BadgeProps = ComponentProps<'span'> &
   VariantProps<typeof tagVariants> & {

@@ -1,6 +1,6 @@
 import { Component, createSignal, JSX } from 'solid-js';
 
-import { IconClose } from '~/components/icons/ui';
+import { IconX } from '~/components/icons/ui';
 import { Dialog, DialogContent } from '~/components/ui/dialog';
 import { cn } from '~/util';
 
@@ -53,7 +53,7 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
                 'opacity-100 group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:opacity-0',
               )}
             >
-              <IconClose class="size-3" />
+              <IconX class="size-3" />
             </button>
           </div>
         )}

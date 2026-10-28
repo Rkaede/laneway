@@ -1,6 +1,8 @@
 // using a copy of the tinykeys library to work around a package.json issue
 // see: https://github.com/jamiebuilds/tinykeys/pull/193
 
+import { isAppleDevice, isWindows } from '@solid-primitives/platform';
+
 type KeyBindingPress = [string[], string];
 
 /**
@@ -50,16 +52,9 @@ const DEFAULT_TIMEOUT = 1000;
 const DEFAULT_EVENT = 'keydown';
 
 /**
- * Platform detection code.
- * @see https://github.com/jamiebuilds/tinykeys/issues/184
- */
-const PLATFORM = typeof navigator === 'object' ? navigator.platform : '';
-const APPLE_DEVICE = /Mac|iPod|iPhone|iPad/.test(PLATFORM);
-
-/**
  * An alias for creating platform-specific keybinding aliases.
  */
-const MOD = APPLE_DEVICE ? 'Meta' : 'Control';
+const MOD = isAppleDevice ? 'Meta' : 'Control';
 
 /**
  * Meaning of `AltGraph`, from MDN:
@@ -69,8 +64,7 @@ const MOD = APPLE_DEVICE ? 'Meta' : 'Control';
  * - Android: Not supported
  * @see https://github.com/jamiebuilds/tinykeys/issues/185
  */
-const ALT_GRAPH_ALIASES =
-  PLATFORM === 'Win32' ? ['Control', 'Alt'] : APPLE_DEVICE ? ['Alt'] : [];
+const ALT_GRAPH_ALIASES = isWindows ? ['Control', 'Alt'] : isAppleDevice ? ['Alt'] : [];
 
 /**
  * There's a bug in Chrome that causes event.getModifierState not to exist on

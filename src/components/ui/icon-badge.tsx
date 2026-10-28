@@ -5,19 +5,11 @@ import { splitProps } from 'solid-js';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 
 import { icons } from './badge';
+import { roleColorVariants } from './role-colors';
 
 const iconBadgeVariants = cva('inline-flex items-center transition-colors', {
   variants: {
-    variant: {
-      assistant: 'text-important-subtle-fg',
-      free: 'text-success-subtle-fg',
-      model: 'text-neutral-subtle-fg',
-      new: 'text-warning-subtle-fg',
-      online: 'text-active-subtle-fg',
-      preset: 'text-brand-subtle-fg',
-      reasoning: 'text-info-subtle-fg',
-      vision: 'text-confirmed-subtle-fg',
-    },
+    variant: roleColorVariants('text'),
   },
   defaultVariants: {
     variant: 'free',

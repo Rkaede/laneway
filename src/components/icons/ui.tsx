@@ -48,4 +48,3 @@ export { default as IconSpeaker } from 'lucide-solid/icons/volume-2';
 export { default as IconVolumeOff } from 'lucide-solid/icons/volume-off';
 export { default as IconVolumeX } from 'lucide-solid/icons/volume-x';
 export { default as IconX } from 'lucide-solid/icons/x';
-export { default as IconClose } from 'lucide-solid/icons/x';
