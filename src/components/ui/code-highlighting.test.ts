@@ -3,6 +3,83 @@ import { describe, expect, it } from 'bun:test';
 import { highlightCode } from './code-highlighting';
 
 describe('highlightCode', () => {
+  it('loads Shiki on demand and shares initialization across calls', async () => {
+    const child = Bun.spawn(
+      [
+        process.execPath,
+        '-e',
+        `const { highlightCode } = await import(${JSON.stringify(import.meta.resolve('./code-highlighting'))});
+        const loadedOnImport = Object.keys(require.cache).filter(
+          (name) => name.includes('/shiki/') || name.includes('/@shikijs/'),
+        );
+        const { spyOn } = await import('bun:test');
+        const core = await import('shiki/core');
+        const initialize = spyOn(core, 'createHighlighterCore');
+        await Promise.all([
+          highlightCode('const value = 1;', 'javascript'),
+          highlightCode('value = 1', 'python'),
+        ]);
+        await highlightCode('const value: number = 1;', 'typescript');
+        console.log(JSON.stringify({ loadedOnImport, initializations: initialize.mock.calls.length }));`,
+      ],
+      { cwd: import.meta.dir, stdout: 'pipe', stderr: 'pipe' },
+    );
+    const [exitCode, stdout, stderr] = await Promise.all([
+      child.exited,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+
+    expect(exitCode, stderr).toBe(0);
+    expect(JSON.parse(stdout)).toEqual({ loadedOnImport: [], initializations: 1 });
+  });
+
+  it('retries failed initialization and shares each attempt across concurrent calls', async () => {
+    const child = Bun.spawn(
+      [
+        process.execPath,
+        '-e',
+        `const { spyOn } = await import('bun:test');
+        const core = await import('shiki/core');
+        const createHighlighterCore = core.createHighlighterCore;
+        const initialize = spyOn(core, 'createHighlighterCore')
+          .mockImplementation(createHighlighterCore)
+          .mockRejectedValueOnce(new Error('Initialization failed'));
+        const { highlightCode } = await import(${JSON.stringify(import.meta.resolve('./code-highlighting'))});
+        const failures = await Promise.allSettled([
+          highlightCode('const value = 1;', 'javascript'),
+          highlightCode('value = 1', 'python'),
+        ]);
+        const attemptsAfterFailure = initialize.mock.calls.length;
+        const html = await Promise.all([
+          highlightCode('const value = 1;', 'javascript'),
+          highlightCode('value = 1', 'python'),
+        ]);
+        await highlightCode('const value: number = 1;', 'typescript');
+        console.log(JSON.stringify({
+          failures: failures.map((result) => result.status === 'rejected' ? result.reason.message : result.status),
+          attemptsAfterFailure,
+          initializations: initialize.mock.calls.length,
+          highlighted: html.every((result) => result.includes('class="shiki css-variables"')),
+        }));`,
+      ],
+      { cwd: import.meta.dir, stdout: 'pipe', stderr: 'pipe' },
+    );
+    const [exitCode, stdout, stderr] = await Promise.all([
+      child.exited,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+
+    expect(exitCode, stderr).toBe(0);
+    expect(JSON.parse(stdout)).toEqual({
+      failures: ['Initialization failed', 'Initialization failed'],
+      attemptsAfterFailure: 1,
+      initializations: 2,
+      highlighted: true,
+    });
+  });
+
   it.each([
     ['c', 'int main() { return 0; }'],
     ['cpp', 'int main() { return 0; }'],
