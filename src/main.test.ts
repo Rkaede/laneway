@@ -50,6 +50,13 @@ it('excludes developer code and builds an installable production PWA', async () 
     const entry = await Bun.file(join(directory, manifest['index.html'].file)).text();
     expect(entry).not.toMatch(/["']\/(?:debug|sandbox)["']/);
 
+    for (const file of ['src/services/llm.ts', 'node_modules/ai/dist/index.js']) {
+      const chunk = manifest[file];
+      expect(chunk).toBeDefined();
+      expect(chunk.isDynamicEntry).toBe(true);
+      expect(Bun.file(join(directory, chunk.file)).size).toBeLessThanOrEqual(500_000);
+    }
+
     const serviceWorker = await Bun.file(join(directory, 'sw.js')).text();
     expect(serviceWorker).toContain('precacheAndRoute');
     expect(serviceWorker).not.toMatch(/(?:debug|sandbox-layout|story-page)-[^"']+\.js/);

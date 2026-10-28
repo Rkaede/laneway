@@ -2,14 +2,13 @@ import { nanoid } from 'nanoid';
 import { createEffect, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
+import { append, cancel } from '~/services/chat-controller';
 import { getProvider } from '~/services/util';
 import { setStore } from '~/store';
 import { clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { ChatProps, MessageProps } from '~/types';
-const router = import('~/services/llm');
-import { append, cancel } from '~/services/chat-controller';
 
 type UseChat = {
   chat: ChatProps;
@@ -52,7 +51,7 @@ export function useChat({ chat, readOnly }: UseChat) {
       ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
       : chat.messages;
 
-    const llm = await router;
+    const llm = await import('~/services/llm');
     return llm.getStream(messagesWithSystem, provider()?.modelId, provider()?.id, {
       abortSignal,
     });

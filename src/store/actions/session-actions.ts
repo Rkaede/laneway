@@ -4,6 +4,7 @@ import { reconcile } from 'solid-js/store';
 import { IconNewSession, IconSquarePen, IconTrash } from '~/components/icons/ui';
 import { showSuccess } from '~/components/ui/notify';
 import { imageCache } from '~/services/image-cache';
+import { getProvider } from '~/services/util';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,
@@ -14,10 +15,6 @@ import type {
   SessionProps,
   SessionType,
 } from '~/types';
-
-const router = import('~/services/llm');
-
-import { getProvider } from '~/services/util';
 
 import { setStore, store } from '..';
 import { apiKeys } from '../keys';
@@ -236,7 +233,7 @@ export async function autonameChat(sessionId: string, title: string) {
     if (!provider || !apiKeys[provider.id]?.trim()) return;
 
     const prompt = summarizeTitle.replace('{{messages}}', () => title);
-    const llm = await router;
+    const llm = await import('~/services/llm');
     const response = await llm.getText({
       messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
       modelId: provider.modelId,
@@ -260,7 +257,7 @@ export async function autonameChat(sessionId: string, title: string) {
 
 export async function getCompletion(input: string) {
   const prompt = completion.replace('{{input}}', () => input);
-  const llm = await router;
+  const llm = await import('~/services/llm');
   const provider = getProvider(store.settings.completions.model);
   const response = await llm.getText({
     messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],

@@ -1,5 +1,4 @@
 import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
-import { generateText, streamText } from 'ai';
 
 import { OPENROUTER_URL } from '~/constants';
 import { apiKeys } from '~/store/keys';
@@ -43,6 +42,7 @@ export async function getStream(
   const createService = services[provider];
   const service = createService();
   const formattedMessages = await formatMessages(messages);
+  const { streamText } = await import('ai');
 
   return streamText({
     model: service(modelId),
@@ -67,6 +67,7 @@ export async function getText({
   const createService = services[provider];
   const service = createService();
   const formattedMessages = await formatMessages(messages);
+  const { generateText } = await import('ai');
 
   return await generateText({
     model: service(modelId),
