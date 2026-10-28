@@ -27,7 +27,7 @@ export const SettingTitle: ParentComponent = (props) => {
 };
 
 export const SettingDescription: ParentComponent<{ class?: string }> = (props) => {
-  return <p class={cn('text-sm text-muted-foreground', props.class)}>{props.children}</p>;
+  return <p class={cn('text-sm text-muted', props.class)}>{props.children}</p>;
 };
 
 export const FormContainer: ParentComponent<{ class?: string }> = (props) => {

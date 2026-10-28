@@ -25,25 +25,22 @@ export const TextFieldRoot = <T extends ValidComponent = 'div'>(
   return <TextFieldPrimitive class={cn('space-y-1', local.class)} {...rest} />;
 };
 
-const textfieldLabel = cva(
-  'text-sm data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70 font-medium',
-  {
-    variants: {
-      label: {
-        true: 'data-[invalid]:text-destructive',
-      },
-      error: {
-        true: 'text-destructive',
-      },
-      description: {
-        true: 'font-normal text-muted-foreground',
-      },
+const textfieldLabel = cva('text-sm font-medium data-[disabled]:opacity-70', {
+  variants: {
+    label: {
+      true: 'data-[invalid]:text-danger',
     },
-    defaultVariants: {
-      label: true,
+    error: {
+      true: 'text-danger',
+    },
+    description: {
+      true: 'font-normal text-muted',
     },
   },
-);
+  defaultVariants: {
+    label: true,
+  },
+});
 
 type textFieldLabelProps<T extends ValidComponent = 'label'> = TextFieldLabelProps<T> & {
   class?: string;
@@ -106,10 +103,7 @@ export const TextField = <T extends ValidComponent = 'input'>(
 
   return (
     <TextFieldPrimitive.Input
-      class={cn(
-        'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-shadow file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        local.class,
-      )}
+      class={cn('input input-md border-border-emphasis', local.class)}
       {...rest}
     />
   );

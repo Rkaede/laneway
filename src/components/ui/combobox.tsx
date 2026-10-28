@@ -20,7 +20,7 @@ const ComboboxItem = <T extends ValidComponent = 'li'>(
   return (
     <ComboboxPrimitive.Item
       class={cn(
-        'relative flex cursor-default select-none items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50',
+        'relative flex cursor-default items-center justify-between rounded-sm px-2 py-1.5 text-sm font-menu outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-surface-hover',
         local.class,
       )}
       {...others}
@@ -38,7 +38,7 @@ const ComboboxItemIndicator = <T extends ValidComponent = 'div'>(
 ) => {
   const [local, others] = splitProps(props as ComboboxItemIndicatorProps, ['children']);
   return (
-    <ComboboxPrimitive.ItemIndicator {...others}>
+    <ComboboxPrimitive.ItemIndicator class="text-brand" {...others}>
       {local.children ?? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -66,10 +66,7 @@ const ComboboxSection = <T extends ValidComponent = 'li'>(
   const [local, others] = splitProps(props as ComboboxSectionProps, ['class']);
   return (
     <ComboboxPrimitive.Section
-      class={cn(
-        'overflow-hidden p-1 px-2 py-1.5 text-xs font-medium text-muted-foreground',
-        local.class,
-      )}
+      class={cn('overflow-hidden p-1 px-2 py-1.5 text-xs font-medium text-muted', local.class)}
       {...others}
     />
   );
@@ -88,7 +85,10 @@ const ComboboxControl = <T, U extends ValidComponent = 'div'>(
   const [local, others] = splitProps(props as ComboboxControlProps<T>, ['class']);
   return (
     <ComboboxPrimitive.Control
-      class={cn('flex items-center rounded-md border border-input px-3', local.class)}
+      class={cn(
+        'flex items-center rounded-md border border-border-emphasis bg-surface-input px-3 shadow-field focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
+        local.class,
+      )}
       {...others}
     />
   );
@@ -104,7 +104,7 @@ const ComboboxInput = <T extends ValidComponent = 'input'>(
   return (
     <ComboboxPrimitive.Input
       class={cn(
-        'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-placeholder disabled:opacity-50',
         local.class,
       )}
       {...others}
@@ -156,7 +156,7 @@ const ComboboxContent = <T extends ValidComponent = 'div'>(
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Content
         class={cn(
-          'animate-in fade-in-80 relative z-50 min-w-32 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md',
+          'relative z-50 min-w-32 animate-in overflow-hidden rounded-card border bg-surface-overlay text-main shadow-md fade-in-80',
           local.class,
         )}
         {...others}
