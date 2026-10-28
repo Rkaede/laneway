@@ -38,9 +38,9 @@ export async function append({
   chatId: string;
   streamFn: (abortSignal: AbortSignal) => ReturnType<typeof router.getStream>;
 }) {
+  const controller = new AbortController();
   try {
     const startTime = Date.now();
-    const controller = new AbortController();
     setStore('chats', (c) => c.id === chatId, 'controller', controller);
 
     const stream = await streamFn(controller.signal);
@@ -50,6 +50,7 @@ export async function append({
 
     // textStream hides API failures behind a generic NoOutputGeneratedError, fullStream carries them
     for await (const part of stream.fullStream) {
+      if (controller.signal.aborted) return;
       if (part.type === 'error') throw part.error;
       if (part.type !== 'text-delta') continue;
 
@@ -62,6 +63,7 @@ export async function append({
     }
 
     const usage = await stream.usage;
+    if (controller.signal.aborted) return;
     const timeTaken = Date.now() - startTime;
 
     addMessage(chatId, {
@@ -82,6 +84,7 @@ export async function append({
       latest: undefined,
     });
   } catch (error: unknown) {
+    if (controller.signal.aborted) return;
     const errorMessage = (error as ErrorWithCode).message ?? 'Unknown';
     const errorName = (error as ErrorWithCode).code ?? 'Unknown';
 

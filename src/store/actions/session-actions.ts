@@ -6,6 +6,7 @@ import { completion, summarizeTitle } from '~/store/prompts';
 import type {
   ActionContext,
   Actions,
+  ChatProps,
   MessageProps,
   PresetProps,
   SessionProps,
@@ -125,8 +126,11 @@ export function addMessageToSessionChats(
         setStore(
           'chats',
           (c) => c.id === chatId,
-          'messages',
-          (messages) => (sessionType === 'note' ? [message] : [...messages, message]),
+          (c): Partial<ChatProps> => ({
+            messages: sessionType === 'note' ? [message] : [...c.messages, message],
+            status: c.status === 'loading' ? 'loading' : 'idle',
+            error: undefined,
+          }),
         );
       }
     }
@@ -139,7 +143,10 @@ export function chatError(chatId: string, error: { name: string; message: string
 }
 
 export function clearChatError(chatId: string) {
-  setStore('chats', (c) => c.id === chatId, 'error', undefined);
+  setStore('chats', (c) => c.id === chatId, {
+    error: undefined,
+    status: 'idle',
+  });
 }
 
 export function setAssistant(id: string, chatId: string) {
