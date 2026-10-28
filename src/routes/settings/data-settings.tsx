@@ -1,4 +1,5 @@
 import { Button } from '~/components/ui';
+import { showSuccess } from '~/components/ui/notifications';
 import { deleteData, store } from '~/store';
 import { deleteKeys } from '~/store/keys';
 import { download } from '~/util';
@@ -14,7 +15,12 @@ export function Data() {
         description="Removes all data from your browser except for the API keys."
       >
         <div class="flex justify-end">
-          <Button variant="destructive" onClick={() => deleteData()}>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (deleteData()) showSuccess('Data deleted.');
+            }}
+          >
             Delete Data
           </Button>
         </div>
@@ -25,7 +31,13 @@ export function Data() {
         description="Removes the API keys from your browser."
       >
         <div class="flex justify-end">
-          <Button variant="destructive" onClick={() => deleteKeys()}>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              deleteKeys();
+              showSuccess('API keys deleted.');
+            }}
+          >
             Delete Keys
           </Button>
         </div>

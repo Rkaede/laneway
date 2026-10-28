@@ -1,6 +1,7 @@
 import type { ParentComponent } from 'solid-js';
 
 import { AppSidebar } from '~/app-sidebar';
+import { Notifications } from '~/components/ui/notifications';
 import { useApplyTheme } from '~/hooks/use-theme';
 import { store } from '~/store';
 
@@ -22,6 +23,7 @@ export const AppLayout: ParentComponent = (props) => {
       <div class="max-w-full flex-1">{props.children}</div>
       <CommandMenu />
       <About />
+      <Notifications />
     </main>
   );
 };

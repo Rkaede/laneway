@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { reconcile } from 'solid-js/store';
 
 import { IconNewSession, IconSquarePen, IconTrash } from '~/components/icons/ui';
+import { showSuccess } from '~/components/ui/notify';
 import { imageCache } from '~/services/image-cache';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
@@ -212,6 +213,7 @@ export function deleteSession(sessionId: string) {
     'sessions',
     store.sessions.filter((s) => s.id !== sessionId),
   );
+  showSuccess(session.type === 'note' ? 'Note deleted.' : 'Chat deleted.');
   return true;
 }
 
@@ -220,6 +222,7 @@ export function renameSession(sessionId: string, title: string) {
   const trimmedTitle = title.trim();
   if (!session || !trimmedTitle) return false;
   setStore('sessions', (s) => s.id === sessionId, 'title', trimmedTitle);
+  showSuccess(session.type === 'note' ? 'Note renamed.' : 'Chat renamed.');
   return true;
 }
 

@@ -6,6 +6,7 @@ import {
   createEffect,
   createResource,
   createSignal,
+  createUniqueId,
   For,
   Show,
 } from 'solid-js';
@@ -50,6 +51,7 @@ import {
   SettingTitle,
 } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
+import { showSuccess } from '~/components/ui/notifications';
 import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
@@ -88,6 +90,7 @@ export default function Presets() {
       setIsModalOpen(false);
       setIsDeleteConfirmOpen(false);
       setPresetToDelete(null);
+      showSuccess('Preset deleted.');
     }
   }
 
@@ -107,6 +110,7 @@ export default function Presets() {
   function handleAddFromGallery(preset: PresetProps) {
     addPreset(preset, presets());
     setIsGalleryOpen(false);
+    showSuccess('Preset added.');
   }
 
   const filteredPresets = () => {
@@ -446,6 +450,7 @@ const PresetDetails: Component<{
       store.presets,
       props.isNewPreset ? undefined : props.initialPreset.id,
     );
+  const saveHintId = createUniqueId();
 
   function handleSave() {
     if (validationError()) return;
@@ -457,6 +462,7 @@ const PresetDetails: Component<{
       setStore('presets', (p) => p.id === props.initialPreset.id, preset);
     }
     props.onClose();
+    showSuccess('Preset saved.');
   }
 
   function hasChanges() {
@@ -521,17 +527,25 @@ const PresetDetails: Component<{
           setLocalPreset={setLocalPreset}
         />
       </FormContainer>
-      <DialogFooter class="pt-6">
-        <Button variant="outline" onClick={props.onClose}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges() || !localPreset.chats?.length || !!validationError()}
-        >
-          Save
-        </Button>
-      </DialogFooter>
+      <div class="pt-6">
+        <Show when={!localPreset.chats?.length}>
+          <p id={saveHintId} class="mb-3 text-sm text-muted" role="status">
+            Add at least one assistant or model to save this preset.
+          </p>
+        </Show>
+        <DialogFooter>
+          <Button variant="outline" onClick={props.onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!hasChanges() || !localPreset.chats?.length || !!validationError()}
+            aria-describedby={!localPreset.chats?.length ? saveHintId : undefined}
+          >
+            Save
+          </Button>
+        </DialogFooter>
+      </div>
     </>
   );
 };

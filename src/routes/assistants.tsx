@@ -40,6 +40,7 @@ import {
 } from '~/components/ui/dropdown';
 import { PageTitle, SectionDescription } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
+import { showSuccess } from '~/components/ui/notifications';
 import { setStore, store } from '~/store';
 import { addAssistant, deleteAssistant } from '~/store/actions';
 import { validateAssistant } from '~/store/editor-validation';
@@ -88,6 +89,7 @@ export default function Assistants() {
       setIsModalOpen(false);
       setIsDeleteConfirmOpen(false);
       setAssistantToDelete(null);
+      showSuccess('Assistant deleted.');
     }
   }
 
@@ -101,6 +103,7 @@ export default function Assistants() {
   function handleAddFromGallery(assistant: AssistantProps) {
     addAssistant(assistant);
     setIsGalleryOpen(false);
+    showSuccess('Assistant added.');
   }
 
   return (
@@ -406,6 +409,7 @@ function AssistantDetails(props: {
       setStore('assistants', (a) => a.id === props.initialAssistant.id, assistant);
     }
     props.onClose();
+    showSuccess('Assistant saved.');
   }
 
   function hasChanges() {

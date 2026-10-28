@@ -15,6 +15,7 @@ import {
   SettingHeader,
   SettingTitle,
 } from '~/components/ui';
+import { showSuccess } from '~/components/ui/notifications';
 import { setStore, store } from '~/store';
 import { models } from '~/store/models';
 import { SpeedDialItem } from '~/types';
@@ -37,6 +38,7 @@ export const SpeedDial: Component = () => {
 
   const removeSpeedDialItem = (id: string) => {
     setStore('speedDial', (items) => items.filter((item) => item.id !== id));
+    showSuccess('Shortcut deleted.');
   };
 
   const updateSpeedDialItem = (

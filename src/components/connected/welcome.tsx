@@ -2,6 +2,7 @@ import { type Component, createSignal, onCleanup, onMount, Show } from 'solid-js
 import { Dynamic } from 'solid-js/web';
 
 import { Button } from '~/components/ui/button';
+import { showSuccess } from '~/components/ui/notifications';
 import { APIKeySetting } from '~/routes/settings/api-key-settings';
 import { setApiKeys } from '~/store/keys';
 import { anyKeysSet } from '~/store/selectors';
@@ -60,6 +61,7 @@ export const WelcomeContent: Component<{
 
   const handleGetStarted = () => {
     setApiKeys('hasCompletedWelcome', true);
+    showSuccess('API keys saved.');
   };
 
   function handleAddKeys() {
