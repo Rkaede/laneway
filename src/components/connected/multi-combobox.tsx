@@ -1,4 +1,4 @@
-import { type Component, createSignal, For, Show } from 'solid-js';
+import { type Component, createMemo, createSignal, For, Show } from 'solid-js';
 
 import { IconCheck, IconChevronsUpDown, IconLayoutGrid } from '~/components/icons/ui';
 import {
@@ -14,8 +14,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui';
 import { store } from '~/store';
-import { modelsByCreator } from '~/store/models';
-import { selectAssistantById, selectModelById, selectPresetById } from '~/store/selectors';
+import { models, modelsByCreator } from '~/store/models';
 import { cn } from '~/util';
 
 import { ModelIcon } from './model-icon';
@@ -36,21 +35,21 @@ type MultiComboboxProps = {
 export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
   const [open, setOpen] = createSignal(false);
 
-  const selectedItem = () => {
+  const selectedItem = createMemo(() => {
     if (props.includeAssistants && props.value?.type === 'assistant') {
-      const assistant = selectAssistantById(() => props.value?.id)();
+      const assistant = store.assistants.find((a) => a.id === props.value?.id);
       if (assistant) return { ...assistant, type: 'assistant' as const };
     }
     if (props.includeModels && props.value?.type === 'model') {
-      const model = selectModelById(() => props.value?.id)();
+      const model = models.find((m) => m.id === props.value?.id);
       if (model) return { ...model, type: 'model' as const };
     }
     if (props.includePresets && props.value?.type === 'preset') {
-      const preset = selectPresetById(() => props.value?.id)();
+      const preset = store.presets.find((p) => p.id === props.value?.id);
       if (preset) return { ...preset, type: 'preset' as const, title: preset.presetTitle };
     }
     return undefined;
-  };
+  });
 
   const modelId = () => {
     const item = selectedItem();

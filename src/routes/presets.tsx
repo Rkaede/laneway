@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import {
   type Component,
   createEffect,
+  createMemo,
   createResource,
   createSignal,
   createUniqueId,
@@ -56,6 +57,7 @@ import { TextArea } from '~/components/ui/textarea';
 import { setStore, store } from '~/store';
 import { addPreset, deletePreset } from '~/store/actions/presets';
 import { validatePreset } from '~/store/editor-validation';
+import { models } from '~/store/models';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
 import type { PresetProps } from '~/types';
 import { clone } from '~/util';
@@ -251,14 +253,14 @@ const PresetCard: Component<{
         <div class="mb-2 flex flex-wrap gap-2">
           <For each={props.preset.chats}>
             {(chat) => {
-              const assistant = selectAssistantById(() => chat.assistantId)();
-              const model = assistant
-                ? selectModelById(() => assistant?.modelId)()
-                : selectModelById(() => chat.modelId)();
+              const assistant = selectAssistantById(() => chat.assistantId);
+              const model = selectModelById(() =>
+                assistant() ? assistant()?.modelId : chat.modelId,
+              );
               return (
-                <Show when={model?.icon}>
+                <Show when={model()?.icon}>
                   <Avatar>
-                    <ModelIcon modelId={model?.id} class="size-5" />
+                    <ModelIcon modelId={model()?.id} class="size-5" />
                   </Avatar>
                 </Show>
               );
@@ -318,12 +320,12 @@ const DeleteConfirmDialog: Component<{
   onConfirm: () => void;
   preset: PresetProps | null;
 }> = (props) => {
-  const associatedAssistants = () => {
+  const associatedAssistants = createMemo(() => {
     if (!props.preset) return [];
     return props.preset.chats
-      .map((chat) => selectAssistantById(() => chat.assistantId)())
+      .map((chat) => store.assistants.find((a) => a.id === chat.assistantId))
       .filter(Boolean);
-  };
+  });
 
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
@@ -563,10 +565,10 @@ const AssistantList: Component<{
       }));
 
     if (type === 'assistant') {
-      const selected = selectAssistantById(id)();
+      const selected = store.assistants.find((a) => a.id === id);
       if (selected) addChat({ assistantId: selected.id });
     } else if (type === 'model') {
-      const selected = selectModelById(id)();
+      const selected = models.find((m) => m.id === id);
       if (selected) addChat({ modelId: selected.id });
     }
   }
@@ -617,10 +619,7 @@ const Assistant: Component<{
   onDelete: () => void;
 }> = (props) => {
   const assistant = selectAssistantById(() => props.assistantId);
-  const model = () =>
-    assistant()
-      ? selectModelById(() => assistant()?.modelId)()
-      : selectModelById(() => props.modelId)();
+  const model = selectModelById(() => (assistant() ? assistant()?.modelId : props.modelId));
 
   return (
     <div class="inline-flex items-center gap-2 rounded-lg border border-border-emphasis py-1 pr-2 pl-2">

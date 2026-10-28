@@ -1,8 +1,8 @@
 import type { ParentProps } from 'solid-js';
-import { createContext, useContext } from 'solid-js';
+import { createContext, createMemo, useContext } from 'solid-js';
 
 import { cancel } from '~/services/chat-controller';
-import { selectChatById } from '~/store/selectors';
+import { store } from '~/store';
 import type { SessionProps as StoreSessionProps } from '~/types';
 
 export interface SessionContextValue {
@@ -27,14 +27,14 @@ export function SessionProvider(props: SessionProps) {
     });
   }
 
-  const isLoading = () => {
+  const isLoading = createMemo(() => {
     if (!props.session) return false;
 
     return props.session.chats.some((chatId) => {
-      const chat = selectChatById(chatId)();
+      const chat = store.chats.find((c) => c.id === chatId);
       return chat?.status === 'loading';
     });
-  };
+  });
 
   return (
     <SessionContext.Provider
