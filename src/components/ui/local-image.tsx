@@ -23,6 +23,9 @@ export function LocalImage(props: ImageProps) {
       if (url) URL.revokeObjectURL(url);
     });
 
+    setImageSrc(null);
+    setAvailable(true);
+
     if (props.sourceType === 'path') {
       setImageSrc(props.src);
       return;
