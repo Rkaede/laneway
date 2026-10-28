@@ -2,11 +2,14 @@ import { createStore } from 'solid-js/store';
 
 import { imageCache } from '~/services/image-cache';
 
+import { deserializeChatStore, serializeChatStore } from './chat-persistence';
 import { createDefaultState, defaults } from './default-state';
 import { makePersistedStore } from './persisted';
 
 export const [store, setStore] = makePersistedStore(createStore(createDefaultState()), {
   name: 'chat-store',
+  serialize: serializeChatStore,
+  deserialize: deserializeChatStore,
 });
 
 // migrations
