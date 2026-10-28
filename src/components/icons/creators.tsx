@@ -139,13 +139,13 @@ export function Mistral(props: SVGAttributes) {
     <svg viewBox="0 0 256 233" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
       <title>Mistral AI</title>
       <g>
-        <rect fill="#000000" x="186.181818" y="0" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="186.181818" y="0" width="46.5454545" height="46.5454545" />
         <rect fill="#F7D046" x="209.454545" y="0" width="46.5454545" height="46.5454545" />
-        <rect fill="#000000" x="0" y="0" width="46.5454545" height="46.5454545" />
-        <rect fill="#000000" x="0" y="46.5454545" width="46.5454545" height="46.5454545" />
-        <rect fill="#000000" x="0" y="93.0909091" width="46.5454545" height="46.5454545" />
-        <rect fill="#000000" x="0" y="139.636364" width="46.5454545" height="46.5454545" />
-        <rect fill="#000000" x="0" y="186.181818" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="0" y="0" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="0" y="46.5454545" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="0" y="93.0909091" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="0" y="139.636364" width="46.5454545" height="46.5454545" />
+        <rect fill="currentColor" x="0" y="186.181818" width="46.5454545" height="46.5454545" />
         <rect fill="#F7D046" x="23.2727273" y="0" width="46.5454545" height="46.5454545" />
         <rect
           fill="#F2A73B"
@@ -162,7 +162,7 @@ export function Mistral(props: SVGAttributes) {
           height="46.5454545"
         />
         <rect
-          fill="#000000"
+          fill="currentColor"
           x="139.636364"
           y="46.5454545"
           width="46.5454545"
@@ -204,7 +204,7 @@ export function Mistral(props: SVGAttributes) {
           height="46.5454545"
         />
         <rect
-          fill="#000000"
+          fill="currentColor"
           x="93.0909091"
           y="139.636364"
           width="46.5454545"
@@ -232,7 +232,7 @@ export function Mistral(props: SVGAttributes) {
           height="46.5454545"
         />
         <rect
-          fill="#000000"
+          fill="currentColor"
           x="186.181818"
           y="139.636364"
           width="46.5454545"
@@ -246,7 +246,7 @@ export function Mistral(props: SVGAttributes) {
           height="46.5454545"
         />
         <rect
-          fill="#000000"
+          fill="currentColor"
           x="186.181818"
           y="186.181818"
           width="46.5454545"
