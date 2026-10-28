@@ -22,6 +22,7 @@ export function addAssistant(assistant: AssistantProps = defaultAssistant) {
   } as AssistantProps;
   newAssistant.id = nanoid();
   setStore('assistants', (a) => [...a, newAssistant]);
+  return newAssistant.id;
 }
 
 export function deleteAssistant(assistantId: string) {

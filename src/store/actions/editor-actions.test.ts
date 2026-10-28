@@ -34,10 +34,12 @@ afterEach(() => {
 it.each([assistant, { ...assistant, title: '   ', modelId: '' }])(
   'adds assistants without applying editor validation (%j)',
   (input) => {
-    expect(addAssistant(input)).toBeUndefined();
+    const id = addAssistant(input);
 
+    expect(typeof id).toBe('string');
     expect(store.assistants).toHaveLength(2);
     expect(store.assistants[1]).toMatchObject({
+      id,
       title: input.title,
       modelId: input.modelId,
       templateId: input.id,

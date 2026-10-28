@@ -59,18 +59,24 @@ import { addPreset, deletePreset } from '~/store/actions/presets';
 import { validatePreset } from '~/store/editor-validation';
 import { models } from '~/store/models';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
-import type { PresetProps } from '~/types';
+import type { AssistantProps, PresetProps } from '~/types';
 import { clone } from '~/util';
 
 import { addPresetChat, removePresetChat } from './preset-chats';
 
-const fetchPresets = async () => {
-  const response = await fetch('/presets.json');
-  return response.json();
+const fetchPresetGallery = async () => {
+  const [presetResponse, assistantResponse] = await Promise.all([
+    fetch('/presets.json'),
+    fetch('/assistants.json'),
+  ]);
+  return {
+    presets: (await presetResponse.json()) as PresetProps[],
+    assistants: (await assistantResponse.json()) as AssistantProps[],
+  };
 };
 
 export default function Presets() {
-  const [presets] = createResource(fetchPresets);
+  const [gallery] = createResource(fetchPresetGallery);
   const [selectedPreset, setSelectedPreset] = createSignal<PresetProps | null>(null);
   const [isModalOpen, setIsModalOpen] = createSignal(false);
   const [searchTerm, setSearchTerm] = createSignal('');
@@ -110,7 +116,10 @@ export default function Presets() {
   }
 
   function handleAddFromGallery(preset: PresetProps) {
-    addPreset(preset, presets());
+    const data = gallery();
+    if (!data) return;
+
+    addPreset(preset, data.assistants);
     setIsGalleryOpen(false);
     showSuccess('Preset added.');
   }
@@ -203,7 +212,7 @@ export default function Presets() {
         isOpen={isGalleryOpen()}
         onOpenChange={setIsGalleryOpen}
         onAddFromGallery={handleAddFromGallery}
-        presets={presets()}
+        presets={gallery()?.presets}
       />
     </div>
   );
@@ -445,7 +454,6 @@ const PresetDetails: Component<{
   isNewPreset: boolean;
 }> = (props) => {
   const [localPreset, setLocalPreset] = createStore<PresetProps>(clone(props.initialPreset));
-  const [presets] = createResource(fetchPresets);
   const validationError = () =>
     validatePreset(
       localPreset,
@@ -459,7 +467,7 @@ const PresetDetails: Component<{
 
     const preset = { ...localPreset, presetTitle: localPreset.presetTitle!.trim() };
     if (props.isNewPreset) {
-      addPreset(preset, presets());
+      addPreset(preset, store.assistants);
     } else {
       setStore('presets', (p) => p.id === props.initialPreset.id, preset);
     }

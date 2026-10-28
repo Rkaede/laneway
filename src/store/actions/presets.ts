@@ -11,22 +11,26 @@ export function addPreset(preset: PresetProps, assistants: AssistantProps[]) {
   const newPreset = clone(preset);
   newPreset.id = nanoid();
   newPreset.templateId = preset.id;
-  setStore('presets', (p) => [...p, newPreset]);
 
-  for (const chat of preset.chats) {
-    if (chat.assistantId) {
-      const assistant = assistants.find((a) => a.id === chat.assistantId);
+  for (const chat of newPreset.chats) {
+    if (!chat.assistantId) continue;
 
-      if (assistant) {
-        const assistantInList = store.assistants.find((a) => a.id === chat.assistantId);
+    const assistantInList =
+      store.assistants.find((a) => a.id === chat.assistantId) ??
+      store.assistants.find((a) => a.templateId === chat.assistantId);
 
-        if (!assistantInList) {
-          addAssistant(assistant);
-        }
-      }
+    if (assistantInList) {
+      chat.assistantId = assistantInList.id;
+      continue;
+    }
+
+    const assistant = assistants.find((a) => a.id === chat.assistantId);
+    if (assistant) {
+      chat.assistantId = addAssistant(assistant);
     }
   }
 
+  setStore('presets', (p) => [...p, newPreset]);
   return newPreset.id;
 }
 
