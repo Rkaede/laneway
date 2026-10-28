@@ -2,6 +2,7 @@ import { afterEach, expect, it, mock, spyOn } from 'bun:test';
 
 import type { ModelProps, ModelTags } from '~/types';
 
+const storageDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { fetchModels, models, modelsByCreator, setModels } = await import('./models');
 fetchMock.mockRestore();
@@ -9,6 +10,8 @@ fetchMock.mockRestore();
 afterEach(() => {
   mock.restore();
   setModels([]);
+  if (storageDescriptor) Object.defineProperty(globalThis, 'localStorage', storageDescriptor);
+  else Reflect.deleteProperty(globalThis, 'localStorage');
 });
 
 const model = (id: string, creator: string, deprecated = false): ModelProps => ({
@@ -30,6 +33,51 @@ it('loads the model catalogue', async () => {
   expect(fetch).toHaveBeenCalledWith('/models.json');
   expect(models).toEqual(catalogue);
 });
+
+it('removes the legacy catalogue without reading or writing model storage', async () => {
+  const data = new Map([
+    ['laneway-models', JSON.stringify([model('openai/legacy', 'OpenAI')])],
+    ['laneway-store', 'saved chats'],
+  ]);
+  const storage = {
+    getItem: mock((key: string) => data.get(key) ?? null),
+    setItem: mock((key: string, value: string) => data.set(key, value)),
+    removeItem: (key: string) => data.delete(key),
+  };
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
+  const catalogue = [model('openai/current', 'OpenAI')];
+  spyOn(globalThis, 'fetch').mockResolvedValue(Response.json(catalogue));
+
+  await fetchModels();
+
+  expect(models).toEqual(catalogue);
+  expect(data).toEqual(new Map([['laneway-store', 'saved chats']]));
+  expect(storage.getItem).not.toHaveBeenCalled();
+  expect(storage.setItem).not.toHaveBeenCalled();
+});
+
+it.each(['access', 'removal'])(
+  'loads models when legacy storage %s is blocked',
+  async (operation) => {
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        if (operation === 'access') throw new DOMException('Blocked', 'SecurityError');
+        return {
+          removeItem() {
+            throw new DOMException('Blocked', 'SecurityError');
+          },
+        };
+      },
+    });
+    const catalogue = [model('openai/current', 'OpenAI')];
+    spyOn(globalThis, 'fetch').mockResolvedValue(Response.json(catalogue));
+
+    await fetchModels();
+
+    expect(models).toEqual(catalogue);
+  },
+);
 
 it.each([
   { created: '2026-10-01T00:00:00Z', isNew: true },

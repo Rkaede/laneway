@@ -2,8 +2,6 @@ import { createStore } from 'solid-js/store';
 
 import type { ModelProps, ModelTags } from '~/types';
 
-import { makePersistedStore } from './persisted';
-
 // NOTE: we're moving data to be external from the application code
 // - This is a test to see if it improves performance. We'll need to test this and look at
 //   improvements such as caching via PWA.
@@ -14,6 +12,12 @@ import { makePersistedStore } from './persisted';
 // export const models = (await fetch('/models.json').then((res) => res.json())) as ModelProps[];
 
 export async function fetchModels() {
+  try {
+    globalThis.localStorage?.removeItem('laneway-models');
+  } catch {
+    // Storage may be unavailable; the catalogue only needs to stay in memory.
+  }
+
   try {
     const res = await fetch('/models.json');
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -36,10 +40,7 @@ export async function fetchModels() {
   );
 }
 
-// the warning given by the rule here is not helpful in this case
-export const [models, setModels] = makePersistedStore(createStore<ModelProps[]>([]), {
-  name: 'laneway-models',
-});
+export const [models, setModels] = createStore<ModelProps[]>([]);
 
 fetchModels();
 

@@ -2,8 +2,9 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { afterEach, expect, it } from 'bun:test';
+import { afterEach, expect, it, spyOn } from 'bun:test';
 import { loadConfigFromFile } from 'vite';
+import * as pwa from 'vite-plugin-pwa';
 
 const tailscaleUrl = process.env.PORTLESS_TAILSCALE_URL;
 const directories: string[] = [];
@@ -42,6 +43,49 @@ it('allows only the current Tailscale preview hostname', async () => {
   process.env.PORTLESS_TAILSCALE_URL = 'https://laneway.tail123.ts.net:8443';
 
   expect(await loadAllowedHosts()).toEqual(['laneway.tail123.ts.net']);
+});
+
+it('caches catalogues with a network-first fallback without caching provider APIs', async () => {
+  const createPWA = spyOn(pwa, 'VitePWA');
+
+  try {
+    await loadAllowedHosts();
+    const rules = createPWA.mock.calls[0]?.[0]?.workbox?.runtimeCaching ?? [];
+
+    expect(rules).toHaveLength(1);
+    const [rule] = rules;
+    expect(rule).toMatchObject({
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'laneway-catalogues',
+        networkTimeoutSeconds: 3,
+        expiration: { maxEntries: 3 },
+      },
+    });
+    expect(typeof rule.urlPattern).toBe('function');
+    const matches = rule.urlPattern as (context: { url: URL; sameOrigin: boolean }) => boolean;
+    const origin = 'https://laneway.example';
+
+    for (const path of ['/models.json', '/assistants.json', '/presets.json']) {
+      expect(matches({ url: new URL(path, origin), sameOrigin: true })).toBe(true);
+      for (const host of ['https://openrouter.ai', 'https://api.openai.com']) {
+        expect(matches({ url: new URL(path, host), sameOrigin: false })).toBe(false);
+      }
+    }
+    for (const value of [
+      'https://openrouter.ai/api/v1/models',
+      'https://openrouter.ai/api/v1/chat/completions',
+      'https://api.openai.com/v1/chat/completions',
+      `${origin}/api/v1/models`,
+      `${origin}/models.json/extra`,
+      `${origin}/other.json`,
+    ]) {
+      const url = new URL(value);
+      expect(matches({ url, sameOrigin: url.origin === origin })).toBe(false);
+    }
+  } finally {
+    createPWA.mockRestore();
+  }
 });
 
 async function loadBuildInfo(env: Record<string, string | undefined> = {}) {

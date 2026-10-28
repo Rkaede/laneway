@@ -49,6 +49,20 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && /^\/(?:models|assistants|presets)\.json$/.test(url.pathname),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'laneway-catalogues',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 3 },
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'Laneway',
         short_name: 'Laneway',
