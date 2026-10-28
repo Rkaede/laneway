@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it } from 'bun:test';
 
 const { createMessage } = await import('./message-utils');
 const { setModels } = await import('../store/models');
-const { setStore } = await import('../store');
+const { setStore, store } = await import('../store');
 
 beforeEach(() => {
   setModels([
@@ -31,10 +31,27 @@ beforeEach(() => {
     },
   ] as any);
 
+  setStore('assistants', [
+    { id: 'assistant-vision', title: 'Vision Assistant', modelId: 'vision' },
+    { id: 'assistant-no-vision', title: 'No Vision Assistant', modelId: 'no-vision' },
+  ]);
   setStore('draftChats', [
     { id: 'chat-vision', modelId: 'vision', status: 'idle', messages: [] },
     { id: 'chat-no-vision', modelId: 'no-vision', status: 'idle', messages: [] },
+    {
+      id: 'chat-assistant-vision',
+      assistantId: 'assistant-vision',
+      status: 'idle',
+      messages: [],
+    },
+    {
+      id: 'chat-assistant-no-vision',
+      assistantId: 'assistant-no-vision',
+      status: 'idle',
+      messages: [],
+    },
   ]);
+  setStore('chats', [...store.draftChats]);
 });
 
 describe('createMessage', () => {
@@ -55,5 +72,52 @@ describe('createMessage', () => {
     });
     expect(msg).toBeDefined();
     expect(Array.isArray(msg!.content)).toBe(true);
+  });
+
+  it.each([true, false])(
+    'rejects images for a non-vision assistant (draft: %s)',
+    async (draft) => {
+      const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+        chatIds: ['chat-assistant-no-vision'],
+        draft,
+      });
+
+      expect(msg).toBeUndefined();
+    },
+  );
+
+  it.each([true, false])(
+    'creates image messages for a vision assistant (draft: %s)',
+    async (draft) => {
+      const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+        chatIds: ['chat-assistant-vision'],
+        draft,
+      });
+
+      expect(msg?.content).toEqual([
+        { type: 'image', image: { filename: 'a.png', storageId: expect.any(String) } },
+        { type: 'text', text: 'hello' },
+      ]);
+    },
+  );
+
+  it('checks the assistant model before a model stored on the chat', async () => {
+    setStore('draftChats', (c) => c.id === 'chat-assistant-no-vision', 'modelId', 'vision');
+
+    const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+      chatIds: ['chat-assistant-no-vision'],
+      draft: true,
+    });
+
+    expect(msg).toBeUndefined();
+  });
+
+  it('rejects images when a mixed session includes a non-vision assistant', async () => {
+    const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+      chatIds: ['chat-vision', 'chat-assistant-no-vision'],
+      draft: true,
+    });
+
+    expect(msg).toBeUndefined();
   });
 });

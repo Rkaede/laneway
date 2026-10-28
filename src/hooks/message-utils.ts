@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { imageCache } from '~/services/image-cache';
 import { store } from '~/store';
 import { models } from '~/store/models';
+import { getChatModel } from '~/store/util';
 import type { ImagePart, MessageProps } from '~/types';
 
 export interface MessageContext {
@@ -27,7 +28,7 @@ export async function createMessage(
       const chat = context.draft
         ? store.draftChats.find((c) => c.id === chatId)
         : store.chats.find((c) => c.id === chatId);
-      const model = models.find((m) => m.id === chat?.modelId);
+      const model = getChatModel(chat, store.assistants, models);
       if (model?.vision === false) {
         return undefined;
       }

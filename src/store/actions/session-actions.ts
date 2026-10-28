@@ -19,7 +19,7 @@ import { getProvider } from '~/services/util';
 
 import { setStore, store } from '..';
 import { models } from '../models';
-import { createSessionFromPreset } from '../util';
+import { createSessionFromPreset, getChatModel } from '../util';
 
 export function addMessage(chatId: string, message: MessageProps) {
   const chatIndex = store.chats.findIndex((c) => c.id === chatId);
@@ -116,7 +116,7 @@ export function addMessageToSessionChats(
   if (session) {
     for (const chatId of session.chats) {
       const chat = store.chats.find((c) => c.id === chatId);
-      const model = models.find((m) => m.id === chat?.modelId);
+      const model = getChatModel(chat, store.assistants, models);
 
       const hasImageContent =
         Array.isArray(message.content) && message.content.some((part) => part.type === 'image');

@@ -1,7 +1,16 @@
 import { nanoid } from 'nanoid';
 
-import type { ChatProps, PresetProps, SessionProps } from '~/types';
+import type { AssistantProps, ChatProps, ModelProps, PresetProps, SessionProps } from '~/types';
 import { clone } from '~/util';
+
+export function getChatModel(
+  chat: Pick<ChatProps, 'assistantId' | 'modelId'> | undefined,
+  assistants: AssistantProps[],
+  models: ModelProps[],
+): ModelProps | undefined {
+  const assistant = assistants.find((a) => a.id === chat?.assistantId);
+  return models.find((m) => m.id === (assistant?.modelId ?? chat?.modelId));
+}
 
 export function createSessionFromPreset(preset: PresetProps) {
   const sessionId = nanoid();
