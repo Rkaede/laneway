@@ -1,8 +1,6 @@
 import { useParams } from '@solidjs/router';
 import { For, JSX, Match, Switch } from 'solid-js';
 
-import { cn } from '~/util';
-
 import * as AudioButtonStories from './audio-button.stories';
 import * as AvatarStories from './avatar.stories';
 import * as BadgeStories from './badge.stories';
@@ -19,26 +17,24 @@ import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
-const storyMap: Record<
-  string,
-  { title: string; stories: Record<string, () => JSX.Element>; noTheme?: boolean }
-> = {
-  'audio-button': { title: 'AudioButton', stories: AudioButtonStories },
-  avatar: { title: 'Avatar', stories: AvatarStories },
-  badge: { title: 'Badge', stories: BadgeStories },
-  button: { title: 'Button', stories: ButtonStories },
-  chatcard: { title: 'ChatCard', stories: ChatCardStories },
-  'chat-input': { title: 'ChatInput', stories: ChatInputStories },
-  codeblock: { title: 'CodeBlock', stories: CodeblockStories },
-  icons: { title: 'Icons', stories: IconStories },
-  'icon-badge': { title: 'IconBadge', stories: IconBadgeStories },
-  lightbox: { title: 'Lightbox', stories: LightboxStories },
-  message: { title: 'Message', stories: MessageStories },
-  'multi-combobox': { title: 'MultiCombobox', stories: MultiComboboxStories },
-  'stats-popover': { title: 'StatsPopover', stories: StatsPopoverStories },
-  switch: { title: 'Switch', stories: SwitchStories },
-  'use-animated-text': { title: 'useAnimatedText', stories: UseAnimatedText, noTheme: true },
-};
+const storyMap: Record<string, { title: string; stories: Record<string, () => JSX.Element> }> =
+  {
+    'audio-button': { title: 'AudioButton', stories: AudioButtonStories },
+    avatar: { title: 'Avatar', stories: AvatarStories },
+    badge: { title: 'Badge', stories: BadgeStories },
+    button: { title: 'Button', stories: ButtonStories },
+    chatcard: { title: 'ChatCard', stories: ChatCardStories },
+    'chat-input': { title: 'ChatInput', stories: ChatInputStories },
+    codeblock: { title: 'CodeBlock', stories: CodeblockStories },
+    icons: { title: 'Icons', stories: IconStories },
+    'icon-badge': { title: 'IconBadge', stories: IconBadgeStories },
+    lightbox: { title: 'Lightbox', stories: LightboxStories },
+    message: { title: 'Message', stories: MessageStories },
+    'multi-combobox': { title: 'MultiCombobox', stories: MultiComboboxStories },
+    'stats-popover': { title: 'StatsPopover', stories: StatsPopoverStories },
+    switch: { title: 'Switch', stories: SwitchStories },
+    'use-animated-text': { title: 'useAnimatedText', stories: UseAnimatedText },
+  };
 
 export default function StoryPage() {
   const params = useParams<{ story: string }>();
@@ -48,7 +44,7 @@ export default function StoryPage() {
     <Switch>
       <Match when={!story()}>
         <div class="flex h-full items-center justify-center">
-          <p class="text-muted-foreground">Story not found</p>
+          <p class="text-muted">Story not found</p>
         </div>
       </Match>
       <Match when={story()}>
@@ -60,25 +56,10 @@ export default function StoryPage() {
                 return (
                   <div>
                     <h3 class="mb-4 text-lg font-semibold">{name}</h3>
-                    <div class="flex flex-col gap-4">
-                      {story().noTheme ? (
-                        <StoryContainer>
-                          <Component />
-                        </StoryContainer>
-                      ) : (
-                        <>
-                          <ThemeProvider theme="light">
-                            <StoryContainer>
-                              <Component />
-                            </StoryContainer>
-                          </ThemeProvider>
-                          <ThemeProvider theme="dark">
-                            <StoryContainer>
-                              <Component />
-                            </StoryContainer>
-                          </ThemeProvider>
-                        </>
-                      )}
+                    <div class="rounded-card border bg-surface-raised px-12 py-6">
+                      <StoryContainer>
+                        <Component />
+                      </StoryContainer>
                     </div>
                   </div>
                 );
@@ -88,18 +69,6 @@ export default function StoryPage() {
         </div>
       </Match>
     </Switch>
-  );
-}
-
-function ThemeProvider(props: { children: JSX.Element; theme?: 'light' | 'dark' }) {
-  return (
-    <div
-      class={cn(props.theme, 'rounded bg-background-main px-12 py-6 text-foreground', {
-        border: props.theme !== 'dark',
-      })}
-    >
-      {props.children}
-    </div>
   );
 }
 

@@ -29,9 +29,9 @@ export function Changing() {
 
   return (
     <div class="flex max-w-md flex-col gap-4">
-      <p class="whitespace-pre-line font-mono">{animatedText.animatedText()}</p>
+      <p class="font-mono whitespace-pre-line">{animatedText.animatedText()}</p>
       <button
-        class="w-fit rounded-md bg-background-2 px-4 py-2 hover:bg-background-3"
+        class="w-fit rounded-md bg-surface-hover px-4 py-2 hover:bg-surface-pressed"
         onClick={appendText}
       >
         Append Text

@@ -42,7 +42,7 @@ if (root) {
             <Route
               path="/"
               component={() => (
-                <div class="flex h-full items-center justify-center text-muted-foreground">
+                <div class="flex h-full items-center justify-center text-muted">
                   Select a story from the sidebar
                 </div>
               )}
