@@ -99,11 +99,11 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
       <div class="flex h-full w-full flex-col overflow-hidden">
         <div class="flex w-full justify-center gap-1 border-b px-4 py-2" inert={!props.open}>
           <Button onClick={handleNewChat} variant="outline" size="sm" class="justify-start">
-            <IconPlus class="mr-2 h-4 w-4" />
+            <IconPlus class="h-4 w-4" />
             Chat
           </Button>
           <Button onClick={handleNewNote} variant="outline" size="sm" class="justify-start">
-            <IconPlus class="mr-2 h-4 w-4" />
+            <IconPlus class="h-4 w-4" />
             Note
           </Button>
         </div>
@@ -149,11 +149,11 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
           </SidebarLinkItem>
         </SidebarItems>
       </div>
-      <div class="absolute bottom-0 right-0 top-0 z-10 flex translate-x-full items-center">
+      <div class="absolute top-0 right-0 bottom-0 z-10 flex translate-x-full items-center">
         <button
           type="button"
           aria-label="Toggle sidebar"
-          class="flex items-center justify-center bg-transparent p-0 hover:outline-none"
+          class="flex items-center justify-center bg-transparent p-0 hover:outline-hidden"
           onClick={toggleSidebar}
         >
           <SidebarIcon open={props.open} />
@@ -174,7 +174,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
       <DropdownMenuTrigger
         as={Button}
         aria-label="Session actions"
-        class="flex size-6 items-center justify-center rounded-md p-0 text-muted-foreground opacity-0 transition-none hover:text-foreground group-hover:opacity-100 data-[open='true']:opacity-100"
+        class="flex size-6 items-center justify-center rounded-md p-0 text-muted opacity-0 transition-none group-hover:opacity-100 hover:text-main data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
         size="icon"

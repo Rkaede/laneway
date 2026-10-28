@@ -8,7 +8,9 @@ import { IconLoaderCircle } from '../icons/ui';
 export const SidebarGroup: ParentComponent<SidebarGroupProps> = (props) => {
   return (
     <div class="px-2 pb-6">
-      <div class="px-2 py-1 pb-1 text-sm font-semibold">{props.title}</div>
+      <div class="px-2 py-1 pb-1 text-nav-group font-nav-group text-nav-group-fg">
+        {props.title}
+      </div>
       {props.children}
     </div>
   );
@@ -24,25 +26,25 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
       <a
         href={props.href}
         class={cn(
-          'group flex items-center gap-1 rounded-lg border border-transparent px-2 py-0.5 font-normal text-foreground hover:bg-background-2',
-          props.active && 'bg-background-2 hover:bg-background-3',
+          'group flex min-h-nav-item-h items-center gap-1 rounded-md border border-transparent px-2 py-nav-item-y font-nav text-sidebar-item hover:bg-sidebar-accent',
+          props.active && 'bg-sidebar-accent text-sidebar-accent-fg',
           props.class,
         )}
         onMouseDown={(e) => e.currentTarget.click()}
       >
-        <div class="flex flex-1 items-center gap-1 text-sm">
+        <div class="flex flex-1 items-center gap-1 text-nav">
           <Show when={props.icon}>
             <span>{props.icon}</span>
           </Show>
           <span class="truncate">{props.children}</span>
         </div>
         <Show when={props.isLoading}>
-          <div class="flex h-6 flex-shrink-0 items-center">
+          <div class="flex h-6 shrink-0 items-center">
             <IconLoaderCircle class="size-4 animate-spin" />
           </div>
         </Show>
         <Show when={props.dropdown && props.isLoading !== true}>
-          <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
+          <div class="flex h-6 shrink-0 items-center">{props.dropdown}</div>
         </Show>
       </a>
     </li>
@@ -50,16 +52,16 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
 };
 
 const sidebarItem = cva(
-  'group flex cursor-pointer items-center rounded-lg border border-transparent text-sm',
+  'group flex cursor-pointer items-center rounded-md border border-transparent text-nav font-nav text-sidebar-item',
   {
     variants: {
       active: {
-        true: 'bg-background-2 hover:bg-background-3',
-        false: 'hover:bg-background-3',
+        true: 'bg-sidebar-accent text-sidebar-accent-fg',
+        false: 'hover:bg-sidebar-accent',
       },
       size: {
-        md: 'py-0.5 px-2 gap-1',
-        lg: 'py-2 px-3 gap-2',
+        md: 'min-h-nav-item-h gap-1 px-2 py-nav-item-y',
+        lg: 'gap-2 px-3 py-2',
       },
     },
     defaultVariants: {
@@ -78,7 +80,7 @@ export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
         </Show>
         <span class="flex-1 truncate">{props.children}</span>
         <Show when={props.dropdown}>
-          <div class="flex h-6 flex-shrink-0 items-center">{props.dropdown}</div>
+          <div class="flex h-6 shrink-0 items-center">{props.dropdown}</div>
         </Show>
       </button>
     </li>
