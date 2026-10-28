@@ -1,7 +1,9 @@
 import { nanoid } from 'nanoid';
+import { batch } from 'solid-js';
 
 import { setStore, store } from '~/store';
 import { addAssistant } from '~/store/actions/assistants';
+import { defaults } from '~/store/default-state';
 import type { AssistantProps, PresetProps } from '~/types';
 import { clone } from '~/util';
 
@@ -29,13 +31,22 @@ export function addPreset(preset: PresetProps, assistants: AssistantProps[]) {
 }
 
 export function deletePreset(id: string) {
-  // Remove the preset from the presets list
-  setStore('presets', (presets) => presets.filter((preset) => preset.id !== id));
+  batch(() => {
+    if (
+      store.settings.defaultSession.type === 'preset' &&
+      store.settings.defaultSession.id === id
+    ) {
+      setStore('settings', 'defaultSession', { ...defaults.settings.defaultSession });
+    }
 
-  // Remove the preset from the speed dial if it exists
-  setStore('speedDial', (items) =>
-    items.filter((item) => !(item.type === 'preset' && item.referenceId === id)),
-  );
+    // Remove the preset from the presets list
+    setStore('presets', (presets) => presets.filter((preset) => preset.id !== id));
+
+    // Remove the preset from the speed dial if it exists
+    setStore('speedDial', (items) =>
+      items.filter((item) => !(item.type === 'preset' && item.referenceId === id)),
+    );
+  });
 }
 
 export function setPresetName(presetId: string, name: string) {

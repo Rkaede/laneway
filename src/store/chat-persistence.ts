@@ -1,4 +1,4 @@
-import type { createDefaultState } from './default-state';
+import { type createDefaultState, defaults } from './default-state';
 
 export function serializeChatStore(state: ReturnType<typeof createDefaultState>) {
   return JSON.stringify(state, (key, value) => (key === 'controller' ? undefined : value));
@@ -19,6 +19,30 @@ export function deserializeChatStore(serialized: string) {
     }
     if (assistant.templateId === 'flashcards-gpt-4o') {
       assistant.templateId = 'flashcards';
+    }
+  }
+
+  const assistantIds = new Set(state.assistants.map((assistant) => assistant.id));
+  const { defaultSession, noteModel } = state.settings;
+  if (
+    (defaultSession.type === 'assistant' && !assistantIds.has(defaultSession.id)) ||
+    (defaultSession.type === 'preset' &&
+      !state.presets.some((preset) => preset.id === defaultSession.id))
+  ) {
+    state.settings.defaultSession = { ...defaults.settings.defaultSession };
+  }
+  if (noteModel?.type === 'assistant' && !assistantIds.has(noteModel.referenceId)) {
+    state.settings.noteModel = { ...defaults.settings.noteModel };
+  }
+
+  for (const chat of [
+    ...state.chats,
+    ...state.draftChats,
+    ...state.presets.flatMap((preset) => preset.chats),
+  ]) {
+    if (chat.assistantId && !assistantIds.has(chat.assistantId)) {
+      delete chat.assistantId;
+      chat.modelId ||= defaults.settings.defaultSession.id;
     }
   }
 

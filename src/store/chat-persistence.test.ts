@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 
 import { assistants } from '../../scripts/data/assistants';
 import { deserializeChatStore, serializeChatStore } from './chat-persistence';
-import { createDefaultState } from './default-state';
+import { createDefaultState, defaults } from './default-state';
 
 describe('chat persistence', () => {
   it('omits controllers without changing a running request in memory', () => {
@@ -64,6 +64,42 @@ describe('chat persistence', () => {
       expect(restored.chats[0].status).toBe(status);
       expect(restored.chats[0].controller).toBeUndefined();
       expect(restored.chats[0].error).toEqual(state.chats[0].error);
+    },
+  );
+
+  it.each(['assistant', 'preset'] as const)(
+    'recovers references left behind by earlier %s deletions',
+    (type) => {
+      const state = createDefaultState();
+      state.settings.defaultSession = { type, id: 'deleted' };
+      state.settings.noteModel = { type: 'assistant', referenceId: 'deleted' };
+      state.chats[0].assistantId = 'deleted';
+      state.chats[0].modelId = 'saved-model';
+      state.draftChats[0].assistantId = 'deleted';
+      delete state.draftChats[0].modelId;
+      state.presets[0].chats = [
+        { assistantId: 'deleted', status: 'idle' },
+        { modelId: 'deleted', status: 'idle' },
+        { assistantId: 'kept', status: 'idle' },
+      ];
+      state.assistants = [{ id: 'kept', title: 'Kept assistant', modelId: 'kept-model' }];
+
+      const restored = deserializeChatStore(serializeChatStore(state));
+
+      expect(restored.settings.defaultSession).toEqual(defaults.settings.defaultSession);
+      expect(restored.settings.noteModel).toEqual(defaults.settings.noteModel);
+      expect(restored.chats[0].assistantId).toBeUndefined();
+      expect(restored.chats[0].modelId).toBe('saved-model');
+      expect(restored.chats[0].messages).toEqual(state.chats[0].messages);
+      expect(restored.draftChats[0].assistantId).toBeUndefined();
+      expect(restored.draftChats[0].modelId).toBe(defaults.settings.defaultSession.id);
+      expect(restored.presets[0].chats).toEqual([
+        { modelId: defaults.settings.defaultSession.id, status: 'idle' },
+        { modelId: 'deleted', status: 'idle' },
+        { assistantId: 'kept', status: 'idle' },
+      ]);
+      expect(restored.sessions).toEqual(state.sessions);
+      expect(deserializeChatStore(serializeChatStore(restored))).toEqual(restored);
     },
   );
 
