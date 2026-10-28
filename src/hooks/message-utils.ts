@@ -29,7 +29,7 @@ export async function createMessage(
         ? store.draftChats.find((c) => c.id === chatId)
         : store.chats.find((c) => c.id === chatId);
       const model = getChatModel(chat, store.assistants, models);
-      if (model?.vision === false) {
+      if (model?.vision !== true) {
         return undefined;
       }
     }

@@ -64,6 +64,22 @@ describe('createMessage', () => {
     expect(msg).toBeUndefined();
   });
 
+  it.each([true, false])(
+    'rejects images without confirmed vision support (draft: %s)',
+    async (draft) => {
+      setModels(0, 'vision', undefined);
+
+      for (const chatId of ['chat-vision', 'chat-assistant-vision']) {
+        const msg = await createMessage('hello', [new File(['a'], 'a.png')], {
+          chatIds: [chatId],
+          draft,
+        });
+
+        expect(msg).toBeUndefined();
+      }
+    },
+  );
+
   it('creates a message with image parts when vision is supported', async () => {
     const file = new File(['a'], 'a.png');
     const msg = await createMessage('hello', [file], {
