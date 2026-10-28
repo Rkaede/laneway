@@ -1,5 +1,5 @@
 import { useLocation } from '@solidjs/router';
-import { Component, createEffect, For, lazy, Show } from 'solid-js';
+import { Component, createEffect, createSignal, For, lazy, Show } from 'solid-js';
 
 import { IconPlus, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
@@ -7,6 +7,7 @@ import config from '~/config';
 import { cn } from '~/util';
 
 import { Thumbnail } from '../ui';
+import { validateAttachmentFiles } from './attachment-files';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 interface PromptProps {
@@ -22,18 +23,12 @@ interface PromptProps {
   onSubmit: (value: string) => void;
 }
 
-interface FileSelectDetail {
-  target: { files: FileList | null };
-}
-
-const isValidImageType = (file: File): boolean => {
-  return config.attachments.types.includes(file.type);
-};
-
 export const ChatInput: Component<PromptProps> = (props) => {
   let fileInputRef: HTMLInputElement | undefined;
   let ref: HTMLTextAreaElement | undefined;
   const location = useLocation();
+  const [fileErrors, setFileErrors] = createSignal<string[]>([]);
+  const [isDragging, setIsDragging] = createSignal(false);
 
   createEffect(() => {
     if (location.pathname && ref) {
@@ -41,31 +36,55 @@ export const ChatInput: Component<PromptProps> = (props) => {
     }
   });
 
-  const handleFileSelect = (
-    event:
-      | (Event & { currentTarget: HTMLInputElement; target: Element })
-      | CustomEvent<FileSelectDetail>,
-  ) => {
-    const file =
-      'detail' in event
-        ? event.detail.target.files?.[0]
-        : (event.target as HTMLInputElement).files?.[0];
+  const handleFiles = (files: Iterable<File>) => {
+    if (!props.hasVision || props.isLoading) return;
 
-    if (file && isValidImageType(file)) {
+    const result = validateAttachmentFiles(files);
+    setFileErrors(result.errors);
+    for (const file of result.files) {
       props.onFileSelect?.(file);
-      // remove the file from the input
-      (event.target as HTMLInputElement).value = '';
     }
   };
 
-  const handlePasteFile = (event: ClipboardEvent) => {
-    const file = Array.from(event.clipboardData?.items || [])
-      .find((item) => item.type.startsWith('image/'))
-      ?.getAsFile();
+  const handleFileSelect = (event: Event & { currentTarget: HTMLInputElement }) => {
+    handleFiles(event.currentTarget.files || []);
+    event.currentTarget.value = '';
+  };
 
-    if (file && isValidImageType(file)) {
-      props.onFileSelect?.(file);
+  const handlePasteFile = (event: ClipboardEvent) => {
+    const files = event.clipboardData?.files;
+    if (!files?.length) return;
+
+    event.preventDefault();
+    handleFiles(files);
+  };
+
+  const handleDragOver = (event: DragEvent) => {
+    if (!event.dataTransfer?.types.includes('Files')) return;
+
+    event.preventDefault();
+    const canAttach = !!props.hasVision && !props.isLoading;
+    event.dataTransfer.dropEffect = canAttach ? 'copy' : 'none';
+    setIsDragging(canAttach);
+  };
+
+  const handleDragLeave = (event: DragEvent & { currentTarget: HTMLDivElement }) => {
+    if (
+      !(event.relatedTarget instanceof Node) ||
+      !event.currentTarget.contains(event.relatedTarget)
+    ) {
+      setIsDragging(false);
     }
+  };
+
+  // Capture file drops before the editor reads them as text.
+  const handleDrop = (event: DragEvent) => {
+    if (!event.dataTransfer?.types.includes('Files')) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+    handleFiles(event.dataTransfer.files);
   };
 
   function handleSubmit() {
@@ -81,7 +100,12 @@ export const ChatInput: Component<PromptProps> = (props) => {
   };
 
   return (
-    <div class="relative mx-auto w-full max-w-[534px]">
+    <div
+      class="relative mx-auto w-full max-w-[534px]"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      on:drop={{ handleEvent: handleDrop, capture: true }}
+    >
       <Show when={props.attachments && props.attachments.length > 0}>
         <div class="absolute top-0 left-2 ml-3 flex w-full -translate-y-full gap-2 py-2">
           <For each={props.attachments || []}>
@@ -103,6 +127,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
           }}
           class={cn(
             'relative flex flex-1 items-end gap-1 rounded-composer border border-composer-border bg-composer pt-0 pr-4 shadow-composer transition-[color,box-shadow] focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
+            isDragging() && 'border-field-focus ring-2 ring-border-focus/50',
             props.hasVision ? 'pl-1.5' : 'pl-4',
             props.class,
           )}
@@ -112,15 +137,18 @@ export const ChatInput: Component<PromptProps> = (props) => {
               variant="ghost"
               size="icon"
               disabled={props.isLoading}
+              title={`Attach or drop PNG, JPEG, GIF or WebP images (up to ${config.attachments.maxSize / 1024 / 1024} MiB each)`}
               class="my-3 size-7 shrink-0 p-0 text-faint hover:text-main"
               onClick={() => fileInputRef?.click()}
             >
               <IconPlus class="size-4" />
-              <span class="sr-only">Attach file</span>
+              <span class="sr-only">Attach files</span>
             </Button>
             <input
               type="file"
               ref={fileInputRef}
+              multiple
+              disabled={props.isLoading}
               accept={config.attachments.extensions.join(',')}
               class="hidden"
               onChange={handleFileSelect}
@@ -148,6 +176,11 @@ export const ChatInput: Component<PromptProps> = (props) => {
           </Show>
         </form>
       </div>
+      <Show when={fileErrors().length > 0}>
+        <ul role="alert" class="-mt-2 mb-4 px-4 text-sm text-danger">
+          <For each={fileErrors()}>{(error) => <li>{error}</li>}</For>
+        </ul>
+      </Show>
     </div>
   );
 };
