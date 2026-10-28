@@ -31,7 +31,27 @@ process.env.VITE_APP_VERSION = packageJson.version;
 process.env.VITE_APP_LICENSE = packageJson.license;
 
 export default defineConfig({
-  plugins: [solid(), tailwindcss(), VitePWA({ registerType: 'autoUpdate' })],
+  plugins: [
+    solid(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Laneway',
+        short_name: 'Laneway',
+        description: 'Chat with multiple AI providers from a browser-only app.',
+        theme_color: '#2783eb',
+        background_color: '#fafafa',
+        start_url: '/',
+        display: 'standalone',
+        icons: [
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+        ],
+      },
+    }),
+  ],
   optimizeDeps: {
     // Add both @codemirror/state and @codemirror/view to included deps to optimize
     include: [
