@@ -30,7 +30,6 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
           props.active && 'bg-sidebar-accent text-sidebar-accent-fg',
           props.class,
         )}
-        onMouseDown={(e) => e.currentTarget.click()}
       >
         <div class="flex flex-1 items-center gap-1 text-nav">
           <Show when={props.icon}>
