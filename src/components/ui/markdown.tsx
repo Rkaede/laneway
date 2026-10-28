@@ -5,11 +5,24 @@ import { SolidMarkdown } from 'solid-markdown';
 import { CodeBlock } from '~/components/ui';
 import { cn, sanitizeMessage } from '~/util';
 
+import { sanitizeMarkdownLink } from './markdown-links';
+
 const Markdown: Component<{ text: string }> = (props) => {
   return (
     <SolidMarkdown
       remarkPlugins={[remarkGfm]}
+      transformLinkUri={sanitizeMarkdownLink}
       components={{
+        a(linkProps) {
+          return (
+            <Show when={linkProps.href} fallback={<span>{linkProps.children}</span>}>
+              <a {...linkProps} />
+            </Show>
+          );
+        },
+        img(imageProps) {
+          return <span>{imageProps.alt}</span>;
+        },
         pre(preProps) {
           return <pre class="not-prose overflow-hidden rounded-card" {...preProps} />;
         },
