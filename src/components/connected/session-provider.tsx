@@ -1,7 +1,7 @@
 import type { ParentProps } from 'solid-js';
 import { createContext, useContext } from 'solid-js';
 
-import { setStore, store } from '~/store';
+import { cancel } from '~/services/chat-controller';
 import { selectChatById } from '~/store/selectors';
 import type { SessionProps as StoreSessionProps } from '~/types';
 
@@ -22,14 +22,8 @@ export function SessionProvider(props: SessionProps) {
   function cancelChats() {
     if (!props.session) return;
 
-    store.chats.forEach((chat) => {
-      if (props.session.chats.includes(chat.id)) {
-        chat.controller?.abort();
-        setStore('chats', (c) => c.id === chat.id, {
-          status: 'canceled',
-          controller: undefined,
-        });
-      }
+    props.session.chats.forEach((chatId) => {
+      cancel({ chatId });
     });
   }
 

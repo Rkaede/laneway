@@ -46,6 +46,49 @@ beforeEach(() => {
   setStore('chats', [{ id: chatId, status: 'loading', messages: [prompt] }]);
 });
 
+describe('chat cancellation', () => {
+  it.each(['Partial response', undefined])(
+    'saves one canceled reply and clears the request (partial: %s)',
+    async (content) => {
+      const controller = new AbortController();
+      setStore('chats', 0, {
+        controller,
+        latest: content ? { id: 'partial', role: 'assistant', content } : undefined,
+      });
+
+      await cancel({ chatId });
+      await cancel({ chatId });
+
+      expect(controller.signal.aborted).toBe(true);
+      expect(store.chats[0].status).toBe('canceled');
+      expect(store.chats[0].controller).toBeUndefined();
+      expect(store.chats[0].latest).toBeUndefined();
+      expect(store.chats[0].messages).toEqual([
+        prompt,
+        {
+          id: expect.any(String),
+          role: 'assistant',
+          status: 'canceled',
+          content: content ?? '',
+          cancelled: true,
+          usage: { created: expect.any(Number), timeTaken: 0 },
+        },
+      ]);
+    },
+  );
+
+  it.each(['idle', 'error', 'canceled'] as const)(
+    'leaves a %s chat unchanged when canceling a session',
+    async (status) => {
+      setStore('chats', 0, 'status', status);
+
+      await cancel({ chatId });
+
+      expect(store.chats[0]).toEqual({ id: chatId, status, messages: [prompt] });
+    },
+  );
+});
+
 describe('chat recovery', () => {
   it('ends loading with an error when no stream is available', async () => {
     setStore('chats', 0, 'latest', { role: 'assistant', content: 'Partial response' });
@@ -126,6 +169,9 @@ describe('chat recovery', () => {
       await cancel({ chatId });
 
       expect(store.chats[0].status).toBe('canceled');
+      expect(store.chats[0].controller).toBeUndefined();
+      expect(store.chats[0].latest).toBeUndefined();
+      expect(store.chats[0].messages.at(-1)?.content).toBe('Partial');
       expect(store.chats[0].messages.at(-1)?.cancelled).toBe(true);
 
       addMessageToSessionChats({ id: 'next', role: 'user', content: 'Next' }, sessionId);

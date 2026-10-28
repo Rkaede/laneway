@@ -11,7 +11,7 @@ import { selectChatById } from '~/store/selectors';
 
 export async function cancel({ chatId }: { chatId: string }) {
   const chat = selectChatById(chatId)();
-  if (!chat) return;
+  if (!chat || chat.status !== 'loading') return;
 
   chat.controller?.abort();
 
@@ -27,8 +27,11 @@ export async function cancel({ chatId }: { chatId: string }) {
     },
   });
 
-  setStore('chats', (c) => c.id === chatId, 'latest', undefined);
-  setStore('chats', (c) => c.id === chatId, 'status', 'canceled');
+  setStore('chats', (c) => c.id === chatId, {
+    controller: undefined,
+    latest: undefined,
+    status: 'canceled',
+  });
 }
 
 export async function append({
