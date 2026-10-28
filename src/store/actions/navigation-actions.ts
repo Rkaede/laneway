@@ -53,7 +53,7 @@ export const navigationActions: Actions = {
     icon: IconListRestart,
     fn: (context: ActionContext) => {
       if (store.sessions.length === 0) return;
-      const latest = store.sessions.sort((a, b) => b.created - a.created)[0];
+      const latest = [...store.sessions].sort((a, b) => b.created - a.created)[0];
       context.navigate(`/session/${latest.id}`);
     },
   },
