@@ -10,7 +10,7 @@ export const AlertError: Component<{ error: { message: string }; onRetry: () => 
     <Alert variant="destructive">
       <IconCircleX class="h-4 w-4" />
       <AlertTitle>Error</AlertTitle>
-      <AlertDescription>{props.error.message}</AlertDescription>
+      <AlertDescription class="wrap-anywhere">{props.error.message}</AlertDescription>
       <Button class="mt-2" variant="outline" onClick={props.onRetry}>
         Retry
       </Button>
