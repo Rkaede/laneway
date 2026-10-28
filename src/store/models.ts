@@ -44,11 +44,6 @@ export const [models, setModels] = createStore<ModelProps[]>([]);
 
 fetchModels();
 
-export const providers = {
-  openai: 'OpenAI',
-  openrouter: 'OpenRouter',
-};
-
 export const modelsByCreator = () =>
   models.reduce(
     (acc, model) => {

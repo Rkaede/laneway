@@ -42,11 +42,6 @@ export async function fetchModels() {
   }
 }
 
-export const providers = {
-  openai: 'OpenAI',
-  openrouter: 'OpenRouter',
-};
-
 const defaults = {
   openai: {
     creator: { name: 'OpenAI', website: 'https://openai.com/', icon: 'OpenAI', id: 'openai' },

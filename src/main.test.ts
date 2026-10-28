@@ -40,7 +40,15 @@ it('excludes developer code and builds an installable production PWA', async () 
       (file) => file === 'src/routes/debug.tsx' || file.startsWith('src/routes/sandbox/'),
     );
     expect(developerRoutes).toEqual([]);
+    expect(manifest['src/services/llm-mock.ts']).toBeUndefined();
     expect(manifest['src/routes/settings/settings.tsx']).toBeDefined();
+
+    for (const chunk of Object.values(manifest)) {
+      if (!chunk.file.endsWith('.js')) continue;
+      const code = await Bun.file(join(directory, chunk.file)).text();
+      expect(code.includes('aperture/glados'), chunk.file).toBe(false);
+      expect(code.includes('This was a triumph'), chunk.file).toBe(false);
+    }
 
     const editor = manifest['src/components/ui/text-editor/text-editor.tsx'];
     expect(editor).toBeDefined();

@@ -4,7 +4,6 @@ import { OPENROUTER_URL } from '~/constants';
 import { apiKeys } from '~/store/keys';
 import type { MessageProps } from '~/types';
 
-import { mockStream } from './llm-mock';
 import { createThrottle, formatMessages } from './util';
 
 // OpenAI's provider defaults to the Responses API, which stores conversations server-side and is
@@ -33,7 +32,8 @@ export async function getStream(
 
   throttle();
 
-  if (modelId === 'aperture/glados') {
+  if (import.meta.env.DEV && modelId === 'aperture/glados') {
+    const { mockStream } = await import('./llm-mock');
     return mockStream({ abortSignal: options?.abortSignal });
   }
 

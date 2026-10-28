@@ -34,7 +34,6 @@
 
 @import './button.css';
 @import './input.css';
-@import './scroll-area.css';
 
 @layer base {
   *,
