@@ -190,8 +190,9 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
           <DropdownMenuItem
             onClick={() => {
               if (!props.sessionId) return;
-              deleteSession(props.sessionId);
-              navigate('/');
+              if (deleteSession(props.sessionId)) {
+                navigate('/');
+              }
             }}
           >
             Delete

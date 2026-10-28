@@ -184,7 +184,14 @@ function deleteImagesForChat(chatId: string) {
 
 export function deleteSession(sessionId: string) {
   const session = store.sessions.find((s) => s.id === sessionId);
-  if (!session) return;
+  if (!session) return false;
+  if (
+    !window.confirm(
+      `Delete "${session.title}" and all of its messages and images? This cannot be undone.`,
+    )
+  ) {
+    return false;
+  }
 
   deleteImagesForSession(sessionId);
 
@@ -196,6 +203,7 @@ export function deleteSession(sessionId: string) {
     'sessions',
     store.sessions.filter((s) => s.id !== sessionId),
   );
+  return true;
 }
 
 export function renameSession(sessionId: string, title: string) {
@@ -279,8 +287,9 @@ export const sessionActions: Actions = {
     fn: (context: ActionContext) => {
       const sessionId = context.params.id;
       if (!sessionId) return;
-      deleteSession(sessionId);
-      context.navigate('/');
+      if (deleteSession(sessionId)) {
+        context.navigate('/');
+      }
     },
   },
 } as const;
