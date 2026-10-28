@@ -87,7 +87,7 @@ export const WelcomeContent: Component<{
                     target="_blank"
                   >
                     <IconGithub class="size-4" />
-                    View on Github
+                    View on GitHub
                   </Button>
                   <Button onClick={handleAddKeys}>
                     <IconKey class="size-4" />

@@ -60,7 +60,7 @@ export default function ModelList() {
       <div>
         <PageTitle>Models</PageTitle>
         <SectionDescription>
-          Models will be updated with new releases of laneway. Please note that the pricing may
+          Models will be updated with new releases of Laneway. Please note that the pricing may
           be out of date.
         </SectionDescription>
       </div>

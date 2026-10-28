@@ -514,7 +514,7 @@ const PresetDetails: Component<{
             />
           </TextField>
           <div class="mt-1 text-xs text-muted">
-            Example: <i>Improve the write of the following. Give 5 options</i>
+            Example: <i>Improve the writing of the following. Give 5 options.</i>
           </div>
         </div>
         <AssistantList

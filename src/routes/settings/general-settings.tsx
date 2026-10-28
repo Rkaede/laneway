@@ -54,7 +54,7 @@ export function GeneralSettings() {
       </Setting>
       <Setting
         title="System Model"
-        description="This model is used by the app to generate title for new sessions."
+        description="This model is used by the app to generate titles for new sessions."
       >
         <MultiCombobox
           value={{ id: store.settings.systemModel, type: 'model' }}

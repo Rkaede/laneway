@@ -30,7 +30,7 @@ export function APIKeySetting() {
   return (
     <Section
       title="API Keys"
-      description="Keys are stored locally in your browser and are used to connect to the providers API."
+      description="Keys are stored locally in your browser and are used to connect to provider APIs."
       anchor="api-keys"
     >
       <Setting
@@ -44,7 +44,12 @@ export function APIKeySetting() {
             </p>
             <p>
               You can get a key from the{' '}
-              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">
+              <a
+                class="text-main underline underline-offset-4"
+                href="https://openrouter.ai/keys"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 OpenRouter keys page
               </a>
               .
@@ -91,6 +96,7 @@ export function APIKeySetting() {
             Used for selected OpenAI models and TTS. GPT-5.x requires OpenRouter. You can get a
             key from the{' '}
             <a
+              class="text-main underline underline-offset-4"
               href="https://platform.openai.com/api-keys"
               target="_blank"
               rel="noopener noreferrer"

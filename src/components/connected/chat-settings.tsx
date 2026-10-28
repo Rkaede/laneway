@@ -71,7 +71,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
 
       <div>
         <SettingTitle>System Prompt</SettingTitle>
-        <SettingDescription>Leave blank to use the models default.</SettingDescription>
+        <SettingDescription>Leave blank to use the model's default.</SettingDescription>
         <TextField>
           <TextArea
             class="resize-none"
