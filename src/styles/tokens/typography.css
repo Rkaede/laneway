@@ -1,29 +1,13 @@
 /*
  * Typography tokens. Theme-stable, so values live directly in @theme.
- *
- * The SIZE scale is deliberately absent. Loom uses Tailwind's stock --text-*
- * scale unchanged (xs 12px, sm 14px, base 16px, lg 18px, ...). A dense app
- * still gets compact text: `text-sm` (14px) is the working body size, set on
- * body in loom.css, and `text-base` (16px) marks subheads and
- * emphasised body. Redefining the scale is not how you save real estate, and a
- * custom scale would break every `text-*` utility already in the components.
- *
- * If a project ever does need a custom scale, walk a multiplier from the base
- * size and override the --text-* namespace here: sqrt(phi) ~ 1.27 for general
- * purpose, cbrt(phi) ~ 1.17 for dense UIs. Never use phi (1.618) directly, as
- * the upper steps stop feeling related to the body text.
- *
- * Use font-display for page-level headings, font-sans for everything else, and
- * font-mono for code, data and technical values.
+ * The themes override text-sm to 13px and text-xs to 11.5px; other sizes use
+ * Tailwind's stock scale. Use font-sans for UI and font-mono for code and data.
  */
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, -apple-system, system-ui, Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display:
-    'Inter', ui-sans-serif, -apple-system, system-ui, Helvetica, Arial, sans-serif;
 
-  --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -34,11 +18,6 @@
   --leading-snug: 1.375;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
-  --leading-loose: 2;
 
   --tracking-tight: -0.01em;
-  --tracking-normal: 0em;
-  --tracking-wide: 0.025em;
-  --tracking-wider: 0.05em;
-  --tracking-caps: 0.08em;
 }

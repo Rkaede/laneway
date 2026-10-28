@@ -1,25 +1,8 @@
 /*
- * Layering tokens. Theme-stable.
- *
- * These sit in a plain `:root` block rather than in `@theme`, deliberately.
- * `--z-*` is not one of Tailwind's theme namespaces, so inside `@theme` the
- * names would be treated as unused custom properties and dropped from the
- * output, leaving `var(--z-modal)` undefined at runtime. A plain block is copied
- * through verbatim, so the tokens are always available to hand-written CSS,
- * inline styles and `z-[var(--z-modal)]`.
- *
- * Gaps of 100 leave room for intermediate layers inside a category. If a layer
- * has to sit between two of these (a modal footer above modal content but below
- * the close button), use a value inside the gap rather than adding a token.
+ * Notifications sit above overlays. Keep this in :root because --z-* is not
+ * a Tailwind theme namespace; Toast.List reads it with z-[var(--z-toast)].
  */
 
 :root {
-  --z-base: 0;
-  --z-dropdown: 100; /* menus, selects, popovers */
-  --z-sticky: 200; /* sticky headers, floating buttons */
-  --z-overlay: 300; /* backdrops, scrims */
-  --z-modal: 400; /* dialogs, command palettes */
-  --z-toast: 500; /* notifications, above modals */
-  --z-tooltip: 600; /* always on top */
-  --z-max: 9999;
+  --z-toast: 500;
 }

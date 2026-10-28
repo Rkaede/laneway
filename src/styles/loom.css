@@ -1,14 +1,12 @@
 /*
  * Loom design system entry point, ported from the Loom package.
  *
- * Token layers load first, then the component classes that consume them, then
- * the base element defaults. Order matters: a component class cannot reference a
- * token that has not been registered yet.
+ * Token layers load first, followed by component classes and base element defaults.
  *
  * Colour utilities come only from this design system. tokens/themes.css clears
  * Tailwind's built-in palettes with `--color-*: initial`, so bg-red-500,
  * bg-white and bg-gray-200 do not exist. Reach for a role (bg-danger), a
- * surface (bg-surface-raised) or a primitive step (bg-neutral-3) instead.
+ * surface (bg-surface-raised) or a primitive step (bg-neutral-9) instead.
  * bg-transparent, text-current and text-inherit are static utilities and still
  * work.
  *
@@ -49,8 +47,7 @@
     background-color: var(--surface);
     color: var(--main);
     font-family: var(--font-sans);
-    /* 14px on the stock scale. Dense app screens read best here, and
-       text-base (16px) is left to mark subheads and emphasised body. */
+    /* The themes set text-sm to 13px; text-base keeps Tailwind's 16px. */
     font-size: var(--text-sm);
     line-height: var(--leading-normal);
     letter-spacing: var(--body-tracking);

@@ -1,12 +1,6 @@
 /*
  * Radius tokens. Theme-stable, so values live directly in @theme.
  *
- * The scale absorbs the arbitrary values the components used to carry:
- * rounded-[4px] on tags is now rounded-tag, and rounded-[12px] on table
- * containers is now rounded-card. If a radius does not fit this scale, that is
- * the signal to question whether it should exist rather than to add a bracket
- * value.
- *
  * The named steps are the raw scale; the semantic aliases below say what a
  * radius is FOR. Prefer the aliases in components: rounded-button reads as an
  * intent, rounded-md reads as a measurement.
@@ -21,8 +15,6 @@
   --radius-xl: 0.75rem; /* 12px */
   --radius-2xl: 1rem; /* 16px */
   --radius-full: 9999px;
-
-  --radius-input: var(--radius-2xl);
 }
 
 /*

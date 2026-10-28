@@ -7,9 +7,9 @@
  * on a soft layered shadow, a blue accent used on pill buttons, and tight
  * radii (see the --*-radius vars below, which feed the rounded-* aliases).
  *
- * Neutral, primary, danger, warning and success are rebuilt around the
- * measured values. info, active, confirmed and important have no equivalent in
- * the reference, so they keep Loom's scales. See themes.css for architecture notes.
+ * Only numbered steps used by components or semantic mappings are retained.
+ * info, active, confirmed and important keep Loom's values. See themes.css
+ * for architecture notes.
  * The borders are intentionally low contrast to match the source.
  */
 
@@ -19,7 +19,6 @@
   /* --- Palette source tokens ---
      Measured from a reference design (dark mode). --- */
   --palette-page: oklch(0.209 0.004 264.477);
-  --palette-canvas: oklch(0.231 0.004 264.487);
   --palette-surface: oklch(0.26 0.006 271.191);
   --palette-inset: oklch(0.243 0.004 264.492);
   --palette-field: oklch(0.293 0.006 271.223);
@@ -29,7 +28,6 @@
   --palette-ink-2: oklch(0.731 0.008 260.731);
   --palette-ink-3: oklch(0.541 0.01 264.484);
   --palette-line: oklch(0.308 0.006 258.354);
-  --palette-line-soft: oklch(0.278 0.006 258.354);
   --palette-line-strong: oklch(0.356 0.007 264.474);
   --palette-accent: oklch(0.68 0.173 253.301);
   --palette-accent-ink: oklch(0.788 0.113 248.33);
@@ -43,145 +41,57 @@
 
   /* --- neutral (palette greys) --- */
   --neutral-1: oklch(0.209 0.004 264.477); /* 1 - page */
-  --neutral-2: oklch(0.231 0.004 264.487); /* 2 - canvas */
-  --neutral-3: oklch(0.26 0.006 271.191); /* 3 - surface */
-  --neutral-4: oklch(0.289 0.006 271.22); /* 4 - hover */
-  --neutral-5: oklch(0.318 0.007 274.747); /* 5 - hover-2 */
   --neutral-6: oklch(0.356 0.007 264.474); /* 6 - line-strong */
-  --neutral-7: oklch(0.42 0.009 264); /* 7 - interpolated */
   --neutral-8: oklch(0.48 0.01 264); /* 8 - interpolated */
   --neutral-9: oklch(0.541 0.01 264.484); /* 9 - ink-3 */
-  --neutral-10: oklch(0.62 0.009 262); /* 10 - interpolated */
-  --neutral-11: oklch(0.731 0.008 260.731); /* 11 - ink-2 */
   --neutral-12: oklch(0.964 0.002 247.839); /* 12 - ink */
 
   /* --- primary (accent blue) --- */
-  --primary-1: oklch(0.16 0.0346 253.301);
-  --primary-2: oklch(0.2 0.0519 253.301);
-  --primary-3: oklch(0.24 0.0692 253.301);
-  --primary-4: oklch(0.28 0.0865 253.301);
-  --primary-5: oklch(0.33 0.1038 253.301);
   --primary-6: oklch(0.4 0.1211 253.301);
-  --primary-7: oklch(0.48 0.1384 253.301);
-  --primary-8: oklch(0.55 0.1557 253.301);
-  --primary-9: oklch(0.68 0.173 253.301); /* anchor */
   --primary-10: oklch(0.75 0.173 253.301);
-  --primary-11: oklch(0.788 0.113 248.33);
-  --primary-12: oklch(0.96 0.0346 253.301);
 
   /* --- danger (red) --- */
-  --danger-1: oklch(0.16 0.036 21.433);
-  --danger-2: oklch(0.2 0.054 21.433);
-  --danger-3: oklch(0.24 0.072 21.433);
-  --danger-4: oklch(0.28 0.09 21.433);
-  --danger-5: oklch(0.33 0.108 21.433);
   --danger-6: oklch(0.4 0.126 21.433);
-  --danger-7: oklch(0.48 0.144 21.433);
-  --danger-8: oklch(0.55 0.162 21.433);
-  --danger-9: oklch(0.666 0.18 21.433); /* anchor */
   --danger-10: oklch(0.736 0.18 21.433);
   --danger-11: oklch(0.85 0.117 21.433);
-  --danger-12: oklch(0.96 0.036 21.433);
 
   /* --- warning (orange) --- */
-  --warning-1: oklch(0.16 0.0312 55.642);
-  --warning-2: oklch(0.2 0.0468 55.642);
-  --warning-3: oklch(0.24 0.0624 55.642);
-  --warning-4: oklch(0.28 0.078 55.642);
-  --warning-5: oklch(0.33 0.0936 55.642);
   --warning-6: oklch(0.4 0.1092 55.642);
-  --warning-7: oklch(0.48 0.1248 55.642);
-  --warning-8: oklch(0.55 0.1404 55.642);
-  --warning-9: oklch(0.746 0.156 55.642); /* anchor */
-  --warning-10: oklch(0.816 0.156 55.642);
   --warning-11: oklch(0.85 0.1014 55.642);
-  --warning-12: oklch(0.96 0.0312 55.642);
 
   /* --- success (green) --- */
-  --success-1: oklch(0.16 0.0308 153.814);
-  --success-2: oklch(0.2 0.0462 153.814);
-  --success-3: oklch(0.24 0.0616 153.814);
-  --success-4: oklch(0.28 0.077 153.814);
-  --success-5: oklch(0.33 0.0924 153.814);
   --success-6: oklch(0.4 0.1078 153.814);
-  --success-7: oklch(0.48 0.1232 153.814);
-  --success-8: oklch(0.55 0.1386 153.814);
-  --success-9: oklch(0.705 0.154 153.814); /* anchor */
-  --success-10: oklch(0.775 0.154 153.814);
   --success-11: oklch(0.85 0.1001 153.814);
-  --success-12: oklch(0.96 0.0308 153.814);
 
   /* --- info (cyan-blue, hue 225) --- */
-  --info-1: oklch(0.16 0.038 225);
   --info-2: oklch(0.2 0.057 225);
-  --info-3: oklch(0.24 0.076 225);
-  --info-4: oklch(0.28 0.095 225);
-  --info-5: oklch(0.33 0.114 225);
   --info-6: oklch(0.4 0.133 225);
-  --info-7: oklch(0.48 0.152 225);
-  --info-8: oklch(0.55 0.171 225);
-  --info-9: oklch(0.65 0.19 225); /* anchor */
-  --info-10: oklch(0.72 0.19 225);
   --info-11: oklch(0.85 0.124 225);
-  --info-12: oklch(0.96 0.038 225);
 
   /* --- active (vivid blue, hue 250) --- */
-  --active-1: oklch(0.16 0.044 250);
   --active-2: oklch(0.2 0.066 250);
-  --active-3: oklch(0.24 0.088 250);
-  --active-4: oklch(0.28 0.11 250);
-  --active-5: oklch(0.33 0.132 250);
   --active-6: oklch(0.4 0.154 250);
-  --active-7: oklch(0.48 0.176 250);
-  --active-8: oklch(0.55 0.198 250);
-  --active-9: oklch(0.65 0.22 250); /* anchor */
-  --active-10: oklch(0.72 0.22 250);
   --active-11: oklch(0.85 0.143 250);
-  --active-12: oklch(0.96 0.044 250);
 
   /* --- confirmed (violet, hue 292) --- */
-  --confirmed-1: oklch(0.16 0.04 292);
   --confirmed-2: oklch(0.2 0.06 292);
-  --confirmed-3: oklch(0.24 0.08 292);
-  --confirmed-4: oklch(0.28 0.1 292);
-  --confirmed-5: oklch(0.33 0.12 292);
   --confirmed-6: oklch(0.4 0.14 292);
-  --confirmed-7: oklch(0.48 0.16 292);
-  --confirmed-8: oklch(0.55 0.18 292);
-  --confirmed-9: oklch(0.65 0.2 292); /* anchor */
-  --confirmed-10: oklch(0.72 0.2 292);
   --confirmed-11: oklch(0.85 0.13 292);
-  --confirmed-12: oklch(0.96 0.04 292);
 
   /* --- important (magenta, hue 320) --- */
-  --important-1: oklch(0.16 0.042 320);
   --important-2: oklch(0.2 0.063 320);
-  --important-3: oklch(0.24 0.084 320);
-  --important-4: oklch(0.28 0.105 320);
-  --important-5: oklch(0.33 0.126 320);
   --important-6: oklch(0.4 0.147 320);
-  --important-7: oklch(0.48 0.168 320);
-  --important-8: oklch(0.55 0.189 320);
-  --important-9: oklch(0.65 0.21 320); /* anchor */
-  --important-10: oklch(0.72 0.21 320);
   --important-11: oklch(0.85 0.137 320);
-  --important-12: oklch(0.96 0.042 320);
 
-  /* ==========================================================
-     Semantic mappings: the same shape as the light theme.
-     Roles are theme-invariant, so most lines below are identical
-     to :root. Every divergence is annotated with why.
-     ========================================================== */
+  /* Semantic mappings. Both themes define the same names, with their own
+     palette values and numbered steps. */
 
-  /* Surfaces. Dark surfaces RISE as they elevate, the opposite of the light
-     theme: a dark card needs a lighter step above the page to read as raised,
-     where a light card reads as raised by staying lighter than a tinted page. */
+  /* Surfaces. Cards use a lighter fill than the dark page. */
   --surface: var(--palette-page);
   --surface-raised: var(--palette-surface);
-  --surface-overlay: var(--palette-surface); /* popovers float above cards */
-  --surface-sunken: var(--palette-inset); /* recessed strip in a step-2 card */
+  --surface-overlay: var(--palette-surface);
+  --surface-sunken: var(--palette-inset);
   --surface-input: var(--palette-field);
-  --surface-disabled: var(--palette-hover-2);
   --surface-hover: var(--palette-hover);
   --surface-pressed: var(--palette-hover-2);
 
@@ -193,10 +103,8 @@
   --main: var(--palette-ink);
   --muted: var(--palette-ink-2);
   --faint: var(--palette-ink-3);
-  --disabled: var(--neutral-8);
   --inverse: var(--neutral-1);
   --link: var(--palette-accent-ink);
-  --link-hover: var(--primary-12);
 
   /* Borders. Identical to the light theme. */
   --border: var(--palette-line);
@@ -209,50 +117,14 @@
   --brand: var(--palette-accent);
   --brand-fg: oklch(1 0 0);
   --brand-hover: oklch(0.72 0.173 253.301);
-  --brand-active: var(--primary-11);
 
   --danger: var(--palette-red);
   --danger-fg: var(--neutral-1);
   --danger-hover: var(--danger-10);
 
-  /* Orange still takes dark text, but here neutral-1 IS the dark colour, so
-     this line reads the same as every other role while doing what warning-12
-     does in the light theme. */
   --warning: var(--palette-orange);
-  --warning-fg: var(--neutral-1);
-  --warning-hover: var(--warning-10);
 
   --success: var(--palette-green);
-  --success-fg: var(--neutral-1);
-  --success-hover: var(--success-10);
-
-  --info: var(--info-9);
-  --info-fg: var(--neutral-1);
-  --info-hover: var(--info-10);
-
-  --active: var(--active-9);
-  --active-fg: var(--neutral-1);
-  --active-hover: var(--active-10);
-
-  --confirmed: var(--confirmed-9);
-  --confirmed-fg: var(--neutral-1);
-  --confirmed-hover: var(--confirmed-10);
-
-  --important: var(--important-9);
-  --important-fg: var(--neutral-1);
-  --important-hover: var(--important-10);
-
-  --neutral: var(--neutral-10);
-  --neutral-fg: var(--neutral-1);
-  --neutral-hover: var(--neutral-11);
-
-  /* Divergence: quiet takes step 9 here, not step 8. Step 8 in a dark theme is
-     a mid grey that neither near-white nor near-black text clears. Step 9 with
-     near-black text does, and quiet still reads softer than neutral through
-     its subtle layer. */
-  --quiet: var(--neutral-9);
-  --quiet-fg: var(--neutral-1);
-  --quiet-hover: var(--neutral-10);
 
   /* Roles: subtle tints. Identical steps to the light theme. */
   --brand-subtle: var(--palette-accent-tint);
@@ -293,42 +165,25 @@
 
   --quiet-subtle: var(--palette-field);
   --quiet-subtle-fg: var(--palette-ink-2);
-  --quiet-border: var(--palette-line);
 
-  /* Sidebar. Divergence: step 2 here, step 1 in the light theme. The sidebar
-     keeps the same relationship to the page in both themes (one step above it)
-     and the page itself sits at a different step per theme. */
+  /* Sidebar shares the page background. */
   --sidebar: var(--palette-page);
   --sidebar-fg: var(--palette-ink);
-  --sidebar-primary: var(--palette-ink-2);
-  --sidebar-primary-fg: var(--neutral-1);
   --sidebar-accent: var(--palette-hover-2);
   --sidebar-accent-fg: var(--neutral-12);
   --sidebar-border: var(--palette-line);
 
-  /* Chart series: same hues, L lifted to 0.68 so the series read at the same
-     intensity against a dark page as they do against a light one. */
-  --chart-1: oklch(0.68 0.18 266);
-  --chart-2: oklch(0.68 0.18 210);
-  --chart-3: oklch(0.68 0.18 150);
-  --chart-4: oklch(0.68 0.18 70);
-  --chart-5: oklch(0.68 0.18 320);
-  --chart-fg: var(--neutral-1);
-
-  /* Chat roles. Divergence: agent moves to step 3 so the bubble reads against
-     the step-2 card it is drawn on. */
+  /* User bubbles have a fill; agent messages have a transparent background. */
   --user: var(--palette-field);
   --user-fg: var(--palette-ink);
   --agent: transparent;
   --agent-fg: var(--palette-ink);
 
-  /* Elevation. Roughly double the light opacities: the contrast between a dark
-     surface and its shadow is naturally lower. */
+  /* Elevation. Heavier shadows keep depth visible against dark surfaces. */
   --elevation-xs: 0 1px 2px 0 oklch(0 0 0 / 0.3);
   --elevation-sm: 0 1px 2px 0 oklch(0 0 0 / 0.2), 0 2px 6px 0 oklch(0 0 0 / 0.2);
   --elevation-md: 0 2px 10px 0 oklch(0 0 0 / 0.22);
   --elevation-lg: 0 8px 28px 0 oklch(0 0 0 / 0.34);
-  --elevation-xl: 0 8px 28px 0 oklch(0 0 0 / 0.34);
 
   /* Component tokens, measured on a reference design. Radii: chip 6px, control
      8px, card 10px, window 14px; buttons are pills. Text runs at 13px with
@@ -353,8 +208,8 @@
   --button-outline-border: var(--palette-line-strong);
   --button-outline-shadow: var(--elevation-xs);
 
-  /* Fields are a field-coloured fill with a hairline and a faint shadow. The
-     composer is a white (surface) bar that carries the card shadow. */
+  /* Fields have a hairline and a faint shadow. The composer uses the raised
+     surface colour and the card shadow. */
   --placeholder-fg: var(--palette-ink-3);
   --field-shadow: 0 1px 2px 0 oklch(0 0 0 / 0.2);
   /* No focus ring on fields: the border just steps up to the stronger hairline. */
@@ -400,6 +255,6 @@
   --shiki-token-punctuation: var(--palette-ink-2);
   --shiki-token-link: var(--palette-accent-ink);
 
-  /* Text is tracked in slightly (-0.14px at 14px). */
+  /* Text is tracked in slightly (-0.13px at 13px). */
   --body-tracking: -0.01em;
 }

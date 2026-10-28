@@ -1,50 +1,13 @@
 /*
  * Loom colour and elevation tokens.
  *
- * Architecture (see .agents/skills/loom/tokens.md):
+ * @theme inline registers utility names that read plain vars on the element.
+ * theme-default.css sets the light values on :root and .theme-default;
+ * theme-default-dark.css overrides them on .theme-default-dark.
+ * Every theme defines the same plain vars so nested themes inherit correctly.
  *
- *   @theme inline   registers every token NAME, pointing at a plain var.
- *                   This is what makes Tailwind emit bg-surface, text-muted,
- *                   bg-danger-subtle and so on.
- *   theme-default.css        the light theme, on :root and .theme-default
- *   theme-default-dark.css   its dark sibling, on .theme-default-dark
- *
- * The light theme owns :root, so it is imported first: the dark theme later in the cascade
- * then overrides it.
- *
- * Two rules this file depends on:
- *
- *   1. The step number is a ROLE, not a brightness rank. Step 1 is always
- *      "app background" and step 9 is always "the solid", in every theme.
- *      Do not reach for step 5 because it looks like the brand.
- *   2. Every plain var must have a value in EVERY theme block. A var set only
- *      in :root falls through under .theme-default-dark and ships a broken
- *      component.
- *
- * Never add a --color-* value directly to a theme block, and never delete the
- * --color-*: initial line: it clears Tailwind's 22 built-in palettes so the
- * design system is the only source of colour utilities.
- *
- * THE ONE TRAP IN THIS FILE. Inside a theme block, always reference the PLAIN
- * var, never the --color-* alias:
- *
- *     --surface: var(--neutral-2);          correct
- *     --surface: var(--color-neutral-2);    silently breaks the dark theme
- *
- * Tailwind emits every --color-* alias once, in a single `:root` block. So
- * `--color-neutral-2` is computed at `:root` against the DEFAULT theme's
- * `--neutral-2`, and that already-resolved colour is what inherits into
- * `.theme-default-dark`. The dark block would set its primitives correctly and
- * still render light, with no error anywhere to point at it.
- *
- * The same applies to hand-written CSS and to inline styles in components: the
- * --color-* names exist ONLY to make Tailwind generate utilities. Read a token
- * with var(--surface), style an element with the `bg-surface` class, and never
- * write var(--color-surface) by hand.
- *
- * Contrast: every reduced-contrast pair here is verified by
- * packages/loom/test/theme-contrast.test.ts. Re-run it whenever a step value
- * moves, in every theme file.
+ * Keep --color-*: initial to clear Tailwind's built-in palettes. Hand-written
+ * CSS reads plain vars such as var(--surface); use bg-surface in markup.
  */
 
 @import './theme-default.css';
@@ -55,143 +18,18 @@
      text-inherit are static utilities, so they survive this. */
   --color-*: initial;
 
-  /* --- neutral primitives (1-12) --- */
-  --color-neutral-1: var(--neutral-1); /* 1 - app background */
-  --color-neutral-2: var(--neutral-2); /* 2 - subtle background */
-  --color-neutral-3: var(--neutral-3); /* 3 - UI element bg */
-  --color-neutral-4: var(--neutral-4); /* 4 - hovered UI element */
-  --color-neutral-5: var(--neutral-5); /* 5 - active / selected */
-  --color-neutral-6: var(--neutral-6); /* 6 - subtle border */
-  --color-neutral-7: var(--neutral-7); /* 7 - UI border, focus ring */
-  --color-neutral-8: var(--neutral-8); /* 8 - hovered border */
-  --color-neutral-9: var(--neutral-9); /* 9 - solid */
-  --color-neutral-10: var(--neutral-10); /* 10 - solid hover */
-  --color-neutral-11: var(--neutral-11); /* 11 - low-contrast text */
-  --color-neutral-12: var(--neutral-12); /* 12 - high-contrast text */
-
-  /* --- primary primitives (1-12) --- */
-  --color-primary-1: var(--primary-1);
-  --color-primary-2: var(--primary-2);
-  --color-primary-3: var(--primary-3);
-  --color-primary-4: var(--primary-4);
-  --color-primary-5: var(--primary-5);
-  --color-primary-6: var(--primary-6);
-  --color-primary-7: var(--primary-7);
-  --color-primary-8: var(--primary-8);
-  --color-primary-9: var(--primary-9);
-  --color-primary-10: var(--primary-10);
-  --color-primary-11: var(--primary-11);
-  --color-primary-12: var(--primary-12);
-
-  /* --- danger primitives (1-12) --- */
-  --color-danger-1: var(--danger-1);
-  --color-danger-2: var(--danger-2);
-  --color-danger-3: var(--danger-3);
-  --color-danger-4: var(--danger-4);
-  --color-danger-5: var(--danger-5);
-  --color-danger-6: var(--danger-6);
-  --color-danger-7: var(--danger-7);
-  --color-danger-8: var(--danger-8);
-  --color-danger-9: var(--danger-9);
-  --color-danger-10: var(--danger-10);
-  --color-danger-11: var(--danger-11);
-  --color-danger-12: var(--danger-12);
-
-  /* --- warning primitives (1-12) --- */
-  --color-warning-1: var(--warning-1);
-  --color-warning-2: var(--warning-2);
-  --color-warning-3: var(--warning-3);
-  --color-warning-4: var(--warning-4);
-  --color-warning-5: var(--warning-5);
-  --color-warning-6: var(--warning-6);
-  --color-warning-7: var(--warning-7);
-  --color-warning-8: var(--warning-8);
-  --color-warning-9: var(--warning-9);
-  --color-warning-10: var(--warning-10);
-  --color-warning-11: var(--warning-11);
-  --color-warning-12: var(--warning-12);
-
-  /* --- success primitives (1-12) --- */
-  --color-success-1: var(--success-1);
-  --color-success-2: var(--success-2);
-  --color-success-3: var(--success-3);
-  --color-success-4: var(--success-4);
-  --color-success-5: var(--success-5);
-  --color-success-6: var(--success-6);
-  --color-success-7: var(--success-7);
-  --color-success-8: var(--success-8);
-  --color-success-9: var(--success-9);
-  --color-success-10: var(--success-10);
-  --color-success-11: var(--success-11);
-  --color-success-12: var(--success-12);
-
-  /* --- info primitives (1-12) --- */
-  --color-info-1: var(--info-1);
-  --color-info-2: var(--info-2);
-  --color-info-3: var(--info-3);
-  --color-info-4: var(--info-4);
-  --color-info-5: var(--info-5);
-  --color-info-6: var(--info-6);
-  --color-info-7: var(--info-7);
-  --color-info-8: var(--info-8);
-  --color-info-9: var(--info-9);
-  --color-info-10: var(--info-10);
-  --color-info-11: var(--info-11);
-  --color-info-12: var(--info-12);
-
-  /* --- active primitives (1-12) --- */
-  --color-active-1: var(--active-1);
-  --color-active-2: var(--active-2);
-  --color-active-3: var(--active-3);
-  --color-active-4: var(--active-4);
-  --color-active-5: var(--active-5);
-  --color-active-6: var(--active-6);
-  --color-active-7: var(--active-7);
-  --color-active-8: var(--active-8);
-  --color-active-9: var(--active-9);
-  --color-active-10: var(--active-10);
-  --color-active-11: var(--active-11);
-  --color-active-12: var(--active-12);
-
-  /* --- confirmed primitives (1-12) --- */
-  --color-confirmed-1: var(--confirmed-1);
-  --color-confirmed-2: var(--confirmed-2);
-  --color-confirmed-3: var(--confirmed-3);
-  --color-confirmed-4: var(--confirmed-4);
-  --color-confirmed-5: var(--confirmed-5);
-  --color-confirmed-6: var(--confirmed-6);
-  --color-confirmed-7: var(--confirmed-7);
-  --color-confirmed-8: var(--confirmed-8);
-  --color-confirmed-9: var(--confirmed-9);
-  --color-confirmed-10: var(--confirmed-10);
-  --color-confirmed-11: var(--confirmed-11);
-  --color-confirmed-12: var(--confirmed-12);
-
-  /* --- important primitives (1-12) --- */
-  --color-important-1: var(--important-1);
-  --color-important-2: var(--important-2);
-  --color-important-3: var(--important-3);
-  --color-important-4: var(--important-4);
-  --color-important-5: var(--important-5);
-  --color-important-6: var(--important-6);
-  --color-important-7: var(--important-7);
-  --color-important-8: var(--important-8);
-  --color-important-9: var(--important-9);
-  --color-important-10: var(--important-10);
-  --color-important-11: var(--important-11);
-  --color-important-12: var(--important-12);
+  /* --- Neutral steps used directly by components --- */
+  --color-neutral-6: var(--neutral-6);
+  --color-neutral-8: var(--neutral-8);
+  --color-neutral-9: var(--neutral-9);
 
   /* --- Surfaces ---
-     Deliberately no per-surface -fg: every surface is a neutral step 1-4, so
-     the text emphasis ladder below reads against all of them. Do not add
-     --surface-raised-fg. --surface-disabled is the one whose partner is not
-     obvious from the name: it pairs with --disabled. --- */
+     Neutral backgrounds share the text emphasis ladder below. --- */
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-surface-overlay: var(--surface-overlay);
   --color-surface-sunken: var(--surface-sunken);
   --color-surface-input: var(--surface-input);
-  --color-surface-disabled: var(--surface-disabled);
   --color-surface-hover: var(--surface-hover);
   --color-surface-pressed: var(--surface-pressed);
 
@@ -201,63 +39,27 @@
   --color-scrim: var(--scrim);
 
   /* --- Text emphasis ladder ---
-     Bare weight names, read against the neutral surfaces above. This family
-     never carries a -fg, because it IS the text. It answers "how loud", not
-     "what am I sitting on".
-
-     --faint and --disabled sit BELOW step 11, the step this scale designates
-     as its low-contrast text role. Use them only where failing to read the
-     text costs the user nothing: a placeholder that repeats a visible label is
-     fine, a placeholder carrying the expected date format is not. --- */
+     Main, secondary and low-emphasis text on neutral surfaces. --- */
   --color-main: var(--main);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
-  --color-disabled: var(--disabled);
   --color-inverse: var(--inverse);
-  --color-link: var(--link);
-  --color-link-hover: var(--link-hover);
 
   /* --- Borders ---
-     Suffixes move AWAY from the default. --border is the standard card and
-     control edge; -secondary is weaker (dividers, row rules); -emphasis is the
-     only "stronger than default" tier, because borders need one and text does
-     not.
-
-     Use --border-emphasis, not --border, on anything whose boundary IDENTIFIES
-     a control (inputs, selects, checkboxes). WCAG 1.4.11 wants 3:1 there, and
-     only -emphasis clears it. Card edges and dividers are decorative and
-     exempt, so they use --border and --border-secondary. --- */
+     The standard, secondary and emphasis borders currently share the same
+     palette line. The focus indicator uses the accent colour. --- */
   --color-border: var(--border);
   --color-border-secondary: var(--border-secondary);
   --color-border-emphasis: var(--border-emphasis);
   --color-border-focus: var(--border-focus);
 
   /* --- Role colours ---
-     Every role has the SAME shape, so swapping one for another in markup never
-     means touching the -fg or border class:
-
-       --X              solid fill              (step 9)
-       --X-fg           text on the solid       (step 1, or 12 on amber)
-       --X-hover        solid hover             (step 10)
-       --X-subtle       tinted fill             (step 2)
-       --X-subtle-fg    text on the tint        (step 11)
-       --X-border       border for the tint     (step 6)
-
-     The bare name is ALWAYS the solid. Tints are always -subtle. Never map
-     --danger to a tint while --brand is a solid.
-
-     Hover variants reuse their base's -fg, so there is no --brand-hover-fg.
-     Only --brand carries an -active, because it is the only role used for a
-     press-and-hold primary action.
-
-     brand is the only role on the primary scale. danger, warning, success and
-     info are the skill's four status roles. active, confirmed, important,
-     neutral and quiet are Loom's extra domain tones, built to the identical
-     shape. --- */
+     Bare names are fills; -fg is text on a fill, and -hover is an interactive
+     state. Tints use -subtle, with -subtle-fg text and a -border edge.
+     Register only the variants consumed by the app. --- */
   --color-brand: var(--brand);
   --color-brand-fg: var(--brand-fg);
   --color-brand-hover: var(--brand-hover);
-  --color-brand-active: var(--brand-active);
   --color-brand-subtle: var(--brand-subtle);
   --color-brand-subtle-fg: var(--brand-subtle-fg);
   --color-brand-border: var(--brand-border);
@@ -270,88 +72,46 @@
   --color-danger-border: var(--danger-border);
 
   --color-warning: var(--warning);
-  --color-warning-fg: var(--warning-fg);
-  --color-warning-hover: var(--warning-hover);
   --color-warning-subtle: var(--warning-subtle);
   --color-warning-subtle-fg: var(--warning-subtle-fg);
   --color-warning-border: var(--warning-border);
 
   --color-success: var(--success);
-  --color-success-fg: var(--success-fg);
-  --color-success-hover: var(--success-hover);
   --color-success-subtle: var(--success-subtle);
   --color-success-subtle-fg: var(--success-subtle-fg);
   --color-success-border: var(--success-border);
 
-  --color-info: var(--info);
-  --color-info-fg: var(--info-fg);
-  --color-info-hover: var(--info-hover);
   --color-info-subtle: var(--info-subtle);
   --color-info-subtle-fg: var(--info-subtle-fg);
   --color-info-border: var(--info-border);
 
-  --color-active: var(--active);
-  --color-active-fg: var(--active-fg);
-  --color-active-hover: var(--active-hover);
   --color-active-subtle: var(--active-subtle);
   --color-active-subtle-fg: var(--active-subtle-fg);
   --color-active-border: var(--active-border);
 
-  --color-confirmed: var(--confirmed);
-  --color-confirmed-fg: var(--confirmed-fg);
-  --color-confirmed-hover: var(--confirmed-hover);
   --color-confirmed-subtle: var(--confirmed-subtle);
   --color-confirmed-subtle-fg: var(--confirmed-subtle-fg);
   --color-confirmed-border: var(--confirmed-border);
 
-  --color-important: var(--important);
-  --color-important-fg: var(--important-fg);
-  --color-important-hover: var(--important-hover);
   --color-important-subtle: var(--important-subtle);
   --color-important-subtle-fg: var(--important-subtle-fg);
   --color-important-border: var(--important-border);
 
-  /* neutral and quiet are two weights of the same grey. neutral is the
-     standard-weight tone; quiet reads one rung softer, for tags and markers
-     that should recede. Both live on the neutral scale rather than carrying a
-     second grey palette. */
-  --color-neutral: var(--neutral);
-  --color-neutral-fg: var(--neutral-fg);
-  --color-neutral-hover: var(--neutral-hover);
+  /* Neutral and quiet tints share the palette greys. */
   --color-neutral-subtle: var(--neutral-subtle);
   --color-neutral-subtle-fg: var(--neutral-subtle-fg);
   --color-neutral-border: var(--neutral-border);
 
-  --color-quiet: var(--quiet);
-  --color-quiet-fg: var(--quiet-fg);
-  --color-quiet-hover: var(--quiet-hover);
   --color-quiet-subtle: var(--quiet-subtle);
   --color-quiet-subtle-fg: var(--quiet-subtle-fg);
-  --color-quiet-border: var(--quiet-border);
 
   /* --- Sidebar ---
-     The sidebar diverges from the main surface, so it gets its own token set
-     that stays tunable per theme. --- */
+     Shares the page background, with themeable item states. --- */
   --color-sidebar: var(--sidebar);
   --color-sidebar-fg: var(--sidebar-fg);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-fg: var(--sidebar-primary-fg);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-fg: var(--sidebar-accent-fg);
   --color-sidebar-border: var(--sidebar-border);
-
-  /* --- Chart palette ---
-     Built to its own recipe, NOT from step 9 of each role scale: charts need
-     perceptually equal brightness across series so no bar wins by accident,
-     and the role anchors deliberately differ per hue. Fixed L and C, hues
-     spread around the wheel. Because every series sits at one lightness, a
-     single --chart-fg covers labels drawn inside any of them. --- */
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-chart-fg: var(--chart-fg);
 
   /* --- Chat roles --- */
   --color-user: var(--user);
@@ -366,5 +126,4 @@
   --shadow-sm: var(--elevation-sm);
   --shadow-md: var(--elevation-md);
   --shadow-lg: var(--elevation-lg);
-  --shadow-xl: var(--elevation-xl);
 }
