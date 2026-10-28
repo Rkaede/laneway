@@ -23,7 +23,6 @@ export const uiActions: Actions = {
     id: 'toggle-sidebar',
     name: 'Toggle Sidebar',
     keywords: ['sidebar', 'toggle'],
-    shortcut: '$mod+D',
     icon: IconSidebar,
     fn: () => toggleSidebar(),
   },
