@@ -1,10 +1,11 @@
-import { afterEach, expect, it, spyOn } from 'bun:test';
+import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { reconcile } from 'solid-js/store';
 
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { apiKeys, deleteKeys, setApiKeys } = await import('./keys');
-const { anyKeysSet } = await import('./selectors');
+const { setStore, store } = await import('.');
+const { anyKeysSet, selectRouteSession } = await import('./selectors');
 fetchMock.mockRestore();
 
 afterEach(() => {
@@ -44,4 +45,33 @@ it('requires a supported key even after welcome was completed', () => {
   setApiKeys('hasCompletedWelcome', true);
 
   expect(anyKeysSet()).toBe(false);
+});
+
+describe('route session selection', () => {
+  const originalSessions = [...store.sessions];
+
+  afterEach(() => {
+    setStore('sessions', originalSessions);
+  });
+
+  it('uses the draft only when there is no session ID', () => {
+    expect(selectRouteSession(() => undefined)()).toBe(store.draftSession);
+  });
+
+  it('selects an existing session by ID', () => {
+    const session = store.sessions[0];
+
+    expect(selectRouteSession(() => session.id)()).toBe(session);
+  });
+
+  it.each(['missing-session', 'draft'])('does not use the draft for unknown ID %s', (id) => {
+    expect(selectRouteSession(() => id)()).toBeUndefined();
+  });
+
+  it('does not use the draft when returning to a deleted session', () => {
+    const id = store.sessions[0].id;
+    setStore('sessions', (sessions) => sessions.filter((session) => session.id !== id));
+
+    expect(selectRouteSession(() => id)()).toBeUndefined();
+  });
 });

@@ -8,6 +8,7 @@ import { render } from 'solid-js/web';
 // routes
 import { AppLayout } from './app-layout';
 import { AppError } from './components/connected/app-error';
+import { NotFound } from './routes/not-found';
 import { Session } from './routes/session';
 
 const SandboxLayout = lazy(() => import('./routes/sandbox/sandbox-layout'));
@@ -34,6 +35,7 @@ if (root) {
             <Route path="/presets" component={Presets} />
             <Route path="/assistants" component={Assistants} />
             <Route path="/" component={Session} />
+            <Route path="*" component={NotFound} />
           </Route>
 
           {/* Sandbox routes with SandboxLayout */}

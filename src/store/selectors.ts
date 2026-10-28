@@ -23,6 +23,11 @@ export const selectSessionById = (id: string | Accessor<string | undefined>) => 
   });
 };
 
+export const selectRouteSession = (id: Accessor<string | undefined>) => {
+  const session = selectSessionById(id);
+  return () => (id() ? session() : store.draftSession);
+};
+
 export const selectChatById = (id: string | Accessor<string | undefined>) => {
   return createMemo(() => {
     const _id = typeof id === 'function' ? id() : id;

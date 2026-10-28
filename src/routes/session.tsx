@@ -5,11 +5,12 @@ import { SessionProvider } from '~/components/connected/session-provider';
 import { WelcomeContent } from '~/components/connected/welcome';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
-import { store } from '~/store';
 import { newDraftSession } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
-import { selectSessionById } from '~/store/selectors';
+import { selectRouteSession } from '~/store/selectors';
 import { anyKeysSet } from '~/store/selectors';
+
+import { NotFound } from './not-found';
 
 export function Session() {
   const params = useParams();
@@ -32,31 +33,32 @@ export function Session() {
     }
   });
 
-  const selectedSession = selectSessionById(() => params.id);
-  const activeSession = () => selectedSession() ?? store.draftSession;
+  const activeSession = selectRouteSession(() => params.id);
 
   return (
-    <Show
-      when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || activeSession().created === -1}
-      fallback={
-        <WelcomeContent
-          openRouterKey={() => ''}
-          openAIKey={() => ''}
-          setOpenRouterKey={() => {}}
-          setOpenAIKey={() => {}}
-        />
-      }
-    >
-      <Show when={activeSession()}>
-        <SessionProvider sessionId={params.id} session={activeSession()}>
-          <Show
-            when={activeSession()?.type === 'note'}
-            fallback={<MultiChatLayout sessionId={params.id} />}
-          >
-            <NoteLayout sessionId={params.id} />
-          </Show>
-        </SessionProvider>
-      </Show>
+    <Show when={activeSession()} fallback={<NotFound session />}>
+      {(session) => (
+        <Show
+          when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || session().created === -1}
+          fallback={
+            <WelcomeContent
+              openRouterKey={() => ''}
+              openAIKey={() => ''}
+              setOpenRouterKey={() => {}}
+              setOpenAIKey={() => {}}
+            />
+          }
+        >
+          <SessionProvider sessionId={params.id} session={session()}>
+            <Show
+              when={session().type === 'note'}
+              fallback={<MultiChatLayout sessionId={params.id} />}
+            >
+              <NoteLayout sessionId={params.id} />
+            </Show>
+          </SessionProvider>
+        </Show>
+      )}
     </Show>
   );
 }
