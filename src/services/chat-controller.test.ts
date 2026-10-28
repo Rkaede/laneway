@@ -1,23 +1,6 @@
-import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import { beforeEach, describe, expect, it, spyOn } from 'bun:test';
 
 import type { MessageProps } from '~/types';
-
-// Store actions reference icons, which use Vite-only import aliases.
-mock.module('~/components/icons/ui', () => ({
-  IconBox: () => null,
-  IconInfo: () => null,
-  IconLayoutGrid: () => null,
-  IconListRestart: () => null,
-  IconNewSession: () => null,
-  IconPencilLine: () => null,
-  IconScanFace: () => null,
-  IconSettings: () => null,
-  IconSidebar: () => null,
-  IconSquarePen: () => null,
-  IconSun: () => null,
-  IconTrash: () => null,
-  IconUser: () => null,
-}));
 
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(new Response('[]'));

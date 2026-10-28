@@ -1,9 +1,4 @@
-import { afterEach, beforeEach, expect, it, mock, spyOn } from 'bun:test';
-
-mock.module('~/components/icons/ui', () => ({
-  IconNewSession: () => null,
-  IconTrash: () => null,
-}));
+import { afterEach, beforeEach, expect, it, spyOn } from 'bun:test';
 
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));

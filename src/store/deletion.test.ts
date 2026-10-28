@@ -1,13 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { reconcile } from 'solid-js/store';
 
-// Store actions reference icons, which use Vite-only import aliases.
-mock.module('~/components/icons/ui', () => ({
-  IconNewSession: () => null,
-  IconSquarePen: () => null,
-  IconTrash: () => null,
-}));
-
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { deleteData, setStore, store } = await import('.');

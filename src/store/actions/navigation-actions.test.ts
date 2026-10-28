@@ -1,20 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
-// Store actions reference icons, which use Vite-only import aliases.
-mock.module('~/components/icons/ui', () => ({
-  IconBox: () => null,
-  IconFileSliders: () => null,
-  IconInfo: () => null,
-  IconLayoutGrid: () => null,
-  IconListRestart: () => null,
-  IconNewSession: () => null,
-  IconPencilLine: () => null,
-  IconSettings: () => null,
-  IconSidebar: () => null,
-  IconSun: () => null,
-  IconTrash: () => null,
-}));
-
 Object.defineProperty(globalThis, 'self', {
   value: globalThis,
   configurable: true,

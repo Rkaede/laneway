@@ -2,12 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:te
 
 import type { MessageProps } from '~/types';
 
-// Store actions reference icons, which use Vite-only import aliases.
-mock.module('~/components/icons/ui', () => ({
-  IconNewSession: () => null,
-  IconTrash: () => null,
-}));
-
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { setStore, store } = await import('..');
@@ -80,12 +74,12 @@ describe('newDraftSession', () => {
     newDraftSession({ type, referenceId });
 
     expect(store.draftSession.type).toBe('chat');
-    expect(store.draftSession.title).toBe('Untitled Chat');
+    expect(store.draftSession.title).toBe('New Chat');
 
     newDraftSession({ sessionType: 'note', type, referenceId });
 
     expect(store.draftSession.type).toBe('note');
-    expect(store.draftSession.title).toBe('Untitled Note');
+    expect(store.draftSession.title).toBe('New Note');
   });
 
   it.each([
