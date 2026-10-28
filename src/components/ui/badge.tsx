@@ -34,7 +34,14 @@ const tagVariants = cva('inline-flex items-center gap-1 rounded-badge text-xs fo
 });
 
 type BadgeVariant =
-  'free' | 'reasoning' | 'new' | 'vision' | 'online' | 'preset' | 'model' | 'assistant';
+  | 'free'
+  | 'reasoning'
+  | 'new'
+  | 'vision'
+  | 'online'
+  | 'preset'
+  | 'model'
+  | 'assistant';
 
 export type BadgeProps = ComponentProps<'span'> &
   VariantProps<typeof tagVariants> & {
