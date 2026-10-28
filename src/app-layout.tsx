@@ -11,7 +11,7 @@ import About from './components/connected/about';
 export const AppLayout: ParentComponent = (props) => {
   useApplyTheme();
   return (
-    <main class="flex size-full h-screen">
+    <main class="flex size-full h-dvh">
       <div
         class="w-[240px] shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-fg"
         style={{
