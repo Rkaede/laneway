@@ -13,7 +13,7 @@ const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([])
 const { setStore, store } = await import('..');
 const { setApiKeys } = await import('../keys');
 const { setModels } = await import('../models');
-const { addMessageToSessionChats, autonameChat, renameSession } =
+const { addMessageToSessionChats, autonameChat, getCompletion, renameSession } =
   await import('./session-actions');
 const llm = await import('~/services/llm');
 fetchMock.mockRestore();
@@ -150,6 +150,16 @@ describe('autonameChat', () => {
     mock.restore();
   });
 
+  it('preserves replacement patterns in the conversation snippet', async () => {
+    const input = "Keep $$, $&, $`, $', $1 and $<name> literal.\n{{messages}}";
+
+    await autonameChat('session', input);
+
+    expect(getText.mock.calls[0][0].messages[0].content).toEqual([
+      { type: 'text', text: expect.stringContaining(`>>>\n${input}\n>>>`) },
+    ]);
+  });
+
   it.each(['openai', 'openrouter'] as const)(
     'keeps the existing title without requesting a missing %s key',
     async (provider) => {
@@ -235,5 +245,23 @@ describe('autonameChat', () => {
     await pending;
 
     expect(store.sessions[0].title).toBe('My title');
+  });
+});
+
+describe('getCompletion', () => {
+  afterEach(() => mock.restore());
+
+  it('preserves replacement patterns in the current input', async () => {
+    const input = "Keep $$, $&, $`, $', $1 and $<name> literal.\n{{input}}";
+    const getText = spyOn(llm, 'getText').mockResolvedValue(titleResponse(' suggestion'));
+
+    expect(await getCompletion(input)).toBe(' suggestion');
+
+    expect(getText.mock.calls[0][0].messages[0].content).toEqual([
+      {
+        type: 'text',
+        text: expect.stringContaining(`<current_input>\n${input}\n</current_input>`),
+      },
+    ]);
   });
 });
