@@ -197,12 +197,19 @@ export const generateModels = async () => {
       tags.push('online');
     }
 
+    const pricing = {
+      prompt: Number(routerModel.pricing.prompt),
+      completion: Number(routerModel.pricing.completion),
+      image: Number(routerModel.pricing.image ?? 0),
+      request: Number(routerModel.pricing.request ?? 0),
+    };
+
     // Add a 'Free' tag if the model is free
     if (
-      Number(routerModel.pricing.prompt) === 0 &&
-      Number(routerModel.pricing.completion) === 0 &&
-      Number(routerModel.pricing.image) === 0 &&
-      Number(routerModel.pricing.request) === 0
+      pricing.prompt === 0 &&
+      pricing.completion === 0 &&
+      pricing.image === 0 &&
+      pricing.request === 0
     ) {
       tags.push('free');
     }
@@ -219,12 +226,7 @@ export const generateModels = async () => {
       contextLength: routerModel.context_length,
       maxCompletionTokens: Number(routerModel.top_provider.max_completion_tokens),
       tags,
-      pricing: {
-        prompt: Number(routerModel.pricing.prompt),
-        completion: Number(routerModel.pricing.completion),
-        image: Number(routerModel.pricing.image),
-        request: Number(routerModel.pricing.request),
-      },
+      pricing,
 
       vision,
     };

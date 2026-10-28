@@ -78,6 +78,61 @@ describe('generateModels catalogue', () => {
     });
   });
 
+  it.each([
+    { name: 'omitted', prices: {} },
+    { name: 'null', prices: { image: null, request: null } },
+    { name: 'zero', prices: { image: '0', request: '0' } },
+  ])('normalizes $name optional prices and tags free models', async ({ prices }) => {
+    spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({
+        data: [
+          {
+            ...routerModel('openai/gpt-4o'),
+            pricing: { prompt: '0', completion: '0', ...prices },
+          },
+        ],
+      }),
+    );
+
+    const model = (await generateModels()).find((model) => model.id === 'openai/gpt-4o');
+
+    expect(model?.pricing).toEqual({ prompt: 0, completion: 0, image: 0, request: 0 });
+    expect(JSON.parse(JSON.stringify(model)).pricing).toEqual(model?.pricing);
+    expect(model?.tags).toContain('free');
+  });
+
+  it.each([
+    { field: 'prompt', price: '0.000003', expected: 0.000003 },
+    { field: 'completion', price: '0.000015', expected: 0.000015 },
+    { field: 'image', price: '0.001', expected: 0.001 },
+    { field: 'request', price: '0.01', expected: 0.01 },
+  ])(
+    'preserves $field charges without tagging the model free',
+    async ({ field, price, expected }) => {
+      spyOn(globalThis, 'fetch').mockResolvedValue(
+        Response.json({
+          data: [
+            {
+              ...routerModel('openai/gpt-4o'),
+              pricing: { prompt: '0', completion: '0', [field]: price },
+            },
+          ],
+        }),
+      );
+
+      const model = (await generateModels()).find((model) => model.id === 'openai/gpt-4o');
+
+      expect(model?.pricing).toEqual({
+        prompt: 0,
+        completion: 0,
+        image: 0,
+        request: 0,
+        [field]: expected,
+      });
+      expect(model?.tags).not.toContain('free');
+    },
+  );
+
   it('resolves bundled presets, defaults and examples against available models', async () => {
     // OpenRouter IDs verified on 2026-10-28; no live API calls in unit tests.
     const availableIds = [
