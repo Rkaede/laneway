@@ -1,6 +1,6 @@
 import { afterEach, expect, it, mock, spyOn } from 'bun:test';
 
-import type { ModelProps } from '~/types';
+import type { ModelProps, ModelTags } from '~/types';
 
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { fetchModels, models, modelsByCreator, setModels } = await import('./models');
@@ -17,6 +17,7 @@ const model = (id: string, creator: string, deprecated = false): ModelProps => (
   creator: { id: creator, name: creator, website: '', icon: creator },
   provider: [],
   created: 0,
+  tags: [],
   deprecated,
 });
 
@@ -28,6 +29,43 @@ it('loads the model catalogue', async () => {
 
   expect(fetch).toHaveBeenCalledWith('/models.json');
   expect(models).toEqual(catalogue);
+});
+
+it.each([
+  { created: '2026-10-01T00:00:00Z', isNew: true },
+  { created: '2026-08-28T00:00:01Z', isNew: true },
+  { created: '2026-08-28T00:00:00Z', isNew: false },
+  { created: '2026-08-27T23:59:59Z', isNew: false },
+])('refreshes new tags for a model created at $created', async ({ created, isNew }) => {
+  spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-28T00:00:00Z'));
+  const tags: ModelTags[] = ['vision', 'new', 'free'];
+  const catalogue = [
+    { ...model('openai/tagged', 'OpenAI'), created: Date.parse(created) / 1000, tags },
+    {
+      ...model('openai/untagged', 'OpenAI'),
+      created: Date.parse(created) / 1000,
+      tags: undefined,
+    },
+  ];
+  spyOn(globalThis, 'fetch').mockResolvedValue(Response.json(catalogue));
+
+  await fetchModels();
+
+  expect(models[0].created).toBe(catalogue[0].created);
+  expect(models[0].tags).toEqual(isNew ? ['vision', 'free', 'new'] : ['vision', 'free']);
+  expect(models[1].tags).toEqual(isNew ? ['new'] : []);
+});
+
+it('removes stale new tags from the cached catalogue when offline', async () => {
+  spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-28T00:00:00Z'));
+  const cached = { ...model('openai/cached', 'OpenAI'), tags: ['new', 'free'] as ModelTags[] };
+  setModels([cached]);
+  spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Offline'));
+  spyOn(console, 'error').mockImplementation(() => {});
+
+  await fetchModels();
+
+  expect(models).toEqual([{ ...cached, tags: ['free'] }]);
 });
 
 it.each(['network', 'HTTP', 'JSON'])(

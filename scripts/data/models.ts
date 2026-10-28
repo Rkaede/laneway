@@ -160,7 +160,7 @@ export const generateModels = async () => {
         description: 'AI assistant from Aperture Science.',
         contextLength: 16384,
         maxCompletionTokens: 4096,
-        tags: ['new', 'free'],
+        tags: ['free'],
         pricing: {
           prompt: 0,
           completion: 0,
@@ -186,13 +186,6 @@ export const generateModels = async () => {
     const vision = routerModel.architecture?.input_modalities?.includes('image') ?? false;
     if (vision) {
       tags.push('vision');
-    }
-
-    // Check if the model is less than 3 months old
-    const twoMonthsAgo = new Date();
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-    if (new Date(routerModel.created * 1000) > twoMonthsAgo) {
-      tags.push('new');
     }
 
     const online = routerModel.name.includes('Online');

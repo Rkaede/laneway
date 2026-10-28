@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
 
-import type { ModelProps } from '~/types';
+import type { ModelProps, ModelTags } from '~/types';
 
 import { makePersistedStore } from './persisted';
 
@@ -21,6 +21,19 @@ export async function fetchModels() {
   } catch (error) {
     console.error('Error loading models:', error);
   }
+
+  // Check if the model is less than 2 months old
+  const twoMonthsAgo = new Date(Date.now());
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+  setModels((catalogue) =>
+    catalogue.map((model) => {
+      const tags: ModelTags[] = model.tags?.filter((tag) => tag !== 'new') ?? [];
+      if (new Date(model.created * 1000) > twoMonthsAgo) {
+        tags.push('new');
+      }
+      return { ...model, tags };
+    }),
+  );
 }
 
 // the warning given by the rule here is not helpful in this case
