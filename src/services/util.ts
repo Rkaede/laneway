@@ -68,7 +68,15 @@ export async function formatMessages(messages: MessageProps[]): Promise<ModelMes
         const formattedParts = await Promise.all(
           content.map(async (part) => {
             if (part.type === 'image' && 'image' in part) {
-              const imageData = await imageCache.get('/' + part.image.storageId);
+              const imageData =
+                part.image.sourceType === 'path'
+                  ? await fetch(part.image.storageId).then((response) => {
+                      if (!response.ok) {
+                        throw new Error(`Failed to load image: ${part.image.filename}`);
+                      }
+                      return response.blob();
+                    })
+                  : await imageCache.get(part.image.storageId);
               if (!imageData) return part;
               const file = new File([imageData], part.image.filename, { type: imageData.type });
               const base64Image = await base64EncodeFile(file);
