@@ -15,7 +15,7 @@ export const CodeHighlighter: ParentComponent<CodeHighlighterProps> = (props) =>
 
   return (
     <div class="not-prose">
-      {/* eslint-disable-next-line solid/no-innerhtml */}
+      {/* oxlint-disable-next-line solid/no-innerhtml -- Shiki generates and escapes this markup. */}
       <div innerHTML={html()} data-language={props.language} />
       <div>{props.children}</div>
     </div>

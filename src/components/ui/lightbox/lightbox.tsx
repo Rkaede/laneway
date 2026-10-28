@@ -178,7 +178,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
             </button>
           </div>
 
-          <div class="wide:h-full xl:taller-than-854:h-auto pointer-events-none relative flex aspect-[3/2] w-full max-w-7xl items-center">
+          <div class="pointer-events-none relative flex aspect-[3/2] w-full max-w-7xl items-center">
             <div
               class="w-full touch-pan-y touch-pinch-zoom overflow-hidden"
               onTouchStart={handleTouchStart}
@@ -186,10 +186,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
               onTouchCancel={() => (touchStart = undefined)}
             >
               <div class="relative flex aspect-[3/2] items-center justify-center">
-                <div
-                  class="pointer-events-auto absolute"
-                  style={{ opacity: '1', transform: 'none' }}
-                >
+                <div class="pointer-events-auto absolute">
                   {currentImage().storageId && (
                     <LocalImage
                       src={currentImage().storageId!}
@@ -206,7 +203,6 @@ export const Lightbox: Component<LightboxProps> = (props) => {
                       height={currentImage().height}
                       decoding="async"
                       style={{
-                        color: 'transparent',
                         'max-height': '78vh',
                         'max-width': '100%',
                         'object-fit': 'contain',
@@ -222,7 +218,6 @@ export const Lightbox: Component<LightboxProps> = (props) => {
                 <Show when={props.images.length > 1}>
                   <button
                     class="pointer-events-auto absolute top-[calc(50%-16px)] left-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
-                    style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handlePrevious}
                     aria-label="Previous image"
                   >
@@ -247,7 +242,6 @@ export const Lightbox: Component<LightboxProps> = (props) => {
                 <Show when={props.images.length > 1}>
                   <button
                     class="pointer-events-auto absolute top-[calc(50%-16px)] right-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
-                    style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handleNext}
                     aria-label="Next image"
                   >

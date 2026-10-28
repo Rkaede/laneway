@@ -171,7 +171,7 @@ export const generateModels = async () => {
       };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     const routerModel = base.data.find((m: any) => m.id === model.id);
     if (
       model.deprecated ||

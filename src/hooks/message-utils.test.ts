@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable typescript/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
 // Prevent fetch errors when importing modules that fetch data at load time

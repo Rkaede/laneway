@@ -62,6 +62,24 @@ describe('Markdown', () => {
     expect(html).toContain('x => y\nVec&lt;T>\n&amp;lt;T&amp;gt;\n</code></pre>');
   });
 
+  it('renders fenced code without Markdown metadata on the pre element', () => {
+    const html = render('```ts\nconst value = 1;\n```');
+    const pre = html.match(/<pre\b[^>]*>/)?.[0];
+
+    expect(pre).toMatch(/class="not-prose overflow-hidden rounded-card\s*"/);
+    expect(pre).not.toMatch(/\s(node|key)=/);
+    expect(html).toContain('<code data-language="ts">const value = 1;\n</code>');
+  });
+
+  it('keeps link titles without forwarding Markdown metadata', () => {
+    const html = render('[docs](https://example.com/guide "Read the guide")');
+    const link = html.match(/<a\b[^>]*>/)?.[0];
+
+    expect(link).toContain('title="Read the guide"');
+    expect(link).not.toMatch(/\s(node|key)=/);
+    expect(html).toContain('>docs</a>');
+  });
+
   it.each(['objective-c', 'unknown-language-with-hyphens', 'typescript', 'c++'])(
     'passes the complete fenced language to CodeBlock: %s',
     (language) => {

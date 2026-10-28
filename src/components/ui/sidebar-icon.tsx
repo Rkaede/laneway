@@ -21,7 +21,6 @@ export const SidebarIcon: Component<{ open?: boolean }> = (props) => {
       stroke-linejoin="round"
       class="sidebar-icon"
       data-open={props.open}
-      {...props}
     >
       <line class="sidebar-icon-top" x1={x} y1="2" x2={x} y2={py + lineLength - overlap} />
       <line

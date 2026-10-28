@@ -34,21 +34,21 @@ export type AvatarProps = Partial<JSX.HTMLAttributes<HTMLDivElement>> &
   };
 
 export const Avatar: ParentComponent<AvatarProps> = (props) => {
-  const [local, rest] = splitProps(props, ['class', 'variant', 'size']);
+  const [local, rest] = splitProps(props, ['class', 'variant', 'size', 'modelId']);
 
   return (
     <div
       class={cn(avatarVariants({ variant: local.variant, size: local.size }), local.class)}
       {...rest}
     >
-      <Show when={props.modelId} fallback={props.children}>
+      <Show when={local.modelId} fallback={props.children}>
         <ModelIcon
           class={cn('size-4', {
             'size-3': local.size === 'sm',
             'size-5': local.size === 'md',
             'size-6': local.size === 'lg',
           })}
-          modelId={props.modelId}
+          modelId={local.modelId}
         />
       </Show>
     </div>

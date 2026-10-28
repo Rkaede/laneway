@@ -33,7 +33,6 @@ export const ModelIcon: Component<ModelIconProps> = (props) => {
   return (
     <Dynamic
       component={icon()}
-      {...props}
       // pointer-events-none is needed to prevent the browser popover for the title
       // attribute in the svg
       class={cn(props.class, 'pointer-events-none')}

@@ -19,9 +19,13 @@ const Markdown: Component<{ text: string }> = (props) => {
           return (
             <Show when={linkProps.href} fallback={<span>{linkProps.children}</span>}>
               <a
-                {...linkProps}
+                href={linkProps.href}
+                title={linkProps.title}
+                target={linkProps.target}
                 rel={linkProps.target === '_blank' ? 'noopener noreferrer' : undefined}
-              />
+              >
+                {linkProps.children}
+              </a>
             </Show>
           );
         },
@@ -29,7 +33,7 @@ const Markdown: Component<{ text: string }> = (props) => {
           return <span>{imageProps.alt}</span>;
         },
         pre(preProps) {
-          return <pre class="not-prose overflow-hidden rounded-card" {...preProps} />;
+          return <pre class="not-prose overflow-hidden rounded-card">{preProps.children}</pre>;
         },
         code(codeProps) {
           return (
@@ -42,7 +46,6 @@ const Markdown: Component<{ text: string }> = (props) => {
                     codeProps.node.children[0]?.value ?? ''
                   }
                   language={codeProps.class?.replace(/^language-/, '') ?? 'plaintext'}
-                  {...codeProps}
                 />
               }
             >
