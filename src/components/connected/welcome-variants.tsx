@@ -30,8 +30,9 @@ function Statement() {
     <div class="flex flex-col gap-4">
       <Heading>Every model. One window. Your own keys.</Heading>
       <p class="max-w-xl text-muted">
-        Laneway talks straight to OpenAI and OpenRouter from your browser. Nothing sits in
-        between, and your chats never leave your device.
+        Laneway talks straight to OpenAI and OpenRouter from your browser. Your chat history is
+        stored locally, while prompts and conversation context are sent to your chosen
+        providers.
       </p>
       <ul class="flex flex-wrap gap-x-5 gap-y-2">
         <For each={points}>
