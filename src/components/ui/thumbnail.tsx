@@ -50,7 +50,7 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
                 'relative z-30 translate-x-[40%] translate-y-[-40%]',
                 'rounded-full border border-border-emphasis bg-surface-overlay p-0.5 text-main',
                 'transition-colors hover:scale-105 hover:border-danger hover:bg-danger hover:text-danger-fg',
-                'opacity-0 group-hover:opacity-100',
+                'opacity-100 group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:opacity-0',
               )}
             >
               <IconClose class="size-3" />

@@ -2,7 +2,7 @@ import { formatDateLong, formatResponseTime } from '~/util';
 
 import { IconChartNoAxesColumn } from '../icons/ui';
 import { Button } from './button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 interface StatsPopoverProps {
   stats?: {
@@ -50,21 +50,18 @@ export function StatsPopoverContent(props: StatsPopoverProps) {
 
 export function StatsPopover(props: StatsPopoverProps) {
   return (
-    <HoverCard>
-      <HoverCardTrigger href="#">
-        <Button
-          variant="toolbar"
-          size="toolbar"
-          class="cursor-default"
-          as="div"
-          aria-label="View message statistics"
-        >
-          <IconChartNoAxesColumn class="size-4" />
-        </Button>
-      </HoverCardTrigger>
-      <HoverCardContent class="w-auto p-3">
+    <Popover>
+      <Button
+        as={PopoverTrigger}
+        variant="toolbar"
+        size="toolbar"
+        aria-label="View message statistics"
+      >
+        <IconChartNoAxesColumn class="size-4" />
+      </Button>
+      <PopoverContent class="w-auto p-3 pr-9" aria-label="Message statistics">
         <StatsPopoverContent {...props} />
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   );
 }
