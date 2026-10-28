@@ -75,9 +75,9 @@ const ModelCardContent: ParentComponent<{ model: ModelProps }> = (props) => {
             <p class="text-sm font-semibold">Pricing</p>
             <div class="grid grid-cols-[auto_1fr] gap-x-2">
               <div>input: </div>
-              <Price pricing={props.model.pricing.prompt} class="text-muted" />
+              <Price pricing={props.model.pricing?.prompt} class="text-muted" />
               <div>output: </div>
-              <Price pricing={props.model.pricing.completion} class="text-muted" />
+              <Price pricing={props.model.pricing?.completion} class="text-muted" />
             </div>
           </div>
         </div>

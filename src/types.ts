@@ -63,7 +63,7 @@ export type ModelProps = {
   maxPenalty?: number;
   maxTemperature?: number;
   contextWindow?: number;
-  pricing: {
+  pricing?: {
     prompt: number;
     completion: number;
     image: number;
