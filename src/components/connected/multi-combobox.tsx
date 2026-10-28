@@ -66,12 +66,12 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
         >
           <IconLayoutGrid class="size-4" />
         </Show>
-        <span class="flex-1">
+        <span class="min-w-0 flex-1 truncate">
           {selectedItem() ? (
             <span class="flex items-baseline gap-1">
-              <span>{selectedItem()?.title}</span>
+              <span class="truncate">{selectedItem()?.title}</span>
               {props.showType && (
-                <span class="text-xs text-muted">({selectedItem()?.type})</span>
+                <span class="shrink-0 text-xs text-muted">({selectedItem()?.type})</span>
               )}
             </span>
           ) : (

@@ -35,5 +35,5 @@ export const FormContainer: ParentComponent<{ class?: string }> = (props) => {
 };
 
 export const SplitColumns: ParentComponent = (props) => {
-  return <div class="grid grid-cols-2 gap-4">{props.children}</div>;
+  return <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">{props.children}</div>;
 };

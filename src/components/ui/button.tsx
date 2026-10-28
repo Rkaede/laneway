@@ -18,7 +18,7 @@ const buttonVariants = cva('btn', {
       ghost: 'btn-ghost',
       bare: 'hover:bg-transparent',
       link: 'btn-link',
-      combobox: 'btn-field w-full min-w-72 justify-between text-left font-normal',
+      combobox: 'btn-field w-full min-w-0 justify-between text-left font-normal',
       close: 'size-10 rounded-full p-0 text-on-media hover:bg-media-wash',
       toolbar: 'text-main hover:bg-surface-hover',
     },

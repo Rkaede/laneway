@@ -17,14 +17,14 @@ export function NoteLayout(props: { sessionId?: string }) {
   const sessionContext = useSession();
 
   return (
-    <div class="grid size-full min-h-0 grid-cols-2">
-      <div class="">
+    <div class="grid size-full min-h-0 grid-cols-1 grid-rows-2 md:grid-cols-2 md:grid-rows-1">
+      <div class="min-h-0 min-w-0">
         <div class="grid h-full bg-surface-sunken p-3">
           <TextEditor
             onInput={(value) => setSessionInput(value, props.sessionId)}
             initialValue={session.input}
             onSubmit={() => session.handleSubmit()}
-            class="col-start-1 row-start-1"
+            class="col-start-1 row-start-1 min-h-0 min-w-0"
             placeholder="Write and refine a single prompt"
             mode="note"
           />
