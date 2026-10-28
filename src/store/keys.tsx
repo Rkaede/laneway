@@ -31,6 +31,10 @@ if ('google' in apiKeys) {
   setApiKeys(reconcile(removeLegacyGoogleKey(apiKeys)));
 }
 
+export const setApiKey = (provider: 'openai' | 'openrouter', value: string) => {
+  setApiKeys(provider, value.trim());
+};
+
 export const deleteKeys = () => {
   setApiKeys(reconcile(clone(defaultState)));
 };

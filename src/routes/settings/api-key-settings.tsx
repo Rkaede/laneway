@@ -9,7 +9,7 @@ import {
   SettingHeader,
 } from '~/components/ui';
 import { setStore, store } from '~/store';
-import { apiKeys, setApiKeys } from '~/store/keys';
+import { apiKeys, setApiKey } from '~/store/keys';
 
 import { Section, Setting } from './shared';
 
@@ -62,7 +62,7 @@ export function APIKeySetting() {
           autocomplete="off"
           type="password"
           value={apiKeys?.openrouter ?? ''}
-          onChange={(e) => setApiKeys('openrouter', e.target.value)}
+          onInput={(e) => setApiKey('openrouter', e.currentTarget.value)}
         />
 
         <div class="mt-6">
@@ -112,7 +112,7 @@ export function APIKeySetting() {
           autocomplete="off"
           type="password"
           value={apiKeys?.openai ?? ''}
-          onChange={(e) => setApiKeys('openai', e.target.value)}
+          onInput={(e) => setApiKey('openai', e.currentTarget.value)}
         />
       </Setting>
     </Section>
