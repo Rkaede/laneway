@@ -9,8 +9,16 @@ import type { MessageProps } from '~/types';
 import { mockStream } from './llm-mock';
 import { createThrottle, formatMessages } from './util';
 
-const openai = () => createOpenAI({ apiKey: apiKeys?.openai });
-const openrouter = () => createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
+// OpenAI's provider defaults to the Responses API, which stores conversations server-side and is
+// not supported by OpenRouter. `.chat()` keeps the Chat Completions behavior we always had.
+const openai = () => {
+  const provider = createOpenAI({ apiKey: apiKeys?.openai });
+  return (modelId: string) => provider.chat(modelId);
+};
+const openrouter = () => {
+  const provider = createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
+  return (modelId: string) => provider.chat(modelId);
+};
 const google = () => createGoogleGenerativeAI({ apiKey: apiKeys?.google });
 
 const services = { openai, openrouter, google };

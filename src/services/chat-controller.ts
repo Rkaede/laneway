@@ -48,8 +48,12 @@ export async function append({
     if (!stream) return;
     let latestContent = '';
 
-    for await (const textPart of stream.textStream) {
-      latestContent += textPart;
+    // textStream hides API failures behind a generic NoOutputGeneratedError, fullStream carries them
+    for await (const part of stream.fullStream) {
+      if (part.type === 'error') throw part.error;
+      if (part.type !== 'text-delta') continue;
+
+      latestContent += part.text;
 
       setStore('chats', (c) => c.id === chatId, 'latest', {
         role: 'assistant',

@@ -49,7 +49,7 @@ export function mockStream({ abortSignal }: { abortSignal?: AbortSignal }) {
 
   // Return an object that matches the AI library's expected interface
   return {
-    textStream: (async function* () {
+    fullStream: (async function* () {
       for (const message of messages) {
         if (abortSignal?.aborted) {
           break;
@@ -61,7 +61,7 @@ export function mockStream({ abortSignal }: { abortSignal?: AbortSignal }) {
             reject();
           });
         });
-        yield message;
+        yield { type: 'text-delta' as const, text: message };
       }
     })(),
     usage: Promise.resolve({

@@ -1,4 +1,4 @@
-import type { CoreMessage, CoreUserMessage } from 'ai';
+import type { ModelMessage, UserModelMessage } from 'ai';
 
 import { store } from '~/store';
 import { apiKeys } from '~/store/keys';
@@ -58,7 +58,7 @@ export function getProvider(modelId: string) {
   return primaryProvider;
 }
 
-export async function formatMessages(messages: MessageProps[]): Promise<CoreMessage[]> {
+export async function formatMessages(messages: MessageProps[]): Promise<ModelMessage[]> {
   return Promise.all(
     messages.map(async (message) => {
       if (message.role === 'user') {
@@ -80,9 +80,9 @@ export async function formatMessages(messages: MessageProps[]): Promise<CoreMess
         return {
           role: 'user' as const,
           content: formattedParts,
-        } as CoreUserMessage;
+        } as UserModelMessage;
       }
-      return message as CoreMessage;
+      return message as ModelMessage;
     }),
   );
 }
