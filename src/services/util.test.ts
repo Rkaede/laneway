@@ -1,16 +1,106 @@
-import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
 import { imageAttachment } from '~/store/examples';
 import type { MessageProps } from '~/types';
 import * as util from '~/util';
 
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
-const { formatMessages } = await import('./util');
+const { setStore } = await import('~/store');
+const { setApiKeys } = await import('~/store/keys');
+const { setModels } = await import('~/store/models');
+const { formatMessages, getProvider } = await import('./util');
 const { imageCache } = await import('./image-cache');
 fetchMock.mockRestore();
 
 afterEach(() => {
   mock.restore();
+});
+
+describe('getProvider', () => {
+  const primary = { id: 'openai', modelId: 'direct-model', primary: true } as const;
+  const openrouter = { id: 'openrouter', modelId: 'openai/model', primary: false } as const;
+
+  beforeEach(() => {
+    setModels([
+      {
+        id: 'model',
+        title: 'Model',
+        creator: { id: 'openai', name: 'OpenAI', website: '', icon: '' },
+        created: 0,
+        provider: [openrouter, primary],
+      },
+    ]);
+    setApiKeys({ openai: '', openrouter: '' });
+    setStore('settings', 'openRouterUsage', 'fallback');
+  });
+
+  afterEach(() => {
+    setModels([]);
+    setApiKeys({ openai: '', openrouter: '' });
+    setStore('settings', 'openRouterUsage', 'fallback');
+  });
+
+  it.each([
+    { usage: 'fallback', directKey: true, routerKey: true, expected: primary },
+    { usage: 'fallback', directKey: true, routerKey: false, expected: primary },
+    { usage: 'fallback', directKey: false, routerKey: true, expected: openrouter },
+    { usage: 'fallback', directKey: false, routerKey: false, expected: primary },
+    { usage: 'always', directKey: true, routerKey: true, expected: openrouter },
+    { usage: 'always', directKey: true, routerKey: false, expected: primary },
+    { usage: 'always', directKey: false, routerKey: true, expected: openrouter },
+    { usage: 'always', directKey: false, routerKey: false, expected: primary },
+  ] as const)(
+    'selects the provider in $usage mode (direct key: $directKey, router key: $routerKey)',
+    ({ usage, directKey, routerKey, expected }) => {
+      setStore('settings', 'openRouterUsage', usage);
+      setApiKeys({
+        openai: directKey ? 'direct-key' : '',
+        openrouter: routerKey ? 'router-key' : '',
+      });
+
+      expect(getProvider('model')).toEqual(expected);
+    },
+  );
+
+  it('returns no provider for an unknown model', () => {
+    setApiKeys({ openai: 'direct-key', openrouter: 'router-key' });
+
+    expect(getProvider('unknown')).toBeUndefined();
+  });
+
+  it.each(['always', 'fallback'] as const)(
+    'returns no provider for a model without providers in %s mode',
+    (usage) => {
+      setStore('settings', 'openRouterUsage', usage);
+      setApiKeys({ openai: 'direct-key', openrouter: 'router-key' });
+      setModels(0, 'provider', []);
+
+      expect(getProvider('model')).toBeUndefined();
+    },
+  );
+
+  it.each(['always', 'fallback'] as const)(
+    'requires a router key for a router-only model in %s mode',
+    (usage) => {
+      setStore('settings', 'openRouterUsage', usage);
+      setModels(0, 'provider', [openrouter]);
+      setApiKeys('openai', 'unrelated-key');
+
+      expect(getProvider('model')).toBeUndefined();
+
+      setApiKeys('openrouter', 'router-key');
+
+      expect(getProvider('model')).toEqual(openrouter);
+    },
+  );
+
+  it('keeps the primary provider when always mode has no router route', () => {
+    setStore('settings', 'openRouterUsage', 'always');
+    setModels(0, 'provider', [primary]);
+    setApiKeys({ openai: 'direct-key', openrouter: 'router-key' });
+
+    expect(getProvider('model')).toEqual(primary);
+  });
 });
 
 describe('formatMessages', () => {
