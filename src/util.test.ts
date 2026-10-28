@@ -1,6 +1,50 @@
-import { describe, expect, it } from 'bun:test';
+import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
-import { cn, formatResponseTime, groupByDate } from './util';
+import { cn, download, formatResponseTime, groupByDate } from './util';
+
+describe('download', () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+
+  afterEach(() => {
+    mock.restore();
+    if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+    else Reflect.deleteProperty(globalThis, 'document');
+  });
+
+  it.each([false, true])(
+    'downloads JSON with a Blob URL and revokes it (Blob input: %s)',
+    async (blobInput) => {
+      const attributes = new Map<string, string>();
+      const link = {
+        setAttribute: (name: string, value: string) => attributes.set(name, value),
+        style: { display: '' },
+        click: mock(() => {}),
+      };
+      const appendChild = mock(() => {});
+      const removeChild = mock(() => {});
+      Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: { createElement: () => link, body: { appendChild, removeChild } },
+      });
+      const createUrl = spyOn(URL, 'createObjectURL').mockReturnValue('blob:backup');
+      const revokeUrl = spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+      const json = JSON.stringify({ text: 'A backup with Unicode: 🦘' });
+      const data = blobInput ? new Blob([json], { type: 'application/json' }) : json;
+
+      download(data, 'laneway-backup.json');
+
+      expect(attributes.get('href')).toBe('blob:backup');
+      expect(attributes.get('download')).toBe('laneway-backup.json');
+      expect(await (createUrl.mock.calls[0][0] as Blob).text()).toBe(json);
+      expect(link.click).toHaveBeenCalledTimes(1);
+      expect(appendChild).toHaveBeenCalledWith(link);
+      expect(removeChild).toHaveBeenCalledWith(link);
+      expect(revokeUrl).not.toHaveBeenCalled();
+      await Bun.sleep(10);
+      expect(revokeUrl).toHaveBeenCalledWith('blob:backup');
+    },
+  );
+});
 
 // < 2000 returns "Nms"
 describe('formatResponseTime', () => {

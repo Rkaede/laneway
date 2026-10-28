@@ -23,16 +23,23 @@ export function clone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function download(data: string, filename: string) {
+export function download(data: string | Blob, filename: string) {
   const element = document.createElement('a');
-  element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
+  const url = URL.createObjectURL(
+    typeof data === 'string' ? new Blob([data], { type: 'application/json' }) : data,
+  );
+  element.setAttribute('href', url);
   element.setAttribute('download', filename);
 
   element.style.display = 'none';
   document.body.appendChild(element);
 
-  element.click();
-  document.body.removeChild(element);
+  try {
+    element.click();
+  } finally {
+    document.body.removeChild(element);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
 }
 
 export function filenameDate(date: Date = new Date()) {

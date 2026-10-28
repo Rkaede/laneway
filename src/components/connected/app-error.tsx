@@ -2,7 +2,7 @@ import type { Component } from 'solid-js';
 
 import { Button } from '~/components/ui/button';
 import { deleteData, store } from '~/store';
-import { download } from '~/util';
+import { exportBackup } from '~/store/backup';
 
 export const AppError: Component = () => {
   const handleClearData = () => {
@@ -11,8 +11,17 @@ export const AppError: Component = () => {
     }
   };
 
-  const handleExportData = () => {
-    download(JSON.stringify(store), 'chat-data.json');
+  const handleExportData = async () => {
+    try {
+      const omittedImages = await exportBackup(store);
+      if (omittedImages) {
+        window.alert(
+          `Data exported. ${omittedImages} unavailable image${omittedImages === 1 ? '' : 's'} left out.`,
+        );
+      }
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to export data.');
+    }
   };
 
   return (
