@@ -22,9 +22,9 @@ export const Tokens: Component<{ tokens?: number; class?: string }> = (props) =>
 export const Price: Component<{ pricing?: number; class?: string }> = (props) => {
   return (
     <div class={props.class}>
-      <Show when={props.pricing} fallback="N/A">
-        {(pricing) => `$${(pricing() * 1000000).toFixed(2)} / 1M tokens`}
-      </Show>
+      {props.pricing === undefined
+        ? 'N/A'
+        : `$${(props.pricing * 1000000).toFixed(2)} / 1M tokens`}
     </div>
   );
 };
