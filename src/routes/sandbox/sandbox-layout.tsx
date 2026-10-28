@@ -8,23 +8,11 @@ import { useApplyTheme } from '~/hooks/use-theme';
 import { setStore, store } from '~/store';
 import { cn } from '~/util';
 
-const stories = [
-  { title: 'AudioButton', path: 'audio-button' },
-  { title: 'Avatar', path: 'avatar' },
-  { title: 'Badge', path: 'badge' },
-  { title: 'Button', path: 'button' },
-  { title: 'ChatCard', path: 'chatcard' },
-  { title: 'ChatInput', path: 'chat-input' },
-  { title: 'CodeBlock', path: 'codeblock' },
-  { title: 'Icons', path: 'icons' },
-  { title: 'IconBadge', path: 'icon-badge' },
-  { title: 'Lightbox', path: 'lightbox' },
-  { title: 'Message', path: 'message' },
-  { title: 'MultiCombobox', path: 'multi-combobox' },
-  { title: 'StatsPopover', path: 'stats-popover' },
-  { title: 'Switch', path: 'switch' },
-  { title: 'useAnimatedText', path: 'use-animated-text' },
-].sort((a, b) => a.title.localeCompare(b.title));
+import { storyMap } from './stories';
+
+const stories = Object.entries(storyMap)
+  .map(([path, { title }]) => ({ title, path }))
+  .sort((a, b) => a.title.localeCompare(b.title));
 
 const SandboxLayout: ParentComponent = (props) => {
   const location = useLocation();

@@ -19,14 +19,16 @@ type IconComponent = (props: { class?: string }) => JSX.Element;
  * shortcut key, so they all stick to what the app actually does.
  */
 
+function Heading(props: { children: JSX.Element }) {
+  return <h2 class="text-2xl leading-tight font-semibold tracking-tight">{props.children}</h2>;
+}
+
 function Statement() {
   const points = ['No account', 'No middleman', 'Open source'];
 
   return (
     <div class="flex flex-col gap-4">
-      <h2 class="text-2xl leading-tight font-semibold tracking-tight">
-        Every model. One window. Your own keys.
-      </h2>
+      <Heading>Every model. One window. Your own keys.</Heading>
       <p class="max-w-xl text-muted">
         Laneway talks straight to OpenAI, Google and OpenRouter from your browser. Nothing sits
         in between, and your chats never leave your device.
@@ -66,7 +68,7 @@ function Pillars() {
 
   return (
     <div class="flex flex-col gap-5">
-      <h2 class="text-2xl leading-tight font-semibold tracking-tight">Bring your own keys.</h2>
+      <Heading>Bring your own keys.</Heading>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <For each={pillars}>
           {(pillar) => (
@@ -88,9 +90,7 @@ function Compare() {
 
   return (
     <div class="flex flex-col gap-4">
-      <h2 class="text-2xl leading-tight font-semibold tracking-tight">
-        Ask once. Compare everything.
-      </h2>
+      <Heading>Ask once. Compare everything.</Heading>
       <p class="max-w-xl text-muted">
         Send one prompt to several models at the same time and read the answers side by side.
       </p>
@@ -149,9 +149,7 @@ function FeatureGrid() {
 
   return (
     <div class="flex flex-col gap-5">
-      <h2 class="text-2xl leading-tight font-semibold tracking-tight">
-        Everything in one place.
-      </h2>
+      <Heading>Everything in one place.</Heading>
       <ul class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
         <For each={features}>
           {(feature) => (
@@ -187,9 +185,7 @@ function Steps() {
 
   return (
     <div class="flex flex-col gap-5">
-      <h2 class="text-2xl leading-tight font-semibold tracking-tight">
-        Three steps to your first chat.
-      </h2>
+      <Heading>Three steps to your first chat.</Heading>
       <ol class="flex flex-col gap-4">
         <For each={steps}>
           {(step, index) => (

@@ -1,13 +1,4 @@
-import { existsSync, readFileSync } from 'fs';
-import path from 'path';
-
-import { anthropic } from './data/models/anthropic';
-import { deepseek } from './data/models/deepseek';
-import { google } from './data/models/google';
-import { microsoft } from './data/models/microsoft';
-import { openai } from './data/models/openai';
-import { perplexity } from './data/models/perplexity';
-import { xai } from './data/models/xai';
+import { fetchModels, modelsBase } from './data/models';
 
 const SUPPORTED_PROVIDERS = [
   'openai',
@@ -46,56 +37,6 @@ const FILTERED_MODELS: string[] = [
   // Example: 'openai/gpt-3.5-turbo-0613',
 ];
 
-async function fetchModels() {
-  // Local copy of the models from openrouter.
-  // Used in offline development.
-  const modelsPath = path.resolve('./models.json');
-  if (existsSync(modelsPath)) {
-    console.info('Loading model data from local models.json.');
-    try {
-      const data = JSON.parse(readFileSync(modelsPath, 'utf-8'));
-      return data;
-    } catch (error) {
-      console.error('Error reading local models.json:', error);
-      throw error;
-    }
-  }
-
-  console.info('Fetching model data from OpenRouter.');
-  try {
-    const response = await fetch('https://openrouter.ai/api/v1/models');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching models:', error);
-    throw error;
-  }
-}
-
-function getConfiguredModelIds(): Set<string> {
-  const allModels = [
-    ...openai,
-    ...anthropic,
-    ...google,
-    ...microsoft,
-    ...perplexity,
-    ...deepseek,
-    ...xai,
-  ];
-
-  const modelIds = new Set<string>();
-  for (const model of allModels) {
-    if (model.id) {
-      modelIds.add(model.id);
-    }
-  }
-
-  return modelIds;
-}
-
 function getProviderFromModelId(modelId: string): string | null {
   for (const provider of SUPPORTED_PROVIDERS) {
     if (modelId.startsWith(`${provider}/`)) {
@@ -107,7 +48,7 @@ function getProviderFromModelId(modelId: string): string | null {
 
 async function findMissingModels() {
   const routerData = await fetchModels();
-  const configuredIds = getConfiguredModelIds();
+  const configuredIds = new Set(modelsBase.map((model) => model.id));
 
   // Calculate the date 12 months ago
   const twelveMonthsAgo = new Date();

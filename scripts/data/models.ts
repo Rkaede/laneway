@@ -13,7 +13,7 @@ import { xai } from './models/xai';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-async function fetchModels() {
+export async function fetchModels() {
   // Local copy of the models from openrouter.
   // Used in offline development.
   const modelsPath = path.resolve('./models.json');

@@ -1,4 +1,5 @@
-import { type Component, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { type Component, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 
 import { Button } from '~/components/ui/button';
 import { APIKeySetting } from '~/routes/settings/api-key-settings';
@@ -78,12 +79,7 @@ export const WelcomeContent: Component<{
             <div class="overflow-visible">
               <Show when={showKeys() === false}>
                 <div class="mb-6" id="intro">
-                  <For each={[variant()]}>
-                    {(index) => {
-                      const Variant = WELCOME_VARIANTS[index];
-                      return <Variant />;
-                    }}
-                  </For>
+                  <Dynamic component={WELCOME_VARIANTS[variant()]} />
                 </div>
                 <div class="mb-4 flex justify-start gap-2">
                   <Button

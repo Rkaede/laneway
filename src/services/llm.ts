@@ -1,5 +1,5 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
 import { generateText, streamText } from 'ai';
 
 import { OPENROUTER_URL } from '~/constants';
@@ -11,14 +11,13 @@ import { createThrottle, formatMessages } from './util';
 
 // OpenAI's provider defaults to the Responses API, which stores conversations server-side and is
 // not supported by OpenRouter. `.chat()` keeps the Chat Completions behavior we always had.
-const openai = () => {
-  const provider = createOpenAI({ apiKey: apiKeys?.openai });
+function chatCompletions(provider: OpenAIProvider) {
   return (modelId: string) => provider.chat(modelId);
-};
-const openrouter = () => {
-  const provider = createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL });
-  return (modelId: string) => provider.chat(modelId);
-};
+}
+
+const openai = () => chatCompletions(createOpenAI({ apiKey: apiKeys?.openai }));
+const openrouter = () =>
+  chatCompletions(createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL }));
 const google = () => createGoogleGenerativeAI({ apiKey: apiKeys?.google });
 
 const services = { openai, openrouter, google };
