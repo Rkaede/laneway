@@ -85,6 +85,39 @@ describe('generateModels catalogue', () => {
     spyOn(console, 'log').mockImplementation(() => {});
   });
 
+  it('generates current text chat models with metadata and OpenRouter routing', async () => {
+    // OpenRouter IDs verified on 2026-10-28; no live API calls in unit tests.
+    const currentIds = [
+      'openai/gpt-6.1-terra',
+      'openai/gpt-6.1-terra-pro',
+      'openai/gpt-6.1-sol',
+      'anthropic/claude-haiku-5.5',
+      'anthropic/claude-sonnet-5.5',
+      'anthropic/claude-opus-5.5',
+      'google/gemini-4-argon',
+      'google/gemma-4-31b-it:free',
+      'deepseek/deepseek-v4.1-flash-1017',
+      'x-ai/grok-4.7',
+    ];
+    spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({ data: currentIds.map(routerModel) }),
+    );
+
+    const models = (await generateModels()).filter((model) => !model.deprecated);
+
+    for (const id of currentIds) {
+      expect(models.find((model) => model.id === id)).toMatchObject({
+        id,
+        provider: [{ id: 'openrouter', modelId: id, primary: false }],
+        created: 1771342990,
+        contextLength: 128000,
+        maxCompletionTokens: 4096,
+        vision: true,
+        pricing: { prompt: 0.000003, completion: 0.000015, image: 0, request: 0 },
+      });
+    }
+  });
+
   it('keeps Gemini and GPT-5.x on OpenRouter while retaining direct OpenAI models', () => {
     const routerOnlyModels = modelsBase.filter(
       (model) => model.id?.startsWith('google/') || model.id?.startsWith('openai/gpt-5'),

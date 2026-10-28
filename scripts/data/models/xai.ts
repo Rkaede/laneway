@@ -14,4 +14,9 @@ export const xai: Partial<ModelProps>[] = [
   },
   { id: 'x-ai/grok-4.20', title: 'Grok 4.20' },
   { id: 'x-ai/grok-4.20-multi-agent', title: 'Grok 4.20 Multi-Agent' },
+  { id: 'x-ai/grok-4.3', title: 'Grok 4.3' },
+  { id: 'x-ai/grok-build-0.1', title: 'Grok Build 0.1', reasoning: true },
+  { id: 'x-ai/grok-4.5', title: 'Grok 4.5', reasoning: true },
+  { id: 'x-ai/grok-4.6', title: 'Grok 4.6', reasoning: true },
+  { id: 'x-ai/grok-4.7', title: 'Grok 4.7', reasoning: true },
 ];

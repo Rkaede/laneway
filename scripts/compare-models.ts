@@ -46,8 +46,8 @@ function getProviderFromModelId(modelId: string): string | null {
   return null;
 }
 
-async function findMissingModels() {
-  const routerData = await fetchModels();
+export async function findMissingModels(loadModels = fetchModels) {
+  const routerData = await loadModels();
   const configuredIds = new Set(modelsBase.map((model) => model.id));
 
   // Calculate the date 12 months ago
@@ -69,8 +69,8 @@ async function findMissingModels() {
       continue; // Skip models from unsupported providers
     }
 
-    // Skip filtered models
-    if (FILTERED_MODELS.includes(model.id)) {
+    // Skip filtered models and batch variants
+    if (FILTERED_MODELS.includes(model.id) || model.id.endsWith(':batch')) {
       continue;
     }
 
@@ -156,4 +156,6 @@ async function main() {
   }
 }
 
-main();
+if (import.meta.main) {
+  main();
+}
