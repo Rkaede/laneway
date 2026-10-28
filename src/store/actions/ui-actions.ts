@@ -1,4 +1,5 @@
 import { IconInfo, IconPencilLine, IconSidebar, IconSun } from '~/components/icons/ui';
+import { THEMES } from '~/constants';
 import type { Actions } from '~/types';
 
 import { setStore, store } from '..';
@@ -26,8 +27,9 @@ export const uiActions: Actions = {
     keywords: ['theme', 'dark', 'light', 'mode'],
     icon: IconSun,
     fn: () => {
-      const newTheme = store.settings.theme === 'dark' ? 'light' : 'dark';
-      setStore('settings', 'theme', newTheme);
+      const current = THEMES.findIndex((theme) => theme.id === store.settings.theme);
+      const next = THEMES[(current + 1) % THEMES.length];
+      setStore('settings', 'theme', next.id);
     },
   },
   showAbout: {

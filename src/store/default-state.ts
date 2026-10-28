@@ -1,4 +1,5 @@
 // Default state factory and constants
+import type { Theme } from '~/constants';
 import * as examples from '~/store/examples';
 import type {
   AssistantProps,
@@ -50,7 +51,7 @@ interface State {
     sidebarOpen: boolean;
     generateTitles: boolean;
     openRouterUsage: 'always' | 'fallback';
-    theme: 'light' | 'dark';
+    theme: Theme;
     hasSeenWelcome: boolean;
     messages: {
       showAvatars: boolean;

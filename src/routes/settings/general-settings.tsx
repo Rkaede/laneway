@@ -1,5 +1,15 @@
 import { MultiCombobox } from '~/components/connected/multi-combobox';
-import { Switch, SwitchControl, SwitchThumb } from '~/components/ui';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  SwitchControl,
+  SwitchThumb,
+} from '~/components/ui';
+import { getTheme, THEMES } from '~/constants';
 import { setStore, store } from '~/store';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -7,6 +17,25 @@ import { Section, Setting, SettingControl } from './shared';
 export function GeneralSettings() {
   return (
     <Section title="General" description="General settings for the app.">
+      <Setting title="Theme" description="The colour theme used across the app.">
+        <Select
+          options={[...THEMES]}
+          optionValue="id"
+          optionTextValue="label"
+          value={getTheme(store.settings.theme)}
+          onChange={(value) => value && setStore('settings', 'theme', value.id)}
+          itemComponent={(props) => (
+            <SelectItem item={props.item}>{props.item.rawValue.label}</SelectItem>
+          )}
+        >
+          <SelectTrigger class="w-1/2">
+            <SelectValue<(typeof THEMES)[number]>>
+              {(state) => state.selectedOption().label}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
+      </Setting>
       <Setting
         inline
         title="Generate Titles"
