@@ -1,5 +1,12 @@
 import { dequal } from 'dequal/lite';
-import { type Component, createResource, createSignal, For, Show } from 'solid-js';
+import {
+  type Component,
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  Show,
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { ChatSettings } from '~/components/connected/chat-settings';
@@ -23,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
+import { confirmDialogDismiss } from '~/components/ui/dialog-dismiss';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -190,9 +198,15 @@ const AssistantDetailsDialog: Component<{
   onClose: () => void;
   onDelete: (id: string) => void;
 }> = (props) => {
+  const [isDirty, setIsDirty] = createSignal(false);
+
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent class="max-w-3xl">
+      <DialogContent
+        class="max-w-3xl"
+        onEscapeKeyDown={(event) => confirmDialogDismiss(event, isDirty())}
+        onPointerDownOutside={(event) => confirmDialogDismiss(event, isDirty())}
+      >
         <Show when={props.selectedAssistant}>
           {(assistant) => (
             <>
@@ -202,6 +216,7 @@ const AssistantDetailsDialog: Component<{
                 </DialogTitle>
               </DialogHeader>
               <AssistantDetails
+                onDirtyChange={setIsDirty}
                 initialAssistant={assistant()}
                 onClose={props.onClose}
                 onDelete={() => props.onDelete(assistant().id)}
@@ -363,6 +378,7 @@ const AssistantCard: Component<{
 function AssistantDetails(props: {
   initialAssistant: AssistantProps;
   onClose: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
   onDelete: () => void;
   isNewAssistant: boolean;
 }) {
@@ -391,6 +407,8 @@ function AssistantDetails(props: {
   function hasChanges() {
     return !dequal(props.initialAssistant, localAssistant);
   }
+
+  createEffect(() => props.onDirtyChange(hasChanges()));
 
   return (
     <>

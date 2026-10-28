@@ -1,7 +1,14 @@
 import { TextField } from '@kobalte/core/text-field';
 import { dequal } from 'dequal/lite';
 import { nanoid } from 'nanoid';
-import { type Component, createResource, createSignal, For, Show } from 'solid-js';
+import {
+  type Component,
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  Show,
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { ModelIcon } from '~/components/connected/model-icon';
@@ -27,6 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
+import { confirmDialogDismiss } from '~/components/ui/dialog-dismiss';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -266,9 +274,15 @@ const PresetDetailsDialog: Component<{
   isNewPreset: boolean;
   onDelete: (id: string) => void;
 }> = (props) => {
+  const [isDirty, setIsDirty] = createSignal(false);
+
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent class="max-w-3xl">
+      <DialogContent
+        class="max-w-3xl"
+        onEscapeKeyDown={(event) => confirmDialogDismiss(event, isDirty())}
+        onPointerDownOutside={(event) => confirmDialogDismiss(event, isDirty())}
+      >
         <Show when={props.selectedPreset}>
           {(preset) => (
             <>
@@ -279,6 +293,7 @@ const PresetDetailsDialog: Component<{
               </DialogHeader>
               <DialogDescription>
                 <PresetDetails
+                  onDirtyChange={setIsDirty}
                   initialPreset={preset()}
                   onClose={() => props.onOpenChange(false)}
                   onDelete={props.onDelete}
@@ -415,6 +430,7 @@ const PresetGalleryDialog: Component<{
 const PresetDetails: Component<{
   initialPreset: PresetProps;
   onClose: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
   onDelete: (id: string) => void;
   isNewPreset: boolean;
 }> = (props) => {
@@ -442,6 +458,8 @@ const PresetDetails: Component<{
   function hasChanges() {
     return !dequal(props.initialPreset, localPreset);
   }
+
+  createEffect(() => props.onDirtyChange(hasChanges()));
 
   return (
     <>
