@@ -21,9 +21,11 @@ async function main() {
     console.log(`Models written to ${modelsPath}`);
   } catch (err) {
     console.error('Error writing models to file:', err);
+    throw err;
   }
 }
 
 main().catch((err) => {
   console.error('Error generating models:', err);
+  process.exitCode = 1;
 });

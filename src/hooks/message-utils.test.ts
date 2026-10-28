@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it } from 'bun:test';
 
 // Prevent fetch errors when importing modules that fetch data at load time
-(globalThis as any).fetch = async () => ({ json: async () => [] });
+(globalThis as any).fetch = async () => Response.json([]);
 (globalThis as any).self = {};
 
 const { createMessage } = await import('./message-utils');

@@ -13,8 +13,14 @@ import { makePersistedStore } from './persisted';
 // - The data, such as prices will still not be "live". We'll address this later.
 // export const models = (await fetch('/models.json').then((res) => res.json())) as ModelProps[];
 
-function fetchModels() {
-  return fetch('/models.json').then((res) => res.json());
+export async function fetchModels() {
+  try {
+    const res = await fetch('/models.json');
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    setModels(await res.json());
+  } catch (error) {
+    console.error('Error loading models:', error);
+  }
 }
 
 // the warning given by the rule here is not helpful in this case
@@ -22,9 +28,7 @@ export const [models, setModels] = makePersistedStore(createStore<ModelProps[]>(
   name: 'laneway-models',
 });
 
-fetchModels().then((models) => {
-  setModels(models);
-});
+fetchModels();
 
 export const providers = {
   openai: 'OpenAI',
