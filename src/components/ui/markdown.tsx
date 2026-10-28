@@ -10,6 +10,7 @@ import { sanitizeMarkdownLink } from './markdown-links';
 const Markdown: Component<{ text: string }> = (props) => {
   return (
     <SolidMarkdown
+      renderingStrategy="reconcile"
       remarkPlugins={[remarkGfm]}
       transformLinkUri={sanitizeMarkdownLink}
       components={{
