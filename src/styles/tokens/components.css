@@ -1,0 +1,45 @@
+/*
+ * Component token aliases.
+ *
+ * Themes set the plain vars (--composer-bg, --bubble-px, --tooltip-bg, ...) in
+ * their own block. This file registers each one with Tailwind so components can
+ * use it as a normal utility: bg-composer, px-bubble-x, font-menu, shadow-field.
+ * They are `inline`, so the lookup happens on the element and follows the
+ * nearest mounted theme. Every theme defines every one of them, so a nested
+ * theme never inherits another theme's values.
+ */
+
+@theme inline {
+  --color-placeholder: var(--placeholder-fg);
+  --color-field-focus: var(--field-focus-border);
+  --color-composer: var(--composer-bg);
+  --color-composer-border: var(--composer-border);
+  --color-tooltip: var(--tooltip-bg);
+  --color-tooltip-fg: var(--tooltip-fg);
+  --color-tooltip-border: var(--tooltip-border);
+  --color-sidebar-item: var(--sidebar-item-fg);
+  --color-nav-group-fg: var(--nav-group-fg);
+  --color-code-bar: var(--code-bar);
+  --color-code-bar-hover: var(--code-bar-hover);
+  --color-code-bar-fg: var(--code-bar-fg);
+  --color-code-border: var(--code-border);
+
+  --shadow-composer: var(--composer-shadow);
+  --shadow-field: var(--field-shadow);
+  --shadow-code: var(--code-shadow);
+
+  --spacing-bubble-x: var(--bubble-px);
+  --spacing-bubble-y: var(--bubble-py);
+  --spacing-agent-x: var(--agent-px);
+  --spacing-nav-item-y: var(--nav-item-py);
+  --spacing-nav-item-h: var(--nav-item-min-h);
+
+  --font-weight-menu: var(--menu-item-weight);
+  --font-weight-nav: var(--nav-item-weight);
+  --font-weight-nav-group: var(--nav-group-weight);
+
+  --text-nav: var(--nav-text-size);
+  --text-nav--line-height: var(--nav-line-height);
+  --text-nav-group: var(--nav-group-size);
+  --text-nav-group--line-height: var(--nav-line-height);
+}
