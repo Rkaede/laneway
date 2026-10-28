@@ -16,7 +16,7 @@ Head over to <https://laneway.app> to use the app directly.
 - 🔊 Text-to-speech support for messages
 - 🤖 Create custom assistants
 - 🎭 Chat with multiple assistants at once via a "preset"
-- 🔌 Supports multiple providers (OpenAI, Google, and OpenRouter)
+- 🔌 Supports multiple providers (OpenAI and OpenRouter)
 - ⌨️ Command palette
 - 🔒 Data stored locally in your browser for privacy & speed
 - 📔 Note sessions for iterating on a single prompt
@@ -46,7 +46,8 @@ Head over to <https://laneway.app> to use the app directly.
 
 4. Set up your API keys:
    - Open the app and go to the Settings page
-   - Enter your API keys for the providers you want to use (OpenAI, Google, OpenRouter)
+   - Enter your API keys for the providers you want to use (OpenAI, OpenRouter)
+   - Direct OpenAI access supports selected models and TTS. Gemini and GPT-5.x models require OpenRouter.
 
 ### Running Tests
 

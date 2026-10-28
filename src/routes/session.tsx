@@ -42,10 +42,8 @@ export function Session() {
         <WelcomeContent
           openRouterKey={() => ''}
           openAIKey={() => ''}
-          googleKey={() => ''}
           setOpenRouterKey={() => {}}
           setOpenAIKey={() => {}}
-          setGoogleKey={() => {}}
         />
       }
     >

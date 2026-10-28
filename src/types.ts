@@ -27,7 +27,7 @@ export type MessageProps = {
   };
 };
 
-export type ProviderId = 'openai' | 'google' | 'openrouter';
+export type ProviderId = 'openai' | 'openrouter';
 
 export type Provider = {
   id: ProviderId;

@@ -26,6 +26,22 @@ describe('generateModels catalogue', () => {
     spyOn(console, 'log').mockImplementation(() => {});
   });
 
+  it('keeps Gemini and GPT-5.x on OpenRouter while retaining direct OpenAI models', () => {
+    const routerOnlyModels = modelsBase.filter(
+      (model) => model.id?.startsWith('google/') || model.id?.startsWith('openai/gpt-5'),
+    );
+
+    expect(routerOnlyModels.length).toBeGreaterThan(0);
+    for (const model of routerOnlyModels) {
+      expect(model.provider).toEqual([{ id: 'openrouter', modelId: model.id, primary: false }]);
+    }
+    expect(modelsBase.find((model) => model.id === 'openai/gpt-4.1')?.provider).toContainEqual({
+      id: 'openai',
+      modelId: 'gpt-4.1',
+      primary: true,
+    });
+  });
+
   it('keeps missing and deprecated models for saved references and warns about them', async () => {
     spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({

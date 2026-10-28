@@ -1,4 +1,3 @@
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
 import { generateText, streamText } from 'ai';
 
@@ -18,11 +17,10 @@ function chatCompletions(provider: OpenAIProvider) {
 const openai = () => chatCompletions(createOpenAI({ apiKey: apiKeys?.openai }));
 const openrouter = () =>
   chatCompletions(createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL }));
-const google = () => createGoogleGenerativeAI({ apiKey: apiKeys?.google });
 
-const services = { openai, openrouter, google };
+const services = { openai, openrouter };
 
-type Provider = 'openai' | 'openrouter' | 'google';
+type Provider = 'openai' | 'openrouter';
 
 const throttle = createThrottle();
 

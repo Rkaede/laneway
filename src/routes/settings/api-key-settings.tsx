@@ -22,7 +22,7 @@ const openRouterOptions: OpenRouterOption[] = [
   { value: 'always', label: 'Always' },
   {
     value: 'fallback',
-    label: 'When keys are not configured for primary providers (OpenAI, Google)',
+    label: 'When direct OpenAI access is not configured or supported',
   },
 ];
 
@@ -38,8 +38,9 @@ export function APIKeySetting() {
         description={
           <>
             <p class="mb-1">
-              Openrouter is a gateway to multiple AI providers like OpenAI, Anthropic, and
-              Google. Required for Anthropic & Llama models.
+              OpenRouter is a gateway to multiple AI providers like OpenAI, Anthropic, and
+              Google. Required for models without direct OpenAI support, including Gemini and
+              GPT-5.x.
             </p>
             <p>
               You can get a key from the{' '}
@@ -87,7 +88,8 @@ export function APIKeySetting() {
         title="OpenAI"
         description={
           <>
-            Used for the ChatGPT models and TTS. You can get a key from the{' '}
+            Used for selected OpenAI models and TTS. GPT-5.x requires OpenRouter. You can get a
+            key from the{' '}
             <a
               href="https://platform.openai.com/api-keys"
               target="_blank"
@@ -105,31 +107,6 @@ export function APIKeySetting() {
           type="password"
           value={apiKeys?.openai ?? ''}
           onChange={(e) => setApiKeys('openai', e.target.value)}
-        />
-      </Setting>
-
-      <Setting
-        title="Google"
-        description={
-          <>
-            Used for the Gemini models. You can get a key from the{' '}
-            <a
-              href="https://aistudio.google.com/app/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Google AI Studio
-            </a>
-            .
-          </>
-        }
-      >
-        <Input
-          data-1p-ignore // disable 1Password extension
-          autocomplete="off"
-          type="password"
-          value={apiKeys?.google ?? ''}
-          onChange={(e) => setApiKeys('google', e.target.value)}
         />
       </Setting>
     </Section>

@@ -32,10 +32,8 @@ function isTypingTarget(target: EventTarget | null) {
 export const WelcomeContent: Component<{
   openRouterKey: () => string;
   openAIKey: () => string;
-  googleKey: () => string;
   setOpenRouterKey: (value: string) => void;
   setOpenAIKey: (value: string) => void;
-  setGoogleKey: (value: string) => void;
 }> = () => {
   const [showKeys, setShowKeys] = createSignal(false);
   const [variant, setVariant] = createSignal(readStoredVariant());

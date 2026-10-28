@@ -44,7 +44,6 @@ export async function fetchModels() {
 
 export const providers = {
   openai: 'OpenAI',
-  google: 'Google',
   openrouter: 'OpenRouter',
 };
 
