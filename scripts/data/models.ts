@@ -180,7 +180,7 @@ export const generateModels = async () => {
     }
 
     const tags: Array<ModelTags> = [];
-    const vision = routerModel.architecture?.modality === 'text+image->text';
+    const vision = routerModel.architecture?.input_modalities?.includes('image') ?? false;
     if (vision) {
       tags.push('vision');
     }
