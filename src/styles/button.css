@@ -1,0 +1,121 @@
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-button text-sm font-medium whitespace-nowrap transition-all;
+    @apply shrink-0 outline-none;
+
+    &:disabled {
+      @apply pointer-events-none opacity-50;
+    }
+
+    &:focus-visible {
+      @apply border-border-focus ring-[3px] ring-border-focus/50;
+    }
+
+    &[aria-invalid='true'] {
+      @apply border-danger ring-danger/20;
+    }
+
+    &.btn-validation-warning {
+      @apply border-warning-border ring-warning-border;
+    }
+
+    &.btn-loading {
+      @apply cursor-wait;
+    }
+
+    svg {
+      @apply pointer-events-none shrink-0;
+
+      &:not([class*='size-']) {
+        @apply size-4;
+      }
+    }
+  }
+
+  .btn-primary {
+    @apply bg-brand text-brand-fg hover:bg-brand-hover;
+    box-shadow: var(--button-primary-shadow);
+  }
+
+  .btn-danger {
+    @apply bg-danger text-danger-fg hover:bg-danger-hover focus-visible:ring-danger/20;
+  }
+
+  .btn-outline {
+    @apply border bg-surface-raised hover:bg-surface-hover hover:text-main;
+    border-color: var(--button-outline-border);
+    box-shadow: var(--button-outline-shadow);
+  }
+
+  /* Form-control chrome: matches Input/Select border strength (WCAG 1.4.11). */
+  .btn-field {
+    @apply border border-border-emphasis bg-surface-input hover:bg-surface-hover hover:text-main;
+  }
+
+  .btn-secondary {
+    @apply text-main;
+    background-color: var(--button-secondary-bg);
+
+    &:hover {
+      background-color: var(--button-secondary-bg);
+    }
+  }
+
+  .btn-ghost {
+    @apply hover:bg-surface-hover hover:text-main;
+  }
+
+  .btn-plain {
+    @apply bg-transparent text-brand hover:bg-brand-subtle;
+  }
+
+  .btn-link {
+    @apply w-fit px-0 text-sm text-main underline-offset-4 hover:underline;
+  }
+
+  .btn-md {
+    @apply h-8 gap-1.5 px-3;
+  }
+
+  .btn-xs {
+    @apply h-6 gap-1 rounded-button px-2 text-xs;
+
+    svg {
+      &:not([class*='size-']) {
+        @apply size-3.5;
+      }
+    }
+  }
+
+  .btn-lg {
+    @apply h-10 rounded-button px-6;
+  }
+
+  .btn-icon {
+    @apply size-9;
+  }
+
+  .btn-icon-sm {
+    @apply size-8;
+  }
+
+  .btn-icon-lg {
+    @apply size-10;
+  }
+
+  .btn-tab {
+    @apply rounded-sm px-3 py-2 text-xs font-medium text-main;
+
+    &:hover {
+      @apply bg-surface-hover;
+    }
+  }
+
+  .btn-tab-active {
+    @apply bg-surface-pressed text-main;
+
+    &:hover {
+      @apply bg-surface-pressed;
+    }
+  }
+}

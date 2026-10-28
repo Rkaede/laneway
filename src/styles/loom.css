@@ -1,0 +1,108 @@
+/*
+ * Loom design system entry point, ported from the Loom package.
+ *
+ * Token layers load first, then the component classes that consume them, then
+ * the base element defaults. Order matters: a component class cannot reference a
+ * token that has not been registered yet.
+ *
+ * Colour utilities come only from this design system. tokens/themes.css clears
+ * Tailwind's built-in palettes with `--color-*: initial`, so bg-red-500,
+ * bg-white and bg-gray-200 do not exist. Reach for a role (bg-danger), a
+ * surface (bg-surface-raised) or a primitive step (bg-neutral-3) instead.
+ * bg-transparent, text-current and text-inherit are static utilities and still
+ * work.
+ *
+ * Hand-written CSS reads tokens as var(--surface), never var(--color-surface).
+ * The --color-* names exist only to generate utilities, and Tailwind resolves
+ * them once at :root, so reading one by hand pins it to the default theme.
+ *
+ * There is no `dark:` variant in this system. Dark mode is a theme, not an
+ * override: mount `.theme-default-dark` on an ancestor (Laneway mounts it on
+ * <html> so portalled overlays inherit it).
+ */
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@import './fonts.css';
+
+@import './tokens/themes.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/radius.css';
+@import './tokens/components.css';
+@import './tokens/animations.css';
+@import './tokens/z-index.css';
+
+@import './button.css';
+@import './input.css';
+@import './scroll-area.css';
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border-secondary);
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--main);
+    font-family: var(--font-sans);
+    /* 14px on the stock scale. Dense app screens read best here, and
+       text-base (16px) is left to mark subheads and emphasised body. */
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    letter-spacing: var(--body-tracking);
+    font-optical-sizing: auto;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role='button'],
+  [type='button'],
+  label {
+    cursor: pointer;
+  }
+
+  /*
+   * Disabled controls keep the default arrow cursor. The disabled styling
+   * already signals the state, and the barred cursor only adds friction.
+   */
+  :disabled,
+  [aria-disabled='true'],
+  [data-disabled] {
+    cursor: default;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/*
+ * Overlays lock body scroll and add padding-right to offset the scrollbar they
+ * hide. Cancel it so the page does not shift sideways when an overlay opens.
+ */
+body {
+  padding-right: 0 !important;
+}
+
+/*
+ * Scrollbars draw from border tokens rather than a hard-coded colour, so they
+ * stay visible under every theme.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-emphasis) transparent;
+}

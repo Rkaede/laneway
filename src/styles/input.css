@@ -1,0 +1,54 @@
+@layer components {
+  .input {
+    @apply w-full min-w-0 rounded-md border border-border bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
+
+    &::placeholder {
+      @apply text-placeholder;
+    }
+
+    &::selection {
+      @apply bg-brand text-brand-fg;
+    }
+
+    &::file-selector-button {
+      @apply inline-flex h-7 border-0 bg-transparent text-sm font-medium text-main;
+    }
+
+    &:focus-visible {
+      @apply border-field-focus ring-(length:--field-focus-ring-w) ring-border-focus/50;
+    }
+
+    &:disabled {
+      @apply pointer-events-none opacity-50;
+    }
+
+    &[aria-invalid='true'] {
+      @apply border-danger ring-danger/20;
+    }
+
+    &[data-hint='true'] {
+      @apply border-dashed border-success ring-0;
+    }
+
+    &[data-hint='true']:focus-visible {
+      @apply border-success ring-0;
+    }
+
+    &[type='number'] {
+      appearance: textfield;
+    }
+
+    &[type='number']::-webkit-outer-spin-button,
+    &[type='number']::-webkit-inner-spin-button {
+      appearance: none;
+    }
+  }
+
+  .input-md {
+    @apply h-input-md px-input-x-md py-input-y-md text-sm;
+  }
+
+  .input-lg {
+    @apply h-input-lg px-input-x-lg py-input-y-lg text-lg;
+  }
+}
