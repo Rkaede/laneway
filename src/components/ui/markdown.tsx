@@ -41,7 +41,7 @@ const Markdown: Component<{ text: string }> = (props) => {
                     /* @ts-ignore: this is a depencency bug */
                     codeProps.node.children[0]?.value ?? ''
                   }
-                  language={codeProps.class?.split('-')[1] ?? 'plaintext'}
+                  language={codeProps.class?.replace(/^language-/, '') ?? 'plaintext'}
                   {...codeProps}
                 />
               }

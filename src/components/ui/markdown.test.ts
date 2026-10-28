@@ -11,7 +11,7 @@ import { JsxEmit, ModuleKind, ScriptTarget, transpileModule } from 'typescript';
 // Bun doesn't compile Solid JSX. Compile this component for SSR and stub the code-block UI.
 const source = (await Bun.file(new URL('./markdown.tsx', import.meta.url)).text()).replace(
   "import { CodeBlock } from '~/components/ui';",
-  'const CodeBlock = (props) => props.code;',
+  'const CodeBlock = (props) => <code data-language={props.language}>{props.code}</code>;',
 );
 const jsx = transpileModule(source, {
   compilerOptions: {
@@ -59,7 +59,20 @@ describe('Markdown', () => {
   it('passes fenced code to CodeBlock without altering angle brackets or literal entities', () => {
     const html = render('```ts\nx => y\nVec<T>\n&lt;T&gt;\n```');
 
-    expect(html).toContain('x => y\nVec&lt;T>\n&amp;lt;T&amp;gt;\n</pre>');
+    expect(html).toContain('x => y\nVec&lt;T>\n&amp;lt;T&amp;gt;\n</code></pre>');
+  });
+
+  it.each(['objective-c', 'unknown-language-with-hyphens', 'typescript', 'c++'])(
+    'passes the complete fenced language to CodeBlock: %s',
+    (language) => {
+      expect(render(`\`\`\`${language}\ncode\n\`\`\``)).toContain(
+        `<code data-language="${language}">code\n</code>`,
+      );
+    },
+  );
+
+  it('uses plaintext for code fences without a language', () => {
+    expect(render('```\ncode\n```')).toContain('<code data-language="plaintext">code\n</code>');
   });
 
   it('keeps raw HTML inert', () => {
