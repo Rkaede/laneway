@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { reconcile } from 'solid-js/store';
 
 import { IconNewSession, IconTrash } from '~/components/icons/ui';
 import { imageCache } from '~/services/image-cache';
@@ -80,19 +81,22 @@ export function newDraftSession({
 
   if (type === 'preset') {
     const draft = createSessionFromPreset(_record as PresetProps);
-    setStore('draftSession', { input: '', ...draft.session });
+    setStore('draftSession', reconcile({ input: '', ...draft.session }));
     setStore('draftChats', draft.chats);
     return;
   }
 
-  setStore('draftSession', {
-    id: nanoid(),
-    title: sessionType === 'note' ? 'Untitled Note' : 'Untitled Chat',
-    type: sessionType,
-    chats: [chatId],
-    created: Date.now(),
-    input: '',
-  });
+  setStore(
+    'draftSession',
+    reconcile({
+      id: nanoid(),
+      title: sessionType === 'note' ? 'Untitled Note' : 'Untitled Chat',
+      type: sessionType,
+      chats: [chatId],
+      created: Date.now(),
+      input: '',
+    }),
+  );
 
   setStore('draftChats', [
     {

@@ -56,6 +56,24 @@ beforeEach(() => {
 });
 
 describe('newDraftSession', () => {
+  beforeEach(() => {
+    setStore('presets', [
+      {
+        id: 'preset',
+        type: 'chat',
+        presetTitle: 'Preset title',
+        presetDescription: 'Preset description',
+        templateId: 'template',
+        chats: [{ modelId: 'vision', status: 'idle' }],
+      },
+      {
+        id: 'minimal-preset',
+        type: 'chat',
+        chats: [{ modelId: 'no-vision', status: 'idle' }],
+      },
+    ]);
+  });
+
   it.each(['model', 'assistant'] as const)('titles %s drafts by session type', (type) => {
     const referenceId = type === 'model' ? 'vision' : 'assistant-vision';
 
@@ -68,6 +86,49 @@ describe('newDraftSession', () => {
 
     expect(store.draftSession.type).toBe('note');
     expect(store.draftSession.title).toBe('Untitled Note');
+  });
+
+  it.each([
+    ['model', 'chat'],
+    ['model', 'note'],
+    ['assistant', 'chat'],
+    ['assistant', 'note'],
+  ] as const)('clears preset metadata from %s %s drafts', (type, sessionType) => {
+    newDraftSession({ type: 'preset', referenceId: 'preset' });
+    expect(store.draftSession.presetTitle).toBe('Preset title');
+    expect(store.draftSession.presetDescription).toBe('Preset description');
+    expect(store.draftSession.templateId).toBe('template');
+
+    newDraftSession({
+      type,
+      sessionType,
+      referenceId: type === 'model' ? 'vision' : 'assistant-vision',
+    });
+
+    expect(store.draftSession.presetTitle).toBeUndefined();
+    expect(store.draftSession.presetDescription).toBeUndefined();
+    expect(store.draftSession.templateId).toBeUndefined();
+
+    const sessionId = addMessageToSessionChats({
+      id: 'message',
+      role: 'user',
+      content: 'Hello',
+    });
+    const session = store.sessions.find((s) => s.id === sessionId);
+    expect(session?.presetTitle).toBeUndefined();
+    expect(session?.presetDescription).toBeUndefined();
+    expect(session?.templateId).toBeUndefined();
+  });
+
+  it('clears metadata omitted by the next preset', () => {
+    newDraftSession({ type: 'preset', referenceId: 'preset' });
+
+    newDraftSession({ type: 'preset', referenceId: 'minimal-preset' });
+
+    expect(store.draftSession.presetTitle).toBeUndefined();
+    expect(store.draftSession.presetDescription).toBeUndefined();
+    expect(store.draftSession.templateId).toBeUndefined();
+    expect(store.draftChats[0].modelId).toBe('no-vision');
   });
 });
 
