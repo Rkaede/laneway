@@ -5,16 +5,18 @@ import type { MessageProps } from '~/types';
 // Store actions reference icons, which use Vite-only import aliases.
 mock.module('~/components/icons/ui', () => ({
   IconBox: () => null,
-  IconFileSliders: () => null,
   IconInfo: () => null,
   IconLayoutGrid: () => null,
   IconListRestart: () => null,
   IconNewSession: () => null,
   IconPencilLine: () => null,
+  IconScanFace: () => null,
   IconSettings: () => null,
   IconSidebar: () => null,
+  IconSquarePen: () => null,
   IconSun: () => null,
   IconTrash: () => null,
+  IconUser: () => null,
 }));
 
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });

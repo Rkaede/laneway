@@ -25,7 +25,7 @@ export function createSessionFromPreset(preset: PresetProps) {
   const session: SessionProps = {
     ...clone(preset),
     id: sessionId,
-    title: 'Untitled',
+    title: 'New Chat',
     created: Date.now(),
     type: 'chat',
     chats: chats.map((c) => c.id),

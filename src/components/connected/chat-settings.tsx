@@ -51,7 +51,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
           />
         </div>
         <div>
-          <SettingTitle>Subtitle</SettingTitle>
+          <SettingTitle>Description</SettingTitle>
           <Input
             value={props.subtitle}
             onInput={(e) => props.onSubtitleChange((e.currentTarget as HTMLInputElement).value)}

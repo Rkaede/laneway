@@ -1,4 +1,10 @@
-import { IconInfo, IconPencilLine, IconSidebar, IconSun } from '~/components/icons/ui';
+import {
+  IconInfo,
+  IconPencilLine,
+  IconSidebar,
+  IconSun,
+  IconUser,
+} from '~/components/icons/ui';
 import { THEMES } from '~/constants';
 import type { Actions } from '~/types';
 
@@ -43,7 +49,7 @@ export const uiActions: Actions = {
     id: 'toggle-avatars',
     name: 'Toggle Message Avatars',
     keywords: ['avatars', 'show', 'hide'],
-    icon: IconSidebar,
+    icon: IconUser,
     fn: () => {
       setStore('settings', 'messages', 'showAvatars', (showAvatars) => !showAvatars);
     },

@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { reconcile } from 'solid-js/store';
 
-import { IconNewSession, IconTrash } from '~/components/icons/ui';
+import { IconNewSession, IconSquarePen, IconTrash } from '~/components/icons/ui';
 import { imageCache } from '~/services/image-cache';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
@@ -90,7 +90,7 @@ export function newDraftSession({
     'draftSession',
     reconcile({
       id: nanoid(),
-      title: sessionType === 'note' ? 'Untitled Note' : 'Untitled Chat',
+      title: sessionType === 'note' ? 'New Note' : 'New Chat',
       type: sessionType,
       chats: [chatId],
       created: Date.now(),
@@ -270,8 +270,8 @@ export async function getCompletion(input: string) {
 export const sessionActions: Actions = {
   newSession: {
     id: 'new-session',
-    name: 'New Session',
-    keywords: ['new', 'session'],
+    name: 'New Chat',
+    keywords: ['new', 'chat', 'session'],
     shortcut: 'c',
     icon: IconNewSession,
     fn: (
@@ -291,7 +291,7 @@ export const sessionActions: Actions = {
     name: 'New Note',
     keywords: ['new', 'note'],
     shortcut: 'n',
-    icon: IconNewSession,
+    icon: IconSquarePen,
     fn: (
       context: ActionContext,
       options?: { referenceId?: string; type?: 'model' | 'assistant' | 'preset' },
@@ -306,7 +306,7 @@ export const sessionActions: Actions = {
   },
   deleteSession: {
     id: 'delete-session',
-    name: 'Delete Session',
+    name: 'Delete Chat or Note',
     keywords: [],
     icon: IconTrash,
     available: ({ params }) => store.sessions.some((session) => session.id === params.id),

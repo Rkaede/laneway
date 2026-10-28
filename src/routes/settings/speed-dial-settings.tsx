@@ -161,7 +161,7 @@ export const SpeedDial: Component = () => {
             disabled={store.speedDial.length >= 6}
           >
             <IconPlus class="h-5 w-5" />
-            Add New
+            New Shortcut
           </Button>
         </div>
       </div>

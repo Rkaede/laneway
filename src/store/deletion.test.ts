@@ -4,6 +4,7 @@ import { reconcile } from 'solid-js/store';
 // Store actions reference icons, which use Vite-only import aliases.
 mock.module('~/components/icons/ui', () => ({
   IconNewSession: () => null,
+  IconSquarePen: () => null,
   IconTrash: () => null,
 }));
 

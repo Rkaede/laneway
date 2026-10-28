@@ -82,7 +82,10 @@ export function GeneralSettings() {
           includeAssistants
         />
       </Setting>
-      <Setting title="Default Session" description="The default session for new conversations.">
+      <Setting
+        title="Default Chat"
+        description="The model, assistant, or preset for new chats."
+      >
         <MultiCombobox
           value={{
             id: store.settings.defaultSession.id,

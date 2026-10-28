@@ -147,7 +147,7 @@ export default function Presets() {
           </Button>
           <Button onClick={handleAdd} class="whitespace-nowrap">
             <IconPlus class="h-5 w-5" />
-            Add New
+            New Preset
           </Button>
         </div>
       </div>
@@ -289,9 +289,7 @@ const PresetDetailsDialog: Component<{
           {(preset) => (
             <>
               <DialogHeader>
-                <DialogTitle>
-                  {props.isNewPreset ? 'Add New Preset' : 'Edit Preset'}
-                </DialogTitle>
+                <DialogTitle>{props.isNewPreset ? 'New Preset' : 'Edit Preset'}</DialogTitle>
               </DialogHeader>
               <DialogDescription>
                 <PresetDetails

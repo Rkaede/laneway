@@ -134,7 +134,7 @@ export default function Assistants() {
           </Button>
           <Button onClick={handleAdd} class="whitespace-nowrap">
             <IconPlus class="h-5 w-5" />
-            Create New
+            New Assistant
           </Button>
         </div>
       </div>
@@ -212,7 +212,7 @@ const AssistantDetailsDialog: Component<{
             <>
               <DialogHeader>
                 <DialogTitle>
-                  {props.isNewAssistant ? 'Add New Assistant' : 'Edit Assistant'}
+                  {props.isNewAssistant ? 'New Assistant' : 'Edit Assistant'}
                 </DialogTitle>
               </DialogHeader>
               <AssistantDetails

@@ -4,9 +4,10 @@ import { type Component, createEffect, createSignal, For, on, Show } from 'solid
 import {
   IconBox,
   IconLayoutGrid,
-  IconPlus,
+  IconNewSession,
   IconScanFace,
   IconSettings,
+  IconSquarePen,
   MoreHorizontalIcon,
 } from '~/components/icons/ui';
 import {
@@ -99,12 +100,12 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
       <div class="flex h-full w-full flex-col overflow-hidden">
         <div class="flex w-full justify-center gap-1 border-b px-4 py-2" inert={!props.open}>
           <Button onClick={handleNewChat} variant="outline" size="sm" class="justify-start">
-            <IconPlus class="h-4 w-4" />
-            Chat
+            <IconNewSession class="h-4 w-4" />
+            New Chat
           </Button>
           <Button onClick={handleNewNote} variant="outline" size="sm" class="justify-start">
-            <IconPlus class="h-4 w-4" />
-            Note
+            <IconSquarePen class="h-4 w-4" />
+            New Note
           </Button>
         </div>
         <div class="flex-1 overflow-auto border-b" inert={!props.open}>
@@ -180,7 +181,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
     <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
       <DropdownMenuTrigger
         as={Button}
-        aria-label="Session actions"
+        aria-label="Chat or note actions"
         class="flex size-6 items-center justify-center rounded-md p-0 text-muted opacity-0 transition-none group-hover:opacity-100 hover:text-main data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
@@ -247,7 +248,9 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
     <Dialog open={props.sessionId !== undefined} onOpenChange={handleOnOpenChange}>
       <DialogContent as="form" onSubmit={handleSubmit}>
         <DialogHeader>
-          <DialogTitle>Rename Chat Session</DialogTitle>
+          <DialogTitle>
+            {session()?.type === 'note' ? 'Rename Note' : 'Rename Chat'}
+          </DialogTitle>
         </DialogHeader>
         <DialogDescription>
           <div class="flex flex-col gap-2">

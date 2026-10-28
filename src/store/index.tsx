@@ -54,7 +54,7 @@ if (store.settings.tts === undefined) {
 export const deleteData = () => {
   if (
     !window.confirm(
-      'Delete all your sessions, messages, images, assistants, and presets, and reset settings?\n\nThis cannot be undone. API keys will be kept. Export your data first if you need a backup.',
+      'Delete all your chats, notes, messages, images, assistants, and presets, and reset settings?\n\nThis cannot be undone. API keys will be kept. Export your data first if you need a backup.',
     )
   ) {
     return false;

@@ -1,8 +1,8 @@
 import {
   IconBox,
-  IconFileSliders,
   IconLayoutGrid,
   IconListRestart,
+  IconScanFace,
   IconSettings,
 } from '~/components/icons/ui';
 import type { ActionContext, Actions } from '~/types';
@@ -32,7 +32,7 @@ export const navigationActions: Actions = {
     id: 'edit-assistants',
     name: 'Edit Assistants',
     keywords: [],
-    icon: IconBox,
+    icon: IconScanFace,
     fn: (context: ActionContext) => {
       context.navigate('/assistants');
     },
@@ -41,14 +41,14 @@ export const navigationActions: Actions = {
     id: 'view-models',
     name: 'View Models',
     keywords: [],
-    icon: IconFileSliders,
+    icon: IconBox,
     fn: (context: ActionContext) => {
       context.navigate('/models');
     },
   },
   gotoLatest: {
     id: 'goto-latest',
-    name: 'Latest Session',
+    name: 'Latest Chat or Note',
     keywords: ['navigate', 'latest'],
     icon: IconListRestart,
     available: () => store.sessions.length > 0,
