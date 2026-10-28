@@ -11,6 +11,7 @@ import type {
 } from '~/types';
 
 interface State {
+  schemaVersion: number;
   sessions: SessionProps[];
   chats: ChatProps[];
   draftSession: SessionProps;
@@ -96,6 +97,7 @@ export function createDefaultState(): State {
   const story = examples.story();
 
   return {
+    schemaVersion: 1,
     sessions: [story.session, examples.imageAttachment.session],
     chats: [...story.chats, ...examples.imageAttachment.chats],
     draftSession: {
