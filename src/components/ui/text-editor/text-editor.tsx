@@ -20,7 +20,6 @@ const fetchSuggestion = async (input: EditorState) => {
   const text = input.doc.toString();
   if (!text || text.trim() === '') return '';
 
-  console.log('Fetching suggestion for: ', text);
   const completion = await getCompletion(text);
   // or make an async API call here based on editor state
   return completion ?? '';

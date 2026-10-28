@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { expect, it } from 'bun:test';
 import type { Manifest } from 'vite';
 
-it('excludes developer routes and their chunks from production and the precache', async () => {
+it('excludes developer routes and prompt logging from production and the precache', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'laneway-production-'));
 
   try {
@@ -40,6 +40,11 @@ it('excludes developer routes and their chunks from production and the precache'
     );
     expect(developerRoutes).toEqual([]);
     expect(manifest['src/routes/settings/settings.tsx']).toBeDefined();
+
+    const editor = manifest['src/components/ui/text-editor/text-editor.tsx'];
+    expect(editor).toBeDefined();
+    const editorCode = await Bun.file(join(directory, editor.file)).text();
+    expect(/\bconsole\.(?:log|debug|info)\s*\(/.test(editorCode)).toBe(false);
 
     const entry = await Bun.file(join(directory, manifest['index.html'].file)).text();
     expect(entry).not.toMatch(/["']\/(?:debug|sandbox)["']/);

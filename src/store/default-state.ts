@@ -93,9 +93,6 @@ function clone<T>(obj: T): T {
 // This needs to be a factory function. If we were to use just a variable it would be mutated by
 // the store and resetStore would not work.
 export function createDefaultState(): State {
-  console.log('createDefaultState');
-  console.log('examples.story.chats', examples.story().chats);
-
   const story = examples.story();
 
   return {
