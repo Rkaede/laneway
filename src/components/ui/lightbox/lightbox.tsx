@@ -3,6 +3,8 @@ import { Portal } from 'solid-js/web';
 
 import { LocalImage } from '~/components/ui/local-image';
 
+import { getSwipeDirection } from './swipe';
+
 type Image = {
   src: string;
   alt: string;
@@ -24,6 +26,7 @@ type LightboxProps = {
 export const Lightbox: Component<LightboxProps> = (props) => {
   const [currentIndex, setCurrentIndex] = createSignal(props.initialIndex || 0);
   const [isOpen, setIsOpen] = createSignal(props.open || false);
+  let touchStart: Touch | undefined;
 
   createEffect(() => {
     if (props.open !== undefined) {
@@ -56,15 +59,36 @@ export const Lightbox: Component<LightboxProps> = (props) => {
     setCurrentIndex(index);
   };
 
+  const handleTouchStart = (event: TouchEvent) => {
+    touchStart = event.touches.length === 1 ? event.touches[0] : undefined;
+  };
+
+  const handleTouchEnd = (event: TouchEvent) => {
+    const start = touchStart;
+    touchStart = undefined;
+    if (!start || event.touches.length > 0 || props.images.length < 2) return;
+
+    const direction = getSwipeDirection(start, event.changedTouches[0]);
+    if (direction === 'previous') handlePrevious();
+    if (direction === 'next') handleNext();
+  };
+
   const renderThumbnails = () => {
     return (
-      <div class="fixed inset-x-0 bottom-0 z-40 overflow-hidden bg-linear-to-b from-transparent to-media-backdrop">
-        <div class="mx-auto mt-6 mb-6 flex h-14 justify-center gap-4">
+      <div class="pointer-events-auto fixed inset-x-0 bottom-0 z-40 overflow-x-auto overscroll-x-contain bg-linear-to-b from-transparent to-media-backdrop">
+        <div class="mx-auto mt-6 mb-6 flex h-14 w-max min-w-full justify-center gap-4 px-4">
           <For each={props.images}>
             {(image, index) => {
               return (
                 <button
-                  class={`relative inline-block shrink-0 transform-gpu overflow-hidden focus:outline-hidden ${index() === currentIndex() ? 'z-20 rounded-md shadow-md' : 'z-10 rounded-md'}`}
+                  ref={(element) => {
+                    createEffect(() => {
+                      if (index() === currentIndex()) {
+                        element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                      }
+                    });
+                  }}
+                  class={`relative inline-block shrink-0 transform-gpu scroll-mx-4 overflow-hidden focus:outline-hidden ${index() === currentIndex() ? 'z-20 rounded-md shadow-md' : 'z-10 rounded-md'}`}
                   style={{
                     width: '75px',
                     height: '56px',
@@ -128,7 +152,11 @@ export const Lightbox: Component<LightboxProps> = (props) => {
           role="dialog"
           aria-modal="true"
         >
-          <div class="fixed inset-0 bg-media-backdrop backdrop-blur-2xl" aria-hidden="true" />
+          <div
+            class="fixed inset-0 bg-media-backdrop backdrop-blur-2xl"
+            aria-hidden="true"
+            onClick={handleClose}
+          />
 
           <div class="absolute top-0 right-0 flex items-center gap-2 p-3 text-on-media">
             <button
@@ -150,10 +178,18 @@ export const Lightbox: Component<LightboxProps> = (props) => {
             </button>
           </div>
 
-          <div class="wide:h-full xl:taller-than-854:h-auto relative flex aspect-[3/2] w-full max-w-7xl items-center">
-            <div class="w-full overflow-hidden">
+          <div class="wide:h-full xl:taller-than-854:h-auto pointer-events-none relative flex aspect-[3/2] w-full max-w-7xl items-center">
+            <div
+              class="w-full touch-pan-y touch-pinch-zoom overflow-hidden"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onTouchCancel={() => (touchStart = undefined)}
+            >
               <div class="relative flex aspect-[3/2] items-center justify-center">
-                <div class="absolute" style={{ opacity: '1', transform: 'none' }}>
+                <div
+                  class="pointer-events-auto absolute"
+                  style={{ opacity: '1', transform: 'none' }}
+                >
                   {currentImage().storageId && (
                     <LocalImage
                       src={currentImage().storageId!}
@@ -185,7 +221,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
               <div class="relative aspect-[3/2] max-h-full w-full">
                 <Show when={props.images.length > 1}>
                   <button
-                    class="absolute top-[calc(50%-16px)] left-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
+                    class="pointer-events-auto absolute top-[calc(50%-16px)] left-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
                     style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handlePrevious}
                     aria-label="Previous image"
@@ -210,7 +246,7 @@ export const Lightbox: Component<LightboxProps> = (props) => {
 
                 <Show when={props.images.length > 1}>
                   <button
-                    class="absolute top-[calc(50%-16px)] right-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
+                    class="pointer-events-auto absolute top-[calc(50%-16px)] right-3 rounded-full bg-media-wash p-2 text-on-media backdrop-blur-lg transition"
                     style={{ transform: 'translate3d(0px, 0px, 0px)' }}
                     onClick={handleNext}
                     aria-label="Next image"
