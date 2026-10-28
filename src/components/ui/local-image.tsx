@@ -1,4 +1,4 @@
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 
 import { imageCache } from '~/services/image-cache';
 import { cn } from '~/util';
@@ -16,14 +16,23 @@ export function LocalImage(props: ImageProps) {
   const [available, setAvailable] = createSignal(true);
 
   createEffect(async () => {
+    let disposed = false;
+    let url: string | undefined;
+    onCleanup(() => {
+      disposed = true;
+      if (url) URL.revokeObjectURL(url);
+    });
+
     if (props.sourceType === 'path') {
       setImageSrc(props.src);
       return;
     }
     const cachedImage = await imageCache.get('/' + props.src);
+    if (disposed) return;
 
     if (cachedImage) {
-      setImageSrc(URL.createObjectURL(cachedImage));
+      url = URL.createObjectURL(cachedImage);
+      setImageSrc(url);
     } else {
       setAvailable(false);
     }

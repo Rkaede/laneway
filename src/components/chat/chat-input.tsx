@@ -1,6 +1,6 @@
 import { isMac } from '@solid-primitives/platform';
 import { useLocation } from '@solidjs/router';
-import { Component, createEffect, createSignal, For, lazy, Show } from 'solid-js';
+import { Component, createEffect, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 
 import { IconPlus, IconSendHorizontal, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
@@ -110,13 +110,18 @@ export const ChatInput: Component<PromptProps> = (props) => {
       <Show when={props.attachments && props.attachments.length > 0}>
         <div class="absolute top-0 left-2 ml-3 flex w-full -translate-y-full gap-2 py-2">
           <For each={props.attachments || []}>
-            {(file) => (
-              <Thumbnail
-                file={URL.createObjectURL(file)}
-                alt={file.name}
-                onRemove={() => props.onRemoveFile?.(file)}
-              />
-            )}
+            {(file) => {
+              const url = URL.createObjectURL(file);
+              onCleanup(() => URL.revokeObjectURL(url));
+
+              return (
+                <Thumbnail
+                  file={url}
+                  alt={file.name}
+                  onRemove={() => props.onRemoveFile?.(file)}
+                />
+              );
+            }}
           </For>
         </div>
       </Show>
