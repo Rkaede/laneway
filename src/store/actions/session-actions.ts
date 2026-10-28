@@ -18,6 +18,7 @@ const router = import('~/services/llm');
 import { getProvider } from '~/services/util';
 
 import { setStore, store } from '..';
+import { apiKeys } from '../keys';
 import { models } from '../models';
 import { createSessionFromPreset, getChatModel } from '../util';
 
@@ -216,19 +217,33 @@ export function renameSession(sessionId: string, title: string) {
 export async function autonameChat(sessionId: string, title: string) {
   const session = store.sessions.find((s) => s.id === sessionId);
   if (!session) return;
+  const originalTitle = session.title;
 
-  const prompt = summarizeTitle.replace('{{messages}}', title);
-  const provider = getProvider(store.settings.systemModel);
-  const llm = await router;
-  const response = await llm.getText({
-    messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
-    modelId: provider?.modelId,
-    provider: provider?.id,
-  });
-  if (!response) return;
+  try {
+    const provider = getProvider(store.settings.systemModel);
+    if (!provider || !apiKeys[provider.id]?.trim()) return;
 
-  const formatted = response.text.replace(/\.$/, '');
-  setStore('sessions', (s) => s.id === sessionId, 'title', formatted);
+    const prompt = summarizeTitle.replace('{{messages}}', title);
+    const llm = await router;
+    const response = await llm.getText({
+      messages: [{ id: nanoid(), role: 'user', content: [{ type: 'text', text: prompt }] }],
+      modelId: provider.modelId,
+      provider: provider.id,
+    });
+    if (!response) return;
+
+    const formatted = response.text.replace(/^[\s#"'“‘`*_]+|[\s."'”’`*_]+$/g, '');
+    if (!formatted) return;
+
+    setStore(
+      'sessions',
+      (s) => s.id === sessionId && s.title === originalTitle,
+      'title',
+      formatted,
+    );
+  } catch (error) {
+    console.error('Error generating session title:', error);
+  }
 }
 
 export async function getCompletion(input: string) {

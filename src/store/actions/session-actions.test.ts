@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
 import type { MessageProps } from '~/types';
 
@@ -11,8 +11,11 @@ mock.module('~/components/icons/ui', () => ({
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
 const { setStore, store } = await import('..');
+const { setApiKeys } = await import('../keys');
 const { setModels } = await import('../models');
-const { addMessageToSessionChats } = await import('./session-actions');
+const { addMessageToSessionChats, autonameChat, renameSession } =
+  await import('./session-actions');
+const llm = await import('~/services/llm');
 fetchMock.mockRestore();
 
 const imageMessage: MessageProps = {
@@ -121,5 +124,116 @@ describe('addMessageToSessionChats', () => {
     addMessageToSessionChats(message, 'session');
 
     expect(store.chats[0].messages).toEqual([message]);
+  });
+});
+
+function titleResponse(text: string) {
+  return { text } as NonNullable<Awaited<ReturnType<typeof llm.getText>>>;
+}
+
+describe('autonameChat', () => {
+  const getText = mock<typeof llm.getText>();
+
+  beforeEach(() => {
+    setModels(0, 'provider', [{ id: 'openai', modelId: 'title-model', primary: true }]);
+    setStore('settings', 'systemModel', 'vision');
+    setStore('settings', 'openRouterUsage', 'fallback');
+    setApiKeys({ openai: 'test-key', openrouter: '' });
+    getText.mockReset();
+    getText.mockResolvedValue(titleResponse('Generated title'));
+    spyOn(llm, 'getText').mockImplementation(getText);
+    spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    setApiKeys({ openai: '', openrouter: '' });
+    mock.restore();
+  });
+
+  it.each(['openai', 'openrouter'] as const)(
+    'keeps the existing title without requesting a missing %s key',
+    async (provider) => {
+      setModels(0, 'provider', [{ id: provider, modelId: 'title-model', primary: true }]);
+      setApiKeys(provider === 'openai' ? 'openrouter' : 'openai', 'unrelated-key');
+
+      for (const key of [undefined, '', '   ']) {
+        setApiKeys(provider, key);
+
+        await expect(autonameChat('session', 'Hello')).resolves.toBeUndefined();
+
+        expect(store.sessions[0].title).toBe('Assistant chat');
+        expect(getText).not.toHaveBeenCalled();
+      }
+    },
+  );
+
+  it('skips generation when no provider is available', async () => {
+    setStore('settings', 'systemModel', 'missing-model');
+
+    await autonameChat('session', 'Hello');
+
+    expect(store.sessions[0].title).toBe('Assistant chat');
+    expect(getText).not.toHaveBeenCalled();
+  });
+
+  it.each([new Error('Missing API key'), new Error('Rate limit exceeded'), undefined])(
+    'keeps the existing title when generation rejects with %s',
+    async (error) => {
+      getText.mockRejectedValueOnce(error);
+
+      await expect(autonameChat('session', 'Hello')).resolves.toBeUndefined();
+
+      expect(store.sessions[0].title).toBe('Assistant chat');
+    },
+  );
+
+  it.each([
+    ['  Planning trip.  ', 'Planning trip'],
+    ['"Planning trip."', 'Planning trip'],
+    ["'Planning trip.'", 'Planning trip'],
+    ['“Planning trip.”', 'Planning trip'],
+    ['‘Planning trip.’', 'Planning trip'],
+    ['**Planning trip.**', 'Planning trip'],
+    ['_Planning trip._', 'Planning trip'],
+    ['`Planning trip.`', 'Planning trip'],
+    ['### **"Planning trip."**', 'Planning trip'],
+    ['***Planning trip.***', 'Planning trip'],
+    ["Children's books.", "Children's books"],
+    ['_snake_case_', 'snake_case'],
+    ['`C#`', 'C#'],
+  ])('cleans up %s', async (text, title) => {
+    getText.mockResolvedValueOnce(titleResponse(text));
+
+    await autonameChat('session', 'Hello');
+
+    expect(store.sessions[0].title).toBe(title);
+  });
+
+  it.each(['', '   ', '### **"."**'])(
+    'keeps the existing title when the generated title is empty (%s)',
+    async (text) => {
+      getText.mockResolvedValueOnce(titleResponse(text));
+
+      await autonameChat('session', 'Hello');
+
+      expect(store.sessions[0].title).toBe('Assistant chat');
+    },
+  );
+
+  it('preserves a manual rename made while generation is pending', async () => {
+    const started = Promise.withResolvers<void>();
+    const response = Promise.withResolvers<ReturnType<typeof titleResponse>>();
+    getText.mockImplementationOnce(() => {
+      started.resolve();
+      return response.promise;
+    });
+
+    const pending = autonameChat('session', 'Hello');
+    await started.promise;
+    renameSession('session', 'My title');
+    response.resolve(titleResponse('Generated title'));
+    await pending;
+
+    expect(store.sessions[0].title).toBe('My title');
   });
 });
