@@ -1,6 +1,6 @@
 @import './styles/loom.css';
 
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 
 /*
  * The lightbox is dark chrome over media in every theme, so its colours do not

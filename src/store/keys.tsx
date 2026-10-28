@@ -20,9 +20,12 @@ const defaultState = {
 
 // the warning given by the rule here is not helpful in this case
 
-export const [apiKeys, setApiKeys] = makePersistedStore(createStore<APIKeys>(clone(defaultState)), {
-  name: 'laneway-api-keys',
-});
+export const [apiKeys, setApiKeys] = makePersistedStore(
+  createStore<APIKeys>(clone(defaultState)),
+  {
+    name: 'laneway-api-keys',
+  },
+);
 
 export const deleteKeys = () => {
   setApiKeys(clone(defaultState));
