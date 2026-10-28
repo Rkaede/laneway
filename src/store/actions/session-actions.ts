@@ -199,6 +199,9 @@ export function deleteSession(sessionId: string) {
     return false;
   }
 
+  for (const chatId of session.chats) {
+    store.chats.find((c) => c.id === chatId)?.controller?.abort();
+  }
   deleteImagesForSession(sessionId);
 
   setStore(

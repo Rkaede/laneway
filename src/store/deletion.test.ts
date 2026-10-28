@@ -99,6 +99,8 @@ describe('session deletion', () => {
     'keeps the session, messages, images, and route when confirmation is canceled (%j)',
     (options) => {
       const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
+      const controller = new AbortController();
+      setStore('chats', 0, { status: 'loading', controller });
       const before = JSON.stringify(store);
 
       sessionActions.deleteSession.fn(context, options);
@@ -107,6 +109,7 @@ describe('session deletion', () => {
       expect(JSON.stringify(store)).toBe(before);
       expect(removeImage).not.toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
+      expect(controller.signal.aborted).toBe(false);
     },
   );
 
@@ -141,6 +144,41 @@ describe('session deletion', () => {
       expect(navigate).not.toHaveBeenCalled();
     },
   );
+
+  it('aborts all requests in the deleted session before removing its chats', () => {
+    spyOn(imageCache, 'remove').mockResolvedValue(undefined);
+    confirm.mockReturnValue(true);
+    const controllers = [new AbortController(), new AbortController()];
+    const keepController = new AbortController();
+    setStore('chats', 0, { status: 'loading', controller: controllers[0] });
+    setStore('chats', 1, { status: 'loading', controller: keepController });
+    setStore('chats', 2, {
+      id: 'second-chat',
+      status: 'loading',
+      messages: [],
+      controller: controllers[1],
+    });
+    setStore('chats', 3, { id: 'idle-chat', status: 'idle', messages: [] });
+    setStore('sessions', 0, 'chats', [
+      'delete-chat',
+      'second-chat',
+      'idle-chat',
+      'missing-chat',
+    ]);
+    for (const controller of controllers) {
+      controller.signal.addEventListener('abort', () => {
+        expect(store.sessions.some((session) => session.id === 'delete-session')).toBe(true);
+        expect(store.chats.some((chat) => chat.controller === controller)).toBe(true);
+      });
+    }
+
+    expect(deleteSession('delete-session')).toBe(true);
+
+    expect(controllers.every((controller) => controller.signal.aborted)).toBe(true);
+    expect(keepController.signal.aborted).toBe(false);
+    expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
+    expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
+  });
 
   it('does not prompt or navigate for a missing session', () => {
     expect(deleteSession('missing')).toBe(false);
