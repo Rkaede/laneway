@@ -30,12 +30,7 @@ function isTypingTarget(target: EventTarget | null) {
   );
 }
 
-export const WelcomeContent: Component<{
-  openRouterKey: () => string;
-  openAIKey: () => string;
-  setOpenRouterKey: (value: string) => void;
-  setOpenAIKey: (value: string) => void;
-}> = () => {
+export const WelcomeContent: Component = () => {
   const [showKeys, setShowKeys] = createSignal(false);
   const [variant, setVariant] = createSignal(readStoredVariant());
 

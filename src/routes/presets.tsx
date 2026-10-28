@@ -132,7 +132,6 @@ export default function Presets() {
               onDirtyChange={onDirtyChange}
               initialPreset={preset}
               onClose={() => setIsModalOpen(false)}
-              onDelete={(id) => handleDeletePreset({ id } as PresetProps)}
               isNewPreset={isNewPreset()}
             />
           </DialogDescription>
@@ -269,7 +268,6 @@ const PresetDetails: Component<{
   initialPreset: PresetProps;
   onClose: () => void;
   onDirtyChange: (isDirty: boolean) => void;
-  onDelete: (id: string) => void;
   isNewPreset: boolean;
 }> = (props) => {
   const {

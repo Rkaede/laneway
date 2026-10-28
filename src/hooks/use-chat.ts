@@ -8,7 +8,7 @@ import { setStore } from '~/store';
 import { clearChatError } from '~/store/actions';
 import { apiKeys } from '~/store/keys';
 import { selectAssistantById, selectModelById } from '~/store/selectors';
-import type { ChatProps, MessageProps } from '~/types';
+import type { ChatProps } from '~/types';
 
 type UseChat = {
   chat: ChatProps;
@@ -16,8 +16,7 @@ type UseChat = {
 };
 
 type ChatStore = {
-  latest: MessageProps | undefined;
-  append: (messages: MessageProps[]) => Promise<void>;
+  append: () => Promise<void>;
   cancel: () => void;
 };
 
@@ -58,7 +57,6 @@ export function useChat({ chat, readOnly }: UseChat) {
   };
 
   const [chatStore] = createStore<ChatStore>({
-    latest: undefined as MessageProps | undefined,
     cancel: () => {
       cancel({ chatId: chat.id });
     },

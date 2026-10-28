@@ -104,7 +104,6 @@ export default function Assistants() {
             onDirtyChange={onDirtyChange}
             initialAssistant={assistant}
             onClose={() => setIsModalOpen(false)}
-            onDelete={() => handleDeleteAssistant(assistant.id)}
             isNewAssistant={isNewAssistant()}
           />
         )}
@@ -192,7 +191,6 @@ function AssistantDetails(props: {
   initialAssistant: AssistantProps;
   onClose: () => void;
   onDirtyChange: (isDirty: boolean) => void;
-  onDelete: () => void;
   isNewAssistant: boolean;
 }) {
   const {
@@ -231,7 +229,6 @@ function AssistantDetails(props: {
           modelId={localAssistant.modelId}
           systemPrompt={localAssistant.systemPrompt || ''}
           onNameChange={(value) => setLocalAssistant('title', value)}
-          onProviderChange={(value) => setLocalAssistant('providerId', value)}
           onModelChange={(value) => setLocalAssistant('modelId', value)}
           onSubtitleChange={(value) => setLocalAssistant('subtitle', value)}
           onSystemPromptChange={(value) => setLocalAssistant('systemPrompt', value)}

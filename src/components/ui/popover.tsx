@@ -7,8 +7,6 @@ import { mergeProps, splitProps } from 'solid-js';
 import { cn } from '~/util';
 
 export const PopoverTrigger = PopoverPrimitive.Trigger;
-export const PopoverTitle = PopoverPrimitive.Title;
-export const PopoverDescription = PopoverPrimitive.Description;
 
 export const Popover = (props: PopoverRootProps) => {
   const merge = mergeProps<PopoverRootProps[]>({ gutter: 4 }, props);

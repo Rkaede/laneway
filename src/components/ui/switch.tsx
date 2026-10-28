@@ -7,8 +7,6 @@ import { cn } from '~/util';
 
 export const SwitchLabel = SwitchPrimitive.Label;
 export const Switch = SwitchPrimitive.Root;
-export const SwitchErrorMessage = SwitchPrimitive.ErrorMessage;
-export const SwitchDescription = SwitchPrimitive.Description;
 
 type SwitchControlProps = ParentProps<SwitchPrimitive.SwitchControlProps & { class?: string }>;
 

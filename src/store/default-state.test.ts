@@ -28,6 +28,17 @@ describe('createDefaultState', () => {
     ]);
   });
 
+  it('creates independent copies of preset defaults', () => {
+    const state = createDefaultState();
+    const originalPresets = structuredClone(state.presets);
+
+    state.presets[0].presetTitle = 'Renamed preset';
+    state.presets[0].chats[0].modelId = 'another-model';
+    state.presets[1].chats.pop();
+
+    expect(createDefaultState().presets).toEqual(originalPresets);
+  });
+
   it('restores the image example after its session and chat data are changed', () => {
     const state = createDefaultState();
     const session = state.sessions.find((session) => session.title === 'Vision')!;

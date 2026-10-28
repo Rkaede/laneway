@@ -32,6 +32,16 @@ afterEach(() => {
 });
 
 describe('chat API keys', () => {
+  it('dispatches an explicit request for the current chat without a message argument', async () => {
+    const chat = useChat({ chat: store.chats[0] });
+
+    await chat.append();
+
+    expect(append).toHaveBeenCalledTimes(1);
+    expect(append).toHaveBeenCalledWith({ chatId: 'chat', streamFn: expect.any(Function) });
+    expect(store.chats[0].messages).toEqual([prompt]);
+  });
+
   it('does not send read-only chats even when a key is configured', async () => {
     setModels([
       {
@@ -46,7 +56,7 @@ describe('chat API keys', () => {
     const chat = useChat({ chat: store.chats[0], readOnly: () => true });
 
     runEffect();
-    await chat.append([prompt]);
+    await chat.append();
 
     expect(chat.isApiKeyConfigured()).toBe(true);
     expect(append).not.toHaveBeenCalled();

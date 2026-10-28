@@ -9,6 +9,7 @@ import type {
   SessionTemplate,
   SpeedDialItem,
 } from '~/types';
+import { clone } from '~/util';
 
 interface State {
   schemaVersion: number;
@@ -86,10 +87,6 @@ const flagshipModels: PresetProps = {
     { modelId: 'google/gemini-2.5-pro', status: 'idle' },
   ],
 };
-
-function clone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
-}
 
 // This needs to be a factory function. If we were to use just a variable it would be mutated by
 // the store and resetStore would not work.

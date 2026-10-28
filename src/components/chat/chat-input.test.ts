@@ -18,8 +18,7 @@ afterAll(() => rm(directory, { recursive: true, force: true }));
 const stubs = join(directory, 'stubs.mjs');
 await Bun.write(
   stubs,
-  `export const useLocation = () => ({ pathname: '/' });
-export const Button = () => null;
+  `export const Button = () => null;
 export const Thumbnail = Button;
 ${Object.keys(iconsMock())
   .map((name) => `export const ${name} = Button;`)
@@ -41,7 +40,7 @@ const jsx = transpileModule(source, {
 }).outputText;
 const compiled = transformSync(jsx, { presets: [['babel-preset-solid', { generate: 'ssr' }]] });
 if (!compiled?.code) throw new Error('Failed to compile ChatInput');
-const stubbed = ['@solidjs/router', '~/components/icons/ui', '~/components/ui/button', '../ui'];
+const stubbed = ['~/components/icons/ui', '~/components/ui/button', '../ui'];
 const code = compiled.code.replace(/from (['"])([^'"]+)\1/g, (_match, quote, name: string) => {
   const specifier = name === 'solid-js' ? 'solid-js/dist/solid.js' : name;
   return `from ${quote}${stubbed.includes(name) ? stubs : import.meta.resolve(specifier)}${quote}`;

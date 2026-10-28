@@ -41,14 +41,7 @@ export function Session() {
       {(session) => (
         <Show
           when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || session.created === -1}
-          fallback={
-            <WelcomeContent
-              openRouterKey={() => ''}
-              openAIKey={() => ''}
-              setOpenRouterKey={() => {}}
-              setOpenAIKey={() => {}}
-            />
-          }
+          fallback={<WelcomeContent />}
         >
           <SessionProvider sessionId={params.id} session={session}>
             <Show

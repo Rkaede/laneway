@@ -7,11 +7,6 @@ import { cn } from '~/util';
 
 export const Select = SelectPrimitive.Root;
 export const SelectValue = SelectPrimitive.Value;
-export const SelectDescription = SelectPrimitive.Description;
-export const SelectErrorMessage = SelectPrimitive.ErrorMessage;
-export const SelectItemDescription = SelectPrimitive.ItemDescription;
-export const SelectHiddenSelect = SelectPrimitive.HiddenSelect;
-export const SelectSection = SelectPrimitive.Section;
 
 type SelectTriggerProps = ParentProps<SelectPrimitive.SelectTriggerProps & { class?: string }>;
 

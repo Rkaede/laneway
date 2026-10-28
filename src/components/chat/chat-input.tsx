@@ -1,6 +1,5 @@
 import { isMac } from '@solid-primitives/platform';
-import { useLocation } from '@solidjs/router';
-import { Component, createEffect, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
+import { Component, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 
 import { IconPlus, IconSendHorizontal, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
@@ -26,16 +25,8 @@ interface PromptProps {
 
 export const ChatInput: Component<PromptProps> = (props) => {
   let fileInputRef: HTMLInputElement | undefined;
-  let ref: HTMLTextAreaElement | undefined;
-  const location = useLocation();
   const [fileErrors, setFileErrors] = createSignal<string[]>([]);
   const [isDragging, setIsDragging] = createSignal(false);
-
-  createEffect(() => {
-    if (location.pathname && ref) {
-      ref.focus();
-    }
-  });
 
   const handleFiles = (files: Iterable<File>) => {
     if (!props.hasVision || props.isLoading) return;

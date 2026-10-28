@@ -1,5 +1,4 @@
 import { type ClassValue, clsx } from 'clsx';
-import { createEffect } from 'solid-js';
 import { extendTailwindMerge } from 'tailwind-merge';
 
 import type { SessionProps } from './types';
@@ -93,12 +92,6 @@ export function groupByDate(sessions: SessionProps[]) {
   }
 
   return groupedObjects;
-}
-
-export function createLog(obj: unknown) {
-  return createEffect(() => {
-    console.info(JSON.stringify(obj, null, 2));
-  });
 }
 
 export async function base64EncodeFile(file: File): Promise<string> {

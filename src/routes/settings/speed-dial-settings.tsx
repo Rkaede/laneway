@@ -49,10 +49,6 @@ export const SpeedDial: Component = () => {
     setStore('speedDial', (item) => item.id === id, field, value);
   };
 
-  const clearSpeedDialItem = (id: string) => {
-    setStore('speedDial', (item) => item.id === id, { id: id });
-  };
-
   const moveSpeedDialItem = (id: string, direction: 'up' | 'down') => {
     setStore('speedDial', (items) => {
       const index = items.findIndex((item) => item.id === id);
@@ -90,7 +86,6 @@ export const SpeedDial: Component = () => {
                   value={item.sessionType}
                   onChange={(value) => {
                     if (!value) return;
-                    clearSpeedDialItem(item.id);
                     updateSpeedDialItem(item.id, 'sessionType', value);
                     updateSpeedDialItem(item.id, 'referenceId', undefined);
                     updateSpeedDialItem(item.id, 'title', '');

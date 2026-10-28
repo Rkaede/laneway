@@ -20,7 +20,7 @@ const cardVariants = cva('rounded-card border bg-surface-raised text-main shadow
   },
 });
 
-export interface CardProps extends ComponentProps<'div'>, VariantProps<typeof cardVariants> {}
+interface CardProps extends ComponentProps<'div'>, VariantProps<typeof cardVariants> {}
 
 export function Card(props: CardProps) {
   const [local, rest] = splitProps(props, ['class', 'variant']);
@@ -46,20 +46,8 @@ export const CardTitle: ParentComponent<ComponentProps<'h1'>> = (props) => {
   return <h1 class={cn('leading-none font-semibold tracking-tight', local.class)} {...rest} />;
 };
 
-export const CardDescription: ParentComponent<ComponentProps<'h3'>> = (props) => {
-  const [local, rest] = splitProps(props, ['class']);
-
-  return <h3 class={cn('text-sm text-muted', local.class)} {...rest} />;
-};
-
 export const CardContent = (props: ComponentProps<'div'>) => {
   const [local, rest] = splitProps(props, ['class']);
 
   return <div class={cn('p-6 pt-0', local.class)} {...rest} />;
-};
-
-export const CardFooter = (props: ComponentProps<'div'>) => {
-  const [local, rest] = splitProps(props, ['class']);
-
-  return <div class={cn('flex items-center p-6 pt-0', local.class)} {...rest} />;
 };
