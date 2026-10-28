@@ -1,0 +1,71 @@
+/*
+ * Spacing tokens. Theme-stable, so values live directly in @theme.
+ *
+ * The NUMERIC scale is deliberately absent. Tailwind v4 already derives every
+ * numeric spacing utility from a single multiplier, `--spacing: 0.25rem`, which
+ * IS the 4px grid this system asks for: p-1 is 4px, p-2 is 8px, gap-6 is 24px.
+ * Redefining --spacing-1 ... --spacing-24 as individual keys would shadow that
+ * multiplier and break the in-between values the components already use
+ * (py-1.5, gap-1.5, size-9, px-2.5). So the grid comes from the multiplier and
+ * this file adds only the SEMANTIC aliases on top of it.
+ *
+ * Three rules govern which step to pick:
+ *
+ *   1. Every element relates to every other element on screen. Stronger
+ *      relationships sit visually closer, weaker ones further apart.
+ *   2. Pick from the scale, do not eyeball. Judgement happens inside guardrails.
+ *   3. Tight pairs get the smaller step, loose pairs the larger one. Walk the
+ *      page in pairs (title/subtitle, paragraph/next heading) and match the
+ *      step to the strength of the relationship.
+ *
+ * When spacing two related elements, derive the gap from the LARGER element of
+ * the pair: its size sets the visual weight, so its rhythm wins.
+ *
+ * Above about 80px the 4px grid stops being perceptible, since 120px and 128px
+ * look identical. Large rhythm therefore jumps non-linearly, which is why the
+ * section and hero steps below are not simply the next multiple of 4.
+ *
+ * Breaking the grid for a 2px optical correction (icon-to-text alignment, badge
+ * padding, tight button groups) is fine. The grid is for consistency, not a
+ * prison.
+ */
+
+@theme {
+  /* Semantic spacing.
+     stack  = vertical gap between stacked elements
+     inline = horizontal gap between inline elements
+     page   = outer padding of the main content area
+     card   = internal padding of a card or panel */
+  --spacing-stack-sm: 0.5rem;
+  --spacing-stack-md: 1rem;
+  --spacing-stack-lg: 1.5rem;
+
+  --spacing-inline-sm: 0.5rem;
+  --spacing-inline-md: 0.75rem;
+  --spacing-inline-lg: 1rem;
+
+  --spacing-page-x: 1.5rem;
+  --spacing-page-y: 1.5rem;
+  --spacing-card: 1rem;
+
+  /* Large rhythm, jumping non-linearly rather than marching along the grid. */
+  --spacing-section-gap: 2rem;
+  --spacing-section-gap-lg: 3rem;
+  --spacing-hero: 6rem;
+
+  /* Maximum width of the main content column. */
+  --spacing-page-container: 90rem;
+
+  /* Control sizing. Kept as tokens rather than inlined numbers because the
+     input, select, button and combobox families all have to agree on height and
+     padding, and a drift between them is immediately visible in a form row. */
+  --spacing-input-x-sm: 0.625rem;
+  --spacing-input-x-md: 0.75rem;
+  --spacing-input-x-lg: 1rem;
+  --spacing-input-y-sm: 0.125rem;
+  --spacing-input-y-md: 0.25rem;
+  --spacing-input-y-lg: 0.375rem;
+  --spacing-input-sm: 2rem;
+  --spacing-input-md: 2rem;
+  --spacing-input-lg: 2.5rem;
+}

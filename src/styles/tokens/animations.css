@@ -1,0 +1,123 @@
+/*
+ * Motion tokens. Theme-stable, so values live directly in @theme.
+ *
+ * Durations:
+ *   instant  0ms    reduced motion, disabled animation
+ *   fast     100ms  micro-interactions: toggles, checkmarks, hover colour
+ *   normal   200ms  most transitions: dropdowns, tooltips, tab switches
+ *   slow     300ms  larger reveals: modals, panels, page transitions
+ *   slower   500ms  complex or staggered sequences
+ *   lazy     800ms  background effects, skeleton loaders
+ *
+ * Easings:
+ *   default  general purpose, subtle deceleration
+ *   out      elements entering the screen
+ *   in       elements leaving the screen
+ *   in-out   elements repositioning on screen
+ *   bounce   playful UI: tooltips, badges, notifications
+ *   spring   natural feel: modals, drawers, popovers
+ *
+ * Numeric utilities (duration-300, ease-in-out) still work; Tailwind resolves
+ * those without a token. Prefer the named tokens in new code so a timing change
+ * lands in one place.
+ */
+
+@theme {
+  --duration-instant: 0ms;
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+  --duration-lazy: 800ms;
+
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+
+  --animate-fade-in: fade-in var(--duration-normal) var(--ease-out);
+  --animate-fade-out: fade-out var(--duration-fast) var(--ease-in);
+  --animate-slide-up: slide-up var(--duration-normal) var(--ease-spring);
+  --animate-slide-down: slide-down var(--duration-normal) var(--ease-spring);
+  --animate-scale-in: scale-in var(--duration-normal) var(--ease-spring);
+}
+
+/*
+ * Backdrop blur comes in a pair, not a single value. A heavy backdrop-filter on
+ * a sticky element is one of the most expensive paint operations on the page,
+ * and during fast scroll it drops frames. Apply --blur-scroll while the user is
+ * scrolling and settle to --blur-rest after --duration-blur-settle of idle. Skip
+ * the swap under reduced motion: the at-rest value stays applied.
+ *
+ * These live in a plain block, not in @theme, because the swap is driven from JS
+ * and Tailwind drops @theme entries that no CSS or utility references.
+ */
+:root {
+  --blur-scroll: 8px;
+  --blur-rest: 24px;
+  --duration-blur-settle: 120ms;
+}
+
+/* Keyframes live outside @theme. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
