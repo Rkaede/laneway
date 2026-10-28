@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { formatResponseTime, groupByDate } from './util';
+import { cn, formatResponseTime, groupByDate } from './util';
 
 // < 2000 returns "Nms"
 describe('formatResponseTime', () => {
@@ -45,5 +45,21 @@ describe('groupByDate', () => {
     const groups = groupByDate([{ ...baseSession, id: 'b', created: eightDaysAgo.getTime() }]);
 
     expect(groups.older.map((s) => s.id)).toContain('b');
+  });
+});
+
+describe('cn', () => {
+  it('lets stock radius and size classes override Loom token classes', () => {
+    expect(cn('rounded-card', 'rounded-md')).toBe('rounded-md');
+    expect(cn('h-input-md', 'h-9')).toBe('h-9');
+  });
+
+  it('lets the last Loom colour token win', () => {
+    expect(cn('text-muted', 'text-main')).toBe('text-main');
+    expect(cn('bg-surface-raised', 'bg-danger')).toBe('bg-danger');
+  });
+
+  it('keeps font size and text colour together', () => {
+    expect(cn('text-sm', 'text-muted')).toBe('text-sm text-muted');
   });
 });

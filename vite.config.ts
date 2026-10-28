@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
@@ -30,7 +31,7 @@ process.env.VITE_APP_VERSION = packageJson.version;
 process.env.VITE_APP_LICENSE = packageJson.license;
 
 export default defineConfig({
-  plugins: [solid(), VitePWA({ registerType: 'autoUpdate' })],
+  plugins: [solid(), tailwindcss(), VitePWA({ registerType: 'autoUpdate' })],
   optimizeDeps: {
     // Add both @codemirror/state and @codemirror/view to included deps to optimize
     include: [
@@ -50,6 +51,7 @@ export default defineConfig({
     },
   },
   server: {
-    // ... existing code ...
+    // Let the Tailscale preview URL through Vite's host check.
+    allowedHosts: ['.ts.net'],
   },
 });

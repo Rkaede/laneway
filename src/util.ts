@@ -1,8 +1,19 @@
 import { type ClassValue, clsx } from 'clsx';
 import { createEffect } from 'solid-js';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
 
 import type { SessionProps } from './types';
+
+// Teach tailwind-merge the Loom tokens that are not part of Tailwind's stock scales, so
+// `rounded-md` overrides `rounded-card` and `h-9` overrides `h-input-md`.
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      radius: ['tag', 'button', 'input', 'card', 'modal', 'badge'],
+      spacing: ['input-sm', 'input-md', 'input-lg', 'card', 'page-x', 'page-y'],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
