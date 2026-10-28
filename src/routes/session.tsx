@@ -36,10 +36,10 @@ export function Session() {
   const activeSession = selectRouteSession(() => params.id);
 
   return (
-    <Show when={activeSession()} fallback={<NotFound session />}>
+    <Show when={activeSession()} keyed fallback={<NotFound session />}>
       {(session) => (
         <Show
-          when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || session().created === -1}
+          when={(anyKeysSet() && apiKeys.hasCompletedWelcome) || session.created === -1}
           fallback={
             <WelcomeContent
               openRouterKey={() => ''}
@@ -49,9 +49,9 @@ export function Session() {
             />
           }
         >
-          <SessionProvider sessionId={params.id} session={session()}>
+          <SessionProvider sessionId={params.id} session={session}>
             <Show
-              when={session().type === 'note'}
+              when={session.type === 'note'}
               fallback={<MultiChatLayout sessionId={params.id} />}
             >
               <NoteLayout sessionId={params.id} />
