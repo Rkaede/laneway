@@ -90,6 +90,26 @@ describe('chat cancellation', () => {
 });
 
 describe('chat recovery', () => {
+  it.each([undefined, null])(
+    'ends loading with an unknown error when the stream rejects with %s',
+    async (error) => {
+      setStore('chats', 0, 'latest', { role: 'assistant', content: 'Partial response' });
+
+      await append({
+        chatId,
+        streamFn: async () => {
+          throw error;
+        },
+      });
+
+      expect(store.chats[0].status).toBe('error');
+      expect(store.chats[0].error).toEqual({ name: 'Unknown', message: 'Unknown' });
+      expect(store.chats[0].controller).toBeUndefined();
+      expect(store.chats[0].latest).toBeUndefined();
+      expect(store.chats[0].messages).toEqual([prompt]);
+    },
+  );
+
   it('ends loading with an error when no stream is available', async () => {
     setStore('chats', 0, 'latest', { role: 'assistant', content: 'Partial response' });
 

@@ -92,8 +92,8 @@ export async function append({
     });
   } catch (error: unknown) {
     if (controller.signal.aborted) return;
-    const errorMessage = (error as ErrorWithCode).message ?? 'Unknown';
-    const errorName = (error as ErrorWithCode).code ?? 'Unknown';
+    const errorMessage = (error as ErrorWithCode)?.message ?? 'Unknown';
+    const errorName = (error as ErrorWithCode)?.code ?? 'Unknown';
 
     setStore('chats', (c) => c.id === chatId, {
       controller: undefined,
