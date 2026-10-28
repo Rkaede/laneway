@@ -57,6 +57,8 @@ Run the unit tests with Bun:
 bun test
 ```
 
+Unit tests use `*.test.ts`; Playwright tests use `*.e2e.ts` so Bun does not discover them.
+
 To run end-to-end tests with Playwright:
 
 ```bash

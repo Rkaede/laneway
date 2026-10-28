@@ -12,7 +12,7 @@
     "format": "oxfmt src",
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
-    "test": "bun test ./**/*.test.*",
+    "test": "bun test",
     "test:e2e": "playwright test",
     "typecheck": "bunx tsc --noEmit",
     "validate": "bun run format && bun run typecheck && bun run lint:fix && bun run test"
