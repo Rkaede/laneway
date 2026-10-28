@@ -8,7 +8,7 @@ export const openai: Partial<ModelProps>[] = [
     id: 'openai/gpt-3.5-turbo',
     title: 'GPT-3.5 Turbo',
     legacy: true,
-    provider: [{  ...openaiProvider, modelId: 'gpt-3.5-turbo' }],
+    provider: [{ ...openaiProvider, modelId: 'gpt-3.5-turbo' }],
   },
   {
     id: 'openai/gpt-4-turbo',

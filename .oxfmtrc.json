@@ -9,10 +9,7 @@
   "sortPackageJson": false,
   "sortTailwindcss": {
     "stylesheet": "./src/index.css",
-    "functions": [
-      "cn",
-      "cva"
-    ]
+    "functions": ["cn", "cva"]
   },
-  "ignorePatterns": []
+  "ignorePatterns": ["scripts/data/prompts/*.md"]
 }

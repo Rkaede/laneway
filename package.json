@@ -9,13 +9,14 @@
     "build": "bun scripts/generate-data.ts && bun run typecheck && bunx vite build",
     "preview": "vite preview",
     "postinstall": "simple-git-hooks",
-    "format": "oxfmt src",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint src --fix",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
     "test": "bun test",
     "test:e2e": "playwright test",
     "typecheck": "bunx tsc --noEmit && bunx tsc --noEmit -p tsconfig.node.json",
-    "validate": "bun run format && bun run typecheck && bun run lint:fix && bun run test"
+    "validate": "bun run format:check && bun run typecheck && bun run lint && bun run test"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.104",

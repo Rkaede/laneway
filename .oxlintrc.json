@@ -1,12 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript"
-  ],
-  "jsPlugins": [
-    "eslint-plugin-simple-import-sort",
-    "eslint-plugin-solid"
-  ],
+  "plugins": ["typescript"],
+  "jsPlugins": ["eslint-plugin-simple-import-sort", "eslint-plugin-solid"],
   "categories": {
     "correctness": "off"
   },
@@ -112,12 +107,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "rules": {
         "constructor-super": "off",
         "getter-return": "off",
