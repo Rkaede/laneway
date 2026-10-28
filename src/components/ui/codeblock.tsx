@@ -106,13 +106,16 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
   }
 
   return (
-    <div class="codeblock group/toolbar w-full rounded bg-gray-700/80 font-sans" ref={ref}>
-      <div class="flex w-full items-center justify-between px-4 py-0.5 pr-2 text-gray-100">
+    <div
+      class="codeblock group/toolbar w-full overflow-hidden rounded-card border border-code-border bg-code-bar font-sans shadow-code"
+      ref={ref}
+    >
+      <div class="flex w-full items-center justify-between px-4 py-0.5 pr-2 text-code-bar-fg">
         <span class="text-xs font-medium lowercase">{props.language}</span>
         <div class="flex items-center gap-1">
           <Button
             variant="ghost"
-            class="size-6 hover:bg-background-4"
+            class="size-6 text-code-bar-fg hover:bg-code-bar-hover"
             size="icon"
             aria-label="Copy code"
             onClick={onCopy}
@@ -146,7 +149,7 @@ function CodeActionDropdown(props: {
     <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
       <DropdownMenuTrigger
         as={Button}
-        class="size-6 transition-none hover:bg-background-4 data-[open='true']:opacity-100"
+        class="size-6 text-code-bar-fg transition-none hover:bg-code-bar-hover data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
         size="icon"

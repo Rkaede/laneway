@@ -1,4 +1,4 @@
-import { createHighlighter } from 'shiki';
+import { createCssVariablesTheme, createHighlighter } from 'shiki';
 import { createEffect, createSignal, ParentComponent } from 'solid-js';
 
 type CodeHighlighterProps = {
@@ -51,8 +51,11 @@ const languagesWithAliases = languages.concat([
   'ts', // typescript
 ]);
 
+// Reads its colours from the --shiki-* variables of the mounted theme.
+const cssVariablesTheme = createCssVariablesTheme({ name: 'css-variables' });
+
 const highlighter = createHighlighter({
-  themes: ['poimandres'],
+  themes: [cssVariablesTheme],
   langs: languages,
 });
 
@@ -64,7 +67,7 @@ export const CodeHighlighter: ParentComponent<CodeHighlighterProps> = (props) =>
     highlighter.then((h) => {
       const highlightedCode = h.codeToHtml(props.code, {
         lang: languagesWithAliases.includes(props.language) ? props.language : 'text',
-        theme: 'poimandres',
+        theme: 'css-variables',
       });
       setHtml(highlightedCode);
     });
