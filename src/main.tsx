@@ -9,9 +9,12 @@ import { render } from 'solid-js/web';
 import { AppLayout } from './app-layout';
 import { AppError } from './components/connected/app-error';
 import { getDocumentTitle } from './document-title';
+import { registerPreloadErrorHandler } from './preload-error';
 import { NotFound } from './routes/not-found';
 import { Session } from './routes/session';
 import { selectRouteSession } from './store/selectors';
+
+registerPreloadErrorHandler(window, import.meta.url);
 
 const SandboxLayout = import.meta.env.DEV
   ? lazy(() => import('./routes/sandbox/sandbox-layout'))
