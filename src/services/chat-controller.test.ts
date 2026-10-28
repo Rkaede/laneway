@@ -47,6 +47,20 @@ beforeEach(() => {
 });
 
 describe('chat recovery', () => {
+  it('ends loading with an error when no stream is available', async () => {
+    setStore('chats', 0, 'latest', { role: 'assistant', content: 'Partial response' });
+
+    await append({ chatId, streamFn: async () => undefined });
+
+    expect(store.chats[0].status).toBe('error');
+    expect(store.chats[0].error?.message).toBe(
+      'No provider is available for this model. Check your API keys in Settings.',
+    );
+    expect(store.chats[0].controller).toBeUndefined();
+    expect(store.chats[0].latest).toBeUndefined();
+    expect(store.chats[0].messages).toEqual([prompt]);
+  });
+
   it('makes a failed prompt ready to send again when Retry clears the error', async () => {
     await append({
       chatId,

@@ -45,7 +45,11 @@ export async function append({
 
     const stream = await streamFn(controller.signal);
 
-    if (!stream) return;
+    if (!stream) {
+      throw new Error(
+        'No provider is available for this model. Check your API keys in Settings.',
+      );
+    }
     let latestContent = '';
 
     // textStream hides API failures behind a generic NoOutputGeneratedError, fullStream carries them
