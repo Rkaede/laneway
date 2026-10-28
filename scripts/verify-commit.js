@@ -2,11 +2,15 @@
 // https://github.com/vuejs/core/blob/main/scripts/verify-commit.js
 
 // @ts-check
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
-const msgPath = path.resolve('.git/COMMIT_EDITMSG');
+// `.git` is a file in worktrees, so ask git where the message lives
+const msgPath = path.resolve(
+  execFileSync('git', ['rev-parse', '--git-path', 'COMMIT_EDITMSG'], { encoding: 'utf-8' }).trim(),
+);
 const msg = readFileSync(msgPath, 'utf-8').trim();
 
 const commitRE =
