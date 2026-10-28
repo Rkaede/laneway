@@ -111,7 +111,7 @@ export function createDefaultState(): State {
     draftChats: [
       {
         id: 'draft-chat',
-        modelId: 'openai/gpt-4o',
+        modelId: 'openai/gpt-4.1',
         status: 'idle',
         messages: [],
       },
