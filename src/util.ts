@@ -109,10 +109,6 @@ export async function base64EncodeFile(file: File): Promise<string> {
   });
 }
 
-export function sanitizeMessage(message: string) {
-  return message.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-}
-
 // https://stackoverflow.com/a/52171480
 export function hash(str: string, seed = 0) {
   let h1 = 0xdeadbeef ^ seed,

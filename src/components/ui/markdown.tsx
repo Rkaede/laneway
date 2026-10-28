@@ -3,7 +3,7 @@ import { type Component, Show } from 'solid-js';
 import { SolidMarkdown } from 'solid-markdown';
 
 import { CodeBlock } from '~/components/ui';
-import { cn, sanitizeMessage } from '~/util';
+import { cn } from '~/util';
 
 import { sanitizeMarkdownLink } from './markdown-links';
 
@@ -61,7 +61,7 @@ const Markdown: Component<{ text: string }> = (props) => {
         '[--tw-prose-body:var(--main)] [--tw-prose-bold:var(--main)] [--tw-prose-bullets:var(--faint)] [--tw-prose-captions:var(--muted)] [--tw-prose-code:var(--main)] [--tw-prose-counters:var(--muted)] [--tw-prose-headings:var(--main)] [--tw-prose-hr:var(--border)] [--tw-prose-kbd:var(--main)] [--tw-prose-lead:var(--muted)] [--tw-prose-links:var(--link)] [--tw-prose-pre-bg:var(--surface-sunken)] [--tw-prose-pre-code:var(--main)] [--tw-prose-quote-borders:var(--border-emphasis)] [--tw-prose-quotes:var(--main)] [--tw-prose-td-borders:var(--border)] [--tw-prose-th-borders:var(--border-emphasis)]',
       )}
     >
-      {sanitizeMessage(props.text)}
+      {props.text}
     </SolidMarkdown>
   );
 };
