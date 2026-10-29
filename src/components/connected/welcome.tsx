@@ -8,6 +8,7 @@ import { setApiKeys } from '~/store/keys';
 import { anyKeysSet } from '~/store/selectors';
 
 import { IconArrowLeft, IconGithub, IconKey } from '../icons/ui';
+import { WelcomeDemo } from './welcome-demo';
 import { WELCOME_VARIANTS } from './welcome-variants';
 
 const VARIANT_STORAGE_KEY = 'laneway-welcome-variant';
@@ -91,6 +92,7 @@ export const WelcomeContent: Component = () => {
                     Enter API Keys
                   </Button>
                 </div>
+                <WelcomeDemo class="mt-8 mb-12" />
               </Show>
               <Show when={showKeys()}>
                 <div class="mb-4 flex justify-end gap-2">

@@ -86,30 +86,12 @@ function Pillars() {
 }
 
 function Compare() {
-  const models = ['GPT-4o', 'Claude', 'Gemini'];
-  const lineWidths = ['w-full', 'w-11/12', 'w-4/5', 'w-2/3'];
-
   return (
     <div class="flex flex-col gap-4">
       <Heading>Ask once. Compare everything.</Heading>
       <p class="max-w-xl text-muted">
         Send one prompt to several models at the same time and read the answers side by side.
       </p>
-      <div class="grid grid-cols-3 gap-3" aria-hidden="true">
-        <For each={models}>
-          {(model) => (
-            <div class="flex flex-col gap-2 rounded-card border bg-surface-raised p-3 shadow-xs">
-              <div class="flex items-center gap-1.5 font-medium">
-                <IconBot class="size-4 text-muted" />
-                {model}
-              </div>
-              <For each={lineWidths}>
-                {(width) => <div class={`h-2 rounded-full bg-surface-sunken ${width}`} />}
-              </For>
-            </div>
-          )}
-        </For>
-      </div>
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {
   Input,
   SidebarGroup,
   SidebarIcon,
+  SidebarItem,
   SidebarItems,
   SidebarLinkItem,
 } from '~/components/ui';
@@ -82,7 +83,6 @@ function SessionGroup(props: {
 
 export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const params = useParams();
 
   function handleNewChat() {
@@ -98,21 +98,21 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   return (
     <div data-component="Sidebar" class="relative flex h-full">
       <div class="flex h-full w-full flex-col overflow-hidden">
-        <div class="flex w-full justify-center gap-1 border-b px-4 py-2" inert={!props.open}>
-          <Button onClick={handleNewChat} variant="outline" size="sm" class="justify-start">
-            <IconNewSession class="h-4 w-4" />
-            New Chat
-          </Button>
-          <Button onClick={handleNewNote} variant="outline" size="sm" class="justify-start">
-            <IconSquarePen class="h-4 w-4" />
-            New Note
-          </Button>
+        <div class="px-2 pt-2 pb-4" inert={!props.open}>
+          <SidebarItems>
+            <SidebarItem onClick={handleNewChat} icon={<IconNewSession class="mr-2 size-4" />}>
+              New Chat
+            </SidebarItem>
+            <SidebarItem onClick={handleNewNote} icon={<IconSquarePen class="mr-2 size-4" />}>
+              New Note
+            </SidebarItem>
+          </SidebarItems>
         </div>
         <div class="flex-1 overflow-auto border-b" inert={!props.open}>
           <Show when={store.sessions.length === 0}>
             <div role="status" class="px-4 py-6 text-sm text-muted">
               <p>No chats or notes yet.</p>
-              <p class="mt-1">Start a chat or note using the buttons above.</p>
+              <p class="mt-1">Start one from the menu above.</p>
             </div>
           </Show>
           <For each={Object.entries(groups())}>
@@ -121,40 +121,9 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
             }}
           </For>
         </div>
-        <SidebarItems class="px-2 py-2">
-          <SidebarLinkItem
-            href="/models"
-            active={location.pathname === '/models'}
-            class="w-full"
-            icon={<IconBox class="mr-2 size-4" />}
-          >
-            Models
-          </SidebarLinkItem>
-          <SidebarLinkItem
-            href="/assistants"
-            active={location.pathname === '/assistants'}
-            class="w-full"
-            icon={<IconScanFace class="mr-2 size-4" />}
-          >
-            Assistants
-          </SidebarLinkItem>
-          <SidebarLinkItem
-            href="/presets"
-            active={location.pathname === '/presets'}
-            class="w-full"
-            icon={<IconLayoutGrid class="mr-2 size-4" />}
-          >
-            Presets
-          </SidebarLinkItem>
-          <SidebarLinkItem
-            href="/settings"
-            active={location.pathname === '/settings'}
-            class="w-full"
-            icon={<IconSettings class="mr-2 size-4" />}
-          >
-            Settings
-          </SidebarLinkItem>
-        </SidebarItems>
+        <div class="px-2 py-2" inert={!props.open}>
+          <PagesMenu />
+        </div>
       </div>
       <div class="absolute top-0 right-0 bottom-0 z-10 flex translate-x-full items-center">
         <button
@@ -172,6 +141,47 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
     </div>
   );
 };
+
+const pages = [
+  { href: '/settings', label: 'Settings', icon: IconSettings },
+  { href: '/presets', label: 'Presets', icon: IconLayoutGrid },
+  { href: '/assistants', label: 'Assistants', icon: IconScanFace },
+  { href: '/models', label: 'Models', icon: IconBox },
+];
+
+function PagesMenu() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return (
+    <DropdownMenu placement="top-start">
+      <DropdownMenuTrigger
+        as={Button}
+        aria-label="Open menu"
+        variant="ghost"
+        size="icon"
+        class="text-muted hover:text-main data-[expanded]:bg-surface-hover data-[expanded]:text-main"
+      >
+        <IconSettings class="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent class="w-48">
+        <DropdownMenuGroup>
+          <For each={pages}>
+            {(page) => (
+              <DropdownMenuItem
+                class="gap-2"
+                aria-current={location.pathname === page.href ? 'page' : undefined}
+                onSelect={() => navigate(page.href)}
+              >
+                <page.icon class="size-4 text-muted" />
+                {page.label}
+              </DropdownMenuItem>
+            )}
+          </For>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function SidebarItemDropdown(props: { sessionId?: string }) {
   const navigate = useNavigate();

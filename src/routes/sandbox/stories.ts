@@ -15,6 +15,7 @@ import * as MultiComboboxStories from './multi-combobox.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
 import * as SwitchStories from './switch-stories';
 import * as UseAnimatedText from './use-animated-text.stories';
+import * as WelcomeDemoStories from './welcome-demo.stories';
 
 type StoryGroup = { title: string; stories: Record<string, () => JSX.Element> };
 
@@ -35,4 +36,5 @@ export const storyMap: Record<string, StoryGroup> = {
   'stats-popover': { title: 'StatsPopover', stories: StatsPopoverStories },
   switch: { title: 'Switch', stories: SwitchStories },
   'use-animated-text': { title: 'useAnimatedText', stories: UseAnimatedText },
+  'welcome-demo': { title: 'WelcomeDemo', stories: WelcomeDemoStories },
 };

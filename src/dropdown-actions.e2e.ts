@@ -49,8 +49,9 @@ for (const input of ['Enter', 'Space', 'click'] as const) {
           ]);
         });
       }
+      await page.getByRole('button', { name: 'Open menu' }).click();
       await page
-        .getByRole('link', { name: type === 'assistant' ? 'Assistants' : 'Presets' })
+        .getByRole('menuitem', { name: type === 'assistant' ? 'Assistants' : 'Presets' })
         .click();
       const title = type === 'assistant' ? 'Test assistant' : 'Daily Driver';
       const card = page.getByRole('button').filter({

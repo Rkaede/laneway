@@ -52,7 +52,7 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
 };
 
 const sidebarItem = cva(
-  'group flex cursor-pointer items-center rounded-md border border-transparent text-nav font-nav text-sidebar-item',
+  'group flex w-full cursor-pointer items-center rounded-md border border-transparent text-left text-nav font-nav text-sidebar-item',
   {
     variants: {
       active: {
@@ -73,8 +73,12 @@ const sidebarItem = cva(
 
 export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
   return (
-    <li class={sidebarItem({ active: props.active, class: props.class, size: props.size })}>
-      <button onClick={() => props.onClick()} class="flex w-full items-center" type="button">
+    <li>
+      <button
+        onClick={() => props.onClick()}
+        class={sidebarItem({ active: props.active, class: props.class, size: props.size })}
+        type="button"
+      >
         <Show when={props.icon}>
           <span>{props.icon}</span>
         </Show>
