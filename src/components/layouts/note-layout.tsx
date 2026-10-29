@@ -2,6 +2,7 @@ import { isMac } from '@solid-primitives/platform';
 import { Component, For, lazy, Show } from 'solid-js';
 
 import { ChatPanel } from '~/components/chat/chat-panel';
+import { KeyNotice } from '~/components/connected/api-key-dialog';
 import { useSession } from '~/components/connected/session-provider';
 import { SpeedDial } from '~/components/connected/speed-dial';
 import { IconSendHorizontal, IconSquare } from '~/components/icons/ui';
@@ -9,7 +10,7 @@ import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
-import { selectChatById } from '~/store/selectors';
+import { anyKeysSet, selectChatById } from '~/store/selectors';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 export function NoteLayout(props: { sessionId?: string }) {
@@ -55,9 +56,14 @@ export function NoteLayout(props: { sessionId?: string }) {
             </Show>
           </div>
           <div class="z-10 col-start-1 row-start-1 mt-1 mr-0.5 mb-0 flex flex-col items-end gap-0.5 place-self-end justify-self-center">
-            <div class="text-xs text-muted">
-              {isMac ? '⌘' : 'Ctrl'} + Enter or Shift + Enter to send
-            </div>
+            <Show
+              when={anyKeysSet()}
+              fallback={<KeyNotice class="rounded-md bg-surface-sunken px-2 text-xs" />}
+            >
+              <div class="text-xs text-muted">
+                {isMac ? '⌘' : 'Ctrl'} + Enter or Shift + Enter to send
+              </div>
+            </Show>
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { render } from 'solid-js/web';
 // routes
 import { AppLayout } from './app-layout';
 import { AppError } from './components/connected/app-error';
+import { WelcomeContent } from './components/connected/welcome';
 import { getDocumentTitle } from './document-title';
 import { registerPreloadErrorHandler } from './preload-error';
 import { NotFound } from './routes/not-found';
@@ -52,6 +53,7 @@ if (root) {
             {import.meta.env.DEV && (
               <Route path="/debug" component={Debug} info={{ title: 'Debug' }} />
             )}
+            <Route path="/welcome" component={WelcomeContent} info={{ title: 'Welcome' }} />
             <Route path="/settings" component={Settings} info={{ title: 'Settings' }} />
             <Route path="/models" component={ModelList} info={{ title: 'Models' }} />
             <Route path="/presets" component={Presets} info={{ title: 'Presets' }} />

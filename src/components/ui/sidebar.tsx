@@ -76,7 +76,7 @@ export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
     <li>
       <button
         onClick={() => props.onClick()}
-        class={sidebarItem({ active: props.active, class: props.class, size: props.size })}
+        class={cn(sidebarItem({ active: props.active, size: props.size }), props.class)}
         type="button"
       >
         <Show when={props.icon}>

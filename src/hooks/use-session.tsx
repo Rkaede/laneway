@@ -2,10 +2,11 @@ import { useNavigate } from '@solidjs/router';
 import { Accessor, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
+import { requestApiKey } from '~/components/connected/api-key-request';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
 import { addMessageToSessionChats, autonameChat } from '~/store/actions';
-import { selectSessionById } from '~/store/selectors';
+import { anyKeysSet, selectSessionById } from '~/store/selectors';
 
 import { createMessage } from './message-utils';
 
@@ -41,6 +42,11 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
 
   async function handleSubmit() {
     if (isSubmitting) return;
+    if (!anyKeysSet()) {
+      // Keep the draft and send it once a key is saved.
+      requestApiKey(handleSubmit);
+      return;
+    }
     if (
       session().type === 'note' &&
       store.chats.some((chat) => session().chats.includes(chat.id) && chat.status === 'loading')

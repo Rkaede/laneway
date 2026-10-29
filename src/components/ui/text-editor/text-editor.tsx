@@ -61,17 +61,16 @@ export function TextEditor(props: TextEditorProps) {
   });
 
   createEffect(() => {
-    // Value was reset after user sent a message. We update the editor value to the initialValue
-    // which should be an empty string
-    if (props.initialValue === '') {
-      editorView()?.dispatch({
-        changes: {
-          from: 0,
-          to: editorView()?.state.doc.length,
-          insert: props.initialValue,
-        },
-      });
-    }
+    // The value changed outside the editor, either cleared after sending or filled in by a
+    // starter prompt. Typing echoes back the same value, so it never lands here.
+    const view = editorView();
+    const value = props.initialValue;
+    if (!view || value === undefined || value === view.state.doc.toString()) return;
+
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: value },
+      selection: { anchor: value.length },
+    });
   });
 
   // Add paste event handler

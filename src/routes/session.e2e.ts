@@ -6,17 +6,10 @@ for (const type of ['chat', 'note'] as const) {
     await page.getByRole('heading', { name: 'Laneway', exact: true }).waitFor();
     await page.evaluate(async (type) => {
       const storePath = '/src/store/index.tsx';
-      const keysPath = '/src/store/keys.tsx';
       const { setStore }: typeof import('../store') = await import(
         /* @vite-ignore */ storePath
       );
-      const { setApiKeys }: typeof import('../store/keys') = await import(
-        /* @vite-ignore */ keysPath
-      );
-      // Example sessions (created: -1) are read-only, so use real sessions and get past the
-      // welcome screen with a key instead.
-      setApiKeys('openai', 'test-key');
-      setApiKeys('hasCompletedWelcome', true);
+      // Example sessions (created: -1) are read-only, so use real sessions.
       setStore(
         'sessions',
         ['a', 'b'].map((id) => ({

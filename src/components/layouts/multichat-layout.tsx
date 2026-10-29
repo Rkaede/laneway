@@ -9,10 +9,13 @@ import {
   setAssistant,
   setSessionInput,
 } from '~/store/actions';
-import { selectChatById, selectSessionById } from '~/store/selectors';
+import { anyKeysSet, selectChatById, selectSessionById } from '~/store/selectors';
 
 import { ChatInput } from '../chat/chat-input';
 import { ChatPanel } from '../chat/chat-panel';
+import { StarterPrompts } from '../chat/starter-prompts';
+import { KeyNotice } from '../connected/api-key-dialog';
+import { requestApiKey } from '../connected/api-key-request';
 import { useSession } from '../connected/session-provider';
 import { SpeedDial } from '../connected/speed-dial';
 
@@ -32,6 +35,12 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
     setSessionInput(value, props.sessionId);
   }
 
+  // Only before the first real chat, while the draft is still empty.
+  const showStarters = () =>
+    !props.sessionId &&
+    !store.draftSession.input &&
+    store.sessions.every((s) => s.created === -1);
+
   function handleFileSelect(file: File) {
     setAttachments((prev) => [...(prev || []), file]);
   }
@@ -42,6 +51,11 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
 
   async function handleSubmit() {
     if (isSubmitting) return;
+    if (!anyKeysSet()) {
+      // Keep the draft and send it once a key is saved.
+      requestApiKey(handleSubmit);
+      return;
+    }
     isSubmitting = true;
 
     try {
@@ -111,6 +125,12 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
           </p>
         }
       >
+        <Show when={showStarters()}>
+          <StarterPrompts class="mb-3 px-4" onPick={handleInput} />
+        </Show>
+        <Show when={!anyKeysSet()}>
+          <KeyNotice class="mx-auto mb-2 px-4 text-center" />
+        </Show>
         <ChatInput
           hasVision
           input={session()?.input ?? store.draftSession.input ?? ''}

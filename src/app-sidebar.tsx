@@ -1,8 +1,10 @@
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import { type Component, createEffect, createSignal, For, on, Show } from 'solid-js';
 
+import { requestApiKey } from '~/components/connected/api-key-request';
 import {
   IconBox,
+  IconKey,
   IconLayoutGrid,
   IconNewSession,
   IconScanFace,
@@ -32,7 +34,7 @@ import {
 import { Button } from '~/components/ui/button';
 import { setStore, store } from '~/store';
 import { actions, renameSession, toggleSidebar } from '~/store/actions';
-import { selectSessionById } from '~/store/selectors';
+import { anyKeysSet, selectSessionById } from '~/store/selectors';
 import type { SessionProps } from '~/types';
 import { groupByDate } from '~/util';
 
@@ -106,6 +108,15 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
             <SidebarItem onClick={handleNewNote} icon={<IconSquarePen class="mr-2 size-4" />}>
               New Note
             </SidebarItem>
+            <Show when={!anyKeysSet()}>
+              <SidebarItem
+                onClick={() => requestApiKey()}
+                icon={<IconKey class="mr-2 size-4" />}
+                class="text-brand-subtle-fg"
+              >
+                Add API key
+              </SidebarItem>
+            </Show>
           </SidebarItems>
         </div>
         <div class="flex-1 overflow-auto border-b" inert={!props.open}>

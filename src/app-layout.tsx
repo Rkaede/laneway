@@ -7,6 +7,7 @@ import { store } from '~/store';
 
 import { CommandMenu } from './command-menu';
 import About from './components/connected/about';
+import { ApiKeyDialog } from './components/connected/api-key-dialog';
 
 export const AppLayout: ParentComponent = (props) => {
   useApplyTheme();
@@ -23,6 +24,7 @@ export const AppLayout: ParentComponent = (props) => {
       <div class="max-w-full flex-1">{props.children}</div>
       <CommandMenu />
       <About />
+      <ApiKeyDialog />
       <Notifications />
     </main>
   );

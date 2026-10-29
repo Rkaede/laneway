@@ -2,16 +2,19 @@ import { type Component, createSignal, onCleanup, onMount, Show } from 'solid-js
 import { Dynamic } from 'solid-js/web';
 
 import { Button } from '~/components/ui/button';
-import { showSuccess } from '~/components/ui/notifications';
-import { APIKeySetting } from '~/routes/settings/api-key-settings';
-import { setApiKeys } from '~/store/keys';
+import { useActionContext } from '~/hooks/use-action-context';
+import { setStore } from '~/store';
+import { actions } from '~/store/actions';
+import { story } from '~/store/examples';
 import { anyKeysSet } from '~/store/selectors';
 
-import { IconArrowLeft, IconGithub, IconKey } from '../icons/ui';
+import { IconGithub } from '../icons/ui';
+import { ApiKeyForm } from './api-key-form';
 import { WelcomeDemo } from './welcome-demo';
 import { WELCOME_VARIANTS } from './welcome-variants';
 
 const VARIANT_STORAGE_KEY = 'laneway-welcome-variant';
+const EXAMPLE_SESSION_ID = story().session.id;
 
 function readStoredVariant() {
   try {
@@ -31,14 +34,18 @@ function isTypingTarget(target: EventTarget | null) {
   );
 }
 
+/**
+ * The first-run page. The root route sends new visitors here once, before they have a key, and
+ * it then stays out of the way: New Chat always opens a chat.
+ */
 export const WelcomeContent: Component = () => {
-  const [showKeys, setShowKeys] = createSignal(false);
+  const context = useActionContext();
   const [variant, setVariant] = createSignal(readStoredVariant());
 
   // Press v to cycle through the marketing variants, shift+v to go back. There is no on-screen
   // control for this on purpose.
   function handleVariantKey(event: KeyboardEvent) {
-    if (event.key.toLowerCase() !== 'v' || showKeys()) return;
+    if (event.key.toLowerCase() !== 'v') return;
     if (event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) return;
 
     event.preventDefault();
@@ -52,69 +59,62 @@ export const WelcomeContent: Component = () => {
     }
   }
 
-  onMount(() => document.addEventListener('keydown', handleVariantKey));
+  onMount(() => {
+    setStore('settings', 'hasSeenWelcome', true);
+    document.addEventListener('keydown', handleVariantKey);
+  });
   onCleanup(() => document.removeEventListener('keydown', handleVariantKey));
 
-  const handleGetStarted = () => {
-    setApiKeys('hasCompletedWelcome', true);
-    showSuccess('API keys saved.');
-  };
-
-  function handleAddKeys() {
-    setShowKeys(true);
+  function startChat() {
+    actions.newSession.fn(context);
   }
 
   return (
-    <div class="mt-16 flex flex-col gap-4 px-6">
-      <div class="mx-auto w-full max-w-2xl">
-        <div class="mb-4 flex w-full gap-2">
-          <div class="w-full">
-            <h1 class="text-5xl font-black">Laneway</h1>
-            <p class="-mt-1.5 mb-4">A local-first AI chat app.</p>
+    <div class="h-full overflow-auto">
+      <div class="mx-auto mt-16 flex w-full max-w-2xl flex-col px-6 pb-12">
+        <h1 class="text-5xl font-black">Laneway</h1>
+        <p class="-mt-1.5 mb-4">A local-first AI chat app.</p>
 
-            <div class="overflow-visible">
-              <Show when={showKeys() === false}>
-                <div class="mb-6" id="intro">
-                  <Dynamic component={WELCOME_VARIANTS[variant()]} />
-                </div>
-                <div class="mb-4 flex justify-start gap-2">
-                  <Button
-                    variant="outline"
-                    as="a"
-                    href="https://github.com/Rkaede/laneway"
-                    target="_blank"
-                  >
-                    <IconGithub class="size-4" />
-                    View on GitHub
-                  </Button>
-                  <Button onClick={handleAddKeys}>
-                    <IconKey class="size-4" />
-                    Enter API Keys
-                  </Button>
-                </div>
-                <WelcomeDemo class="mt-8 mb-12" />
-              </Show>
-              <Show when={showKeys()}>
-                <div class="mb-4 flex justify-end gap-2">
-                  <APIKeySetting />
-                </div>
-                <div class="flex justify-between">
-                  <div>
-                    <Button variant="outline" onClick={() => setShowKeys(!showKeys())}>
-                      <IconArrowLeft class="size-4" />
-                      Back
-                    </Button>
-                  </div>
-                  <div class="mb-4 flex justify-end gap-2">
-                    <Button onClick={handleGetStarted} disabled={!anyKeysSet()}>
-                      Save & Get Started
-                    </Button>
-                  </div>
-                </div>
-              </Show>
-            </div>
-          </div>
+        <div class="mb-6" id="intro">
+          <Dynamic component={WELCOME_VARIANTS[variant()]} />
         </div>
+
+        <Show
+          when={!anyKeysSet()}
+          fallback={
+            <div class="flex items-center gap-3">
+              <Button onClick={startChat}>Start a chat</Button>
+              <span class="text-sm text-muted">Your key is saved. You are ready to go.</span>
+            </div>
+          }
+        >
+          <div class="rounded-card border bg-surface-raised p-4 shadow-xs">
+            <ApiKeyForm submitLabel="Save and start" onSaved={startChat} />
+          </div>
+        </Show>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <Button variant="outline" as="a" href={`/session/${EXAMPLE_SESSION_ID}`}>
+            Try an example
+          </Button>
+          <Show when={!anyKeysSet()}>
+            <Button variant="ghost" onClick={startChat}>
+              Look around first
+            </Button>
+          </Show>
+          <Button
+            variant="ghost"
+            as="a"
+            href="https://github.com/Rkaede/laneway"
+            target="_blank"
+            class="ml-auto"
+          >
+            <IconGithub class="size-4" />
+            View on GitHub
+          </Button>
+        </div>
+
+        <WelcomeDemo class="mt-10" />
       </div>
     </div>
   );

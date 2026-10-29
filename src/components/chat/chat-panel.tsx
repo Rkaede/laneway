@@ -1,10 +1,11 @@
-import { useNavigate } from '@solidjs/router';
 import { type Component, For, Show } from 'solid-js';
 
+import { requestApiKey } from '~/components/connected/api-key-request';
 import { Loader } from '~/components/ui';
 import { createAnimatedText } from '~/hooks/create-animated-text';
 import { useChat } from '~/hooks/use-chat';
 import { store } from '~/store';
+import { anyKeysSet } from '~/store/selectors';
 import type { ChatProps, MessageProps } from '~/types';
 
 import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './components';
@@ -21,7 +22,6 @@ type ChatPanelProps = {
 };
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
-  const navigate = useNavigate();
   const chat = useChat({ chat: props.chat, readOnly: () => props.isExample });
 
   return (
@@ -72,8 +72,9 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
             <AlertNoVision />
           </Show>
 
-          <Show when={!props.isExample && !chat.isApiKeyConfigured()}>
-            <AlertApiKey onNavigateToSettings={() => navigate('/settings')} />
+          {/* With no key at all, the composer already asks for one. */}
+          <Show when={!props.isExample && anyKeysSet() && !chat.isApiKeyConfigured()}>
+            <AlertApiKey onAddKey={() => requestApiKey()} />
           </Show>
 
           <Show when={props.chat.error}>

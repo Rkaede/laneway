@@ -12,6 +12,9 @@ const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([])
 const { setStore, store } = await import('../store');
 const { setModels } = await import('../store/models');
 const { createSession } = await import('./use-session');
+const { setApiKeys } = await import('../store/keys');
+const { apiKeyRequest, setApiKeyRequest } =
+  await import('../components/connected/api-key-request');
 const { imageCache } = await import('../services/image-cache');
 fetchMock.mockRestore();
 
@@ -19,6 +22,8 @@ const input = 'Please describe this image.';
 
 beforeEach(() => {
   navigate.mockClear();
+  setApiKeys('openrouter', 'sk-or-test');
+  setApiKeyRequest(undefined);
   setModels([
     {
       id: 'no-vision',
@@ -52,6 +57,21 @@ afterEach(() => {
 });
 
 describe('session submission', () => {
+  it('asks for a key instead of sending, then sends the kept draft once one is saved', async () => {
+    setApiKeys({ openai: '', openrouter: '' });
+    const session = createSession();
+
+    await session.handleSubmit();
+    expect(apiKeyRequest()).toBeDefined();
+    expect(store.draftSession.input).toBe(input);
+    expect(store.sessions).toHaveLength(1);
+
+    setApiKeys('openrouter', 'sk-or-test');
+    await apiKeyRequest()?.onSaved?.();
+    expect(store.sessions).toHaveLength(2);
+    expect(store.sessions[0].id).not.toBe('session');
+  });
+
   it('allows submitting again after an empty input or a successful submission', async () => {
     setStore('sessions', 0, 'input', '');
     const session = createSession(() => 'session');
