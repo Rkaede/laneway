@@ -21,13 +21,12 @@ beforeEach(() => {
   }) as typeof solid.createEffect);
   spyOn(controller, 'append').mockImplementation(append);
   append.mockClear();
-  setApiKeys({ openai: '', openrouter: '' });
-  setStore('settings', 'openRouterUsage', 'fallback');
+  setApiKeys({ openrouter: '' });
   setStore('chats', [{ id: 'chat', modelId: 'model', status: 'idle', messages: [prompt] }]);
 });
 
 afterEach(() => {
-  setApiKeys({ openai: '', openrouter: '' });
+  setApiKeys({ openrouter: '' });
   mock.restore();
 });
 
@@ -49,10 +48,10 @@ describe('chat API keys', () => {
         title: 'Model',
         creator: { id: 'c', name: 'c', website: '', icon: '' },
         created: 0,
-        provider: [{ id: 'openai', modelId: 'provider-model', primary: true }],
+        provider: [{ id: 'openrouter', modelId: 'provider-model', primary: false }],
       },
     ]);
-    setApiKeys('openai', 'test-key');
+    setApiKeys('openrouter', 'test-key');
     const chat = useChat({ chat: store.chats[0], readOnly: () => true });
 
     runEffect();
@@ -64,40 +63,36 @@ describe('chat API keys', () => {
     expect(store.chats[0].messages).toEqual([prompt]);
   });
 
-  it.each(['openai', 'openrouter'] as const)(
-    'waits for a %s key before starting a request',
-    (provider) => {
-      setModels([
-        {
-          id: 'model',
-          title: 'Model',
-          creator: { id: 'c', name: 'c', website: '', icon: '' },
-          created: 0,
-          provider: [{ id: provider, modelId: 'provider-model', primary: true }],
-        },
-      ]);
-      setApiKeys(provider === 'openai' ? 'openrouter' : 'openai', 'unrelated-key');
-      const chat = useChat({ chat: store.chats[0] });
+  it('waits for an OpenRouter key before starting a request', () => {
+    setModels([
+      {
+        id: 'model',
+        title: 'Model',
+        creator: { id: 'c', name: 'c', website: '', icon: '' },
+        created: 0,
+        provider: [{ id: 'openrouter', modelId: 'provider-model', primary: false }],
+      },
+    ]);
+    const chat = useChat({ chat: store.chats[0] });
 
-      for (const key of [undefined, '', '   ']) {
-        setApiKeys(provider, key);
-        runEffect();
-
-        expect(chat.isApiKeyConfigured()).toBe(false);
-        expect(append).not.toHaveBeenCalled();
-        expect(store.chats[0].status).toBe('idle');
-        expect(store.chats[0].messages).toEqual([prompt]);
-        expect(store.chats[0].error).toBeUndefined();
-      }
-
-      setApiKeys(provider, 'test-key');
+    for (const key of [undefined, '', '   ']) {
+      setApiKeys('openrouter', key);
       runEffect();
 
-      expect(chat.isApiKeyConfigured()).toBe(true);
-      expect(append).toHaveBeenCalledTimes(1);
-      expect(append).toHaveBeenCalledWith({ chatId: 'chat', streamFn: expect.any(Function) });
-      expect(store.chats[0].status).toBe('loading');
+      expect(chat.isApiKeyConfigured()).toBe(false);
+      expect(append).not.toHaveBeenCalled();
+      expect(store.chats[0].status).toBe('idle');
       expect(store.chats[0].messages).toEqual([prompt]);
-    },
-  );
+      expect(store.chats[0].error).toBeUndefined();
+    }
+
+    setApiKeys('openrouter', 'test-key');
+    runEffect();
+
+    expect(chat.isApiKeyConfigured()).toBe(true);
+    expect(append).toHaveBeenCalledTimes(1);
+    expect(append).toHaveBeenCalledWith({ chatId: 'chat', streamFn: expect.any(Function) });
+    expect(store.chats[0].status).toBe('loading');
+    expect(store.chats[0].messages).toEqual([prompt]);
+  });
 });

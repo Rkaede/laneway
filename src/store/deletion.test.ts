@@ -54,7 +54,7 @@ beforeEach(() => {
     },
     { id: 'keep-chat', status: 'idle', messages: [] },
   ]);
-  setApiKeys('openai', 'saved-key');
+  setApiKeys('openrouter', 'saved-key');
 });
 
 afterEach(() => {
@@ -85,7 +85,7 @@ describe('data deletion', () => {
     expect(JSON.stringify(store)).toBe(before);
     expect(clearImages).not.toHaveBeenCalled();
     expect(deleteCache).not.toHaveBeenCalled();
-    expect(apiKeys.openai).toBe('saved-key');
+    expect(apiKeys.openrouter).toBe('saved-key');
   });
 
   it('resets data and clears caches only after confirmation, keeping API keys', () => {
@@ -99,7 +99,7 @@ describe('data deletion', () => {
     expect(clearImages).toHaveBeenCalledTimes(1);
     expect(deleteCache).toHaveBeenCalledTimes(1);
     expect(deleteCache).toHaveBeenCalledWith('laneway-tts-cache');
-    expect(apiKeys.openai).toBe('saved-key');
+    expect(apiKeys.openrouter).toBe('saved-key');
   });
 
   it('still deletes data when Cache Storage is unavailable', () => {
@@ -113,7 +113,7 @@ describe('data deletion', () => {
     expect(store.chats.some((chat) => chat.id === 'delete-chat')).toBe(false);
     expect(clearImages).toHaveBeenCalledTimes(1);
     expect(deleteCache).not.toHaveBeenCalled();
-    expect(apiKeys.openai).toBe('saved-key');
+    expect(apiKeys.openrouter).toBe('saved-key');
   });
 });
 

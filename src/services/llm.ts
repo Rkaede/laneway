@@ -2,7 +2,7 @@ import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
 
 import { OPENROUTER_URL } from '~/constants';
 import { apiKeys } from '~/store/keys';
-import type { MessageProps } from '~/types';
+import type { MessageProps, ProviderId } from '~/types';
 
 import { createThrottle, formatMessages } from './util';
 
@@ -12,13 +12,12 @@ function chatCompletions(provider: OpenAIProvider) {
   return (modelId: string) => provider.chat(modelId);
 }
 
-const openai = () => chatCompletions(createOpenAI({ apiKey: apiKeys?.openai }));
 const openrouter = () =>
   chatCompletions(createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL }));
 
-const services = { openai, openrouter };
+const services = { openrouter };
 
-type Provider = 'openai' | 'openrouter';
+type Provider = ProviderId;
 
 const throttle = createThrottle();
 

@@ -211,10 +211,9 @@ describe('autonameChat', () => {
   const getText = mock<typeof llm.getText>();
 
   beforeEach(() => {
-    setModels(0, 'provider', [{ id: 'openai', modelId: 'title-model', primary: true }]);
+    setModels(0, 'provider', [{ id: 'openrouter', modelId: 'title-model', primary: false }]);
     setStore('settings', 'systemModel', 'vision');
-    setStore('settings', 'openRouterUsage', 'fallback');
-    setApiKeys({ openai: 'test-key', openrouter: '' });
+    setApiKeys({ openrouter: 'test-key' });
     getText.mockReset();
     getText.mockResolvedValue(titleResponse('Generated title'));
     spyOn(llm, 'getText').mockImplementation(getText);
@@ -222,7 +221,7 @@ describe('autonameChat', () => {
   });
 
   afterEach(() => {
-    setApiKeys({ openai: '', openrouter: '' });
+    setApiKeys({ openrouter: '' });
     mock.restore();
   });
 
@@ -236,22 +235,16 @@ describe('autonameChat', () => {
     ]);
   });
 
-  it.each(['openai', 'openrouter'] as const)(
-    'keeps the existing title without requesting a missing %s key',
-    async (provider) => {
-      setModels(0, 'provider', [{ id: provider, modelId: 'title-model', primary: true }]);
-      setApiKeys(provider === 'openai' ? 'openrouter' : 'openai', 'unrelated-key');
+  it('keeps the existing title without requesting a missing key', async () => {
+    for (const key of [undefined, '', '   ']) {
+      setApiKeys('openrouter', key);
 
-      for (const key of [undefined, '', '   ']) {
-        setApiKeys(provider, key);
+      await expect(autonameChat('session', 'Hello')).resolves.toBeUndefined();
 
-        await expect(autonameChat('session', 'Hello')).resolves.toBeUndefined();
-
-        expect(store.sessions[0].title).toBe('Assistant chat');
-        expect(getText).not.toHaveBeenCalled();
-      }
-    },
-  );
+      expect(store.sessions[0].title).toBe('Assistant chat');
+      expect(getText).not.toHaveBeenCalled();
+    }
+  });
 
   it('skips generation when no provider is available', async () => {
     setStore('settings', 'systemModel', 'missing-model');

@@ -1,4 +1,4 @@
-import type { SetStoreFunction } from 'solid-js/store';
+import { produce, type SetStoreFunction } from 'solid-js/store';
 
 import { createDefaultState, defaults } from './default-state';
 
@@ -48,5 +48,21 @@ export function migrateStore(store: State, setStore: SetStoreFunction<State>) {
     }
 
     setStore('schemaVersion', 1);
+  }
+
+  if ((store.schemaVersion ?? 0) < 2) {
+    // Laneway now talks only to OpenRouter. Speech moved from OpenAI's voices to an OpenRouter
+    // model and voice, and the setting for when to use OpenRouter is gone.
+    setStore(
+      'settings',
+      produce((settings: State['settings'] & { openRouterUsage?: unknown }) => {
+        settings.tts = {
+          ...defaults.settings.tts,
+          enabled: settings.tts?.enabled ?? defaults.settings.tts.enabled,
+        };
+        delete settings.openRouterUsage;
+      }),
+    );
+    setStore('schemaVersion', 2);
   }
 }

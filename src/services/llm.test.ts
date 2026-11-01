@@ -11,6 +11,7 @@ it('defers LLM SDK loading until a request and supports text and streaming', asy
       globalThis.fetch = async () => Response.json([]);
       await import(${JSON.stringify(import.meta.resolve('../hooks/use-chat'))});
       await import(${JSON.stringify(import.meta.resolve('../store/actions/session-actions'))});
+      await import(${JSON.stringify(import.meta.resolve('../hooks/use-audio'))});
       await Bun.sleep(0);
       const loadedOnStartup = Object.keys(require.cache).filter(
         (name) => name.endsWith('/services/llm.ts') ||
@@ -22,7 +23,7 @@ it('defers LLM SDK loading until a request and supports text and streaming', asy
       );
       const loadedBeforeRequest = generationSDKLoaded();
       const { setApiKeys } = await import(${JSON.stringify(import.meta.resolve('../store/keys'))});
-      setApiKeys('openai', 'test-key');
+      setApiKeys('openrouter', 'test-key');
       globalThis.fetch = async (_url, options) => {
         const { stream } = JSON.parse(options.body);
         const choices = [{
@@ -39,8 +40,8 @@ it('defers LLM SDK loading until a request and supports text and streaming', asy
       };
       const messages = [{ id: 'prompt', role: 'user', content: 'Hello' }];
       const [text, stream] = await Promise.all([
-        llm.getText({ messages, modelId: 'test-model', provider: 'openai' }),
-        llm.getStream(messages, 'test-model', 'openai'),
+        llm.getText({ messages, modelId: 'test-model', provider: 'openrouter' }),
+        llm.getStream(messages, 'test-model', 'openrouter'),
       ]);
       let streamedText = '';
       for await (const part of stream.textStream) streamedText += part;

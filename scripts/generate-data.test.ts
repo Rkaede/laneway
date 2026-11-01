@@ -47,8 +47,13 @@ it.each([
   expect(await Bun.file(join(directory, 'public/models.json')).exists()).toBe(false);
 });
 
+const speechModels = {
+  data: [{ id: 'hexgrad/kokoro-82m', name: 'Kokoro', supported_voices: ['af_heart'] }],
+};
+
 it('exits unsuccessfully when generated files cannot be written', async () => {
   await writeFile(join(directory, 'models.json'), JSON.stringify({ data: [] }));
+  await writeFile(join(directory, 'speech-models.json'), JSON.stringify(speechModels));
   await writeFile(join(directory, 'public'), 'Not a directory');
 
   const result = await runGenerator();
@@ -59,12 +64,13 @@ it('exits unsuccessfully when generated files cannot be written', async () => {
 
 it('writes the generated catalogues and exits successfully', async () => {
   await writeFile(join(directory, 'models.json'), JSON.stringify({ data: [] }));
+  await writeFile(join(directory, 'speech-models.json'), JSON.stringify(speechModels));
 
   const result = await runGenerator();
 
   expect(result.exitCode).toBe(0);
   expect(result.stderr).toBe('');
-  for (const name of ['models', 'assistants', 'presets']) {
+  for (const name of ['models', 'assistants', 'presets', 'speech-models']) {
     const data = await Bun.file(join(directory, 'public', `${name}.json`)).json();
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThan(0);

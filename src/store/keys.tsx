@@ -2,22 +2,18 @@ import { createStore, reconcile } from 'solid-js/store';
 
 import { clone } from '~/util';
 
-import { removeLegacyGoogleKey } from './key-migrations';
+import { removeLegacyKeys } from './key-migrations';
 import { makePersistedStore } from './persisted';
 
 type APIKeys = {
-  openai?: string;
   openrouter?: string;
-  hasCompletedWelcome?: boolean;
+  /** Set when an old OpenAI key was dropped, so the key prompt can explain the change. */
+  openaiKeyRemoved?: boolean;
 };
 
 const defaultState = {
-  openai: '',
   openrouter: '',
-  hasCompletedWelcome: false,
 };
-
-// the warning given by the rule here is not helpful in this case
 
 export const [apiKeys, setApiKeys] = makePersistedStore(
   createStore<APIKeys>(clone(defaultState)),
@@ -27,12 +23,12 @@ export const [apiKeys, setApiKeys] = makePersistedStore(
 );
 
 // migrations
-if ('google' in apiKeys) {
-  setApiKeys(reconcile(removeLegacyGoogleKey(apiKeys)));
+if (['google', 'openai', 'hasCompletedWelcome'].some((field) => field in apiKeys)) {
+  setApiKeys(reconcile(removeLegacyKeys(apiKeys)));
 }
 
-export const setApiKey = (provider: 'openai' | 'openrouter', value: string) => {
-  setApiKeys(provider, value.trim());
+export const setApiKey = (value: string) => {
+  setApiKeys('openrouter', value.trim());
 };
 
 export const deleteKeys = () => {

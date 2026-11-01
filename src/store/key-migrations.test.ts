@@ -1,33 +1,33 @@
 import { expect, it } from 'bun:test';
 
-import { removeLegacyGoogleKey } from './key-migrations';
+import { removeLegacyKeys } from './key-migrations';
 
 it.each(['legacy-key', '', null, undefined])(
-  'removes a legacy Google field with value %p without changing supported keys',
+  'removes a legacy Google field with value %p without changing the OpenRouter key',
   (google) => {
-    const keys = {
-      openai: 'openai-key',
-      openrouter: 'openrouter-key',
-      hasCompletedWelcome: true,
-      google,
-    };
+    const keys = { openrouter: 'openrouter-key', google };
 
-    const migrated = removeLegacyGoogleKey(keys);
+    const migrated = removeLegacyKeys(keys);
 
-    expect(migrated).toEqual({
-      openai: 'openai-key',
-      openrouter: 'openrouter-key',
-      hasCompletedWelcome: true,
-    });
-    expect(migrated).not.toHaveProperty('google');
+    expect(migrated).toEqual({ openrouter: 'openrouter-key' });
     expect(JSON.parse(JSON.stringify(migrated))).not.toHaveProperty('google');
     expect(keys).toHaveProperty('google', google);
-    expect(removeLegacyGoogleKey(migrated)).toEqual(migrated);
+    expect(removeLegacyKeys(migrated)).toEqual(migrated);
   },
 );
 
-it('preserves keys that have already been migrated', () => {
-  const keys = { openai: 'openai-key', hasCompletedWelcome: false };
+it('removes an OpenAI key and the old welcome flag, and flags the removed key', () => {
+  const keys = { openai: 'sk-openai', openrouter: '', hasCompletedWelcome: true };
 
-  expect(removeLegacyGoogleKey(keys)).toEqual(keys);
+  expect(removeLegacyKeys(keys)).toEqual({ openrouter: '', openaiKeyRemoved: true });
+});
+
+it.each(['', '  '])('does not flag an empty OpenAI key %p', (openai) => {
+  expect(removeLegacyKeys({ openai, openrouter: 'key' })).toEqual({ openrouter: 'key' });
+});
+
+it('preserves keys that have already been migrated', () => {
+  const keys = { openrouter: 'key', openaiKeyRemoved: true as const };
+
+  expect(removeLegacyKeys(keys)).toEqual(keys);
 });

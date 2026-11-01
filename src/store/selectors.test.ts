@@ -9,42 +9,28 @@ const { anyKeysSet, selectRouteSession } = await import('./selectors');
 fetchMock.mockRestore();
 
 afterEach(() => {
-  setApiKeys(reconcile({ openai: '', openrouter: '', hasCompletedWelcome: false }));
+  setApiKeys(reconcile({ openrouter: '' }));
 });
 
-it('does not accept a legacy Google key as a usable key', () => {
-  const legacyKeys = { openai: '', openrouter: '', google: 'legacy-key' };
-  setApiKeys(legacyKeys);
+it.each(['google', 'openai'])('does not accept a legacy %s key as a usable key', (field) => {
+  setApiKeys({ openrouter: '', [field]: 'legacy-key' });
 
-  expect(apiKeys).toHaveProperty('google', 'legacy-key');
+  expect(apiKeys).toHaveProperty(field, 'legacy-key');
   expect(anyKeysSet()).toBe(false);
 });
 
-it('deletes supported and legacy keys instead of merging them with defaults', () => {
-  const legacyKeys = {
-    openai: 'openai-key',
-    openrouter: 'openrouter-key',
-    google: 'legacy-key',
-    hasCompletedWelcome: true,
-  };
-  setApiKeys(legacyKeys);
+it('deletes the key and legacy fields instead of merging them with defaults', () => {
+  setApiKeys({ openrouter: 'openrouter-key', openaiKeyRemoved: true });
 
   deleteKeys();
 
-  expect(apiKeys).toEqual({ openai: '', openrouter: '', hasCompletedWelcome: false });
-  expect(apiKeys).not.toHaveProperty('google');
+  expect(apiKeys).toEqual({ openrouter: '' });
 });
 
-it.each(['openai', 'openrouter'] as const)('accepts a %s key on its own', (provider) => {
-  setApiKeys(provider, 'test-key');
+it('accepts an OpenRouter key', () => {
+  setApiKeys('openrouter', 'test-key');
 
   expect(anyKeysSet()).toBe(true);
-});
-
-it('requires a supported key even after welcome was completed', () => {
-  setApiKeys('hasCompletedWelcome', true);
-
-  expect(anyKeysSet()).toBe(false);
 });
 
 describe('route session selection', () => {

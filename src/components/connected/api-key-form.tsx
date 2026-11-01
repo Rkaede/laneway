@@ -1,19 +1,17 @@
-import { createSignal, Match, Switch } from 'solid-js';
+import { createSignal, Match, Show, Switch } from 'solid-js';
 
 import { Input } from '~/components/ui';
 import { Button } from '~/components/ui/button';
 import { showSuccess } from '~/components/ui/notify';
-import { checkApiKey, detectKeyProvider, KEY_PROVIDER_NAMES } from '~/services/api-keys';
-import { setApiKey } from '~/store/keys';
+import { checkApiKey, detectKeyKind } from '~/services/api-keys';
+import { apiKeys, setApiKey } from '~/store/keys';
 import { cn } from '~/util';
 
 import { IconCircleCheck } from '../icons/ui';
 
-const linkClass = 'text-main underline underline-offset-4';
-
 /**
- * One field for either provider's key. It works out the provider from the key's prefix and
- * checks the key with the provider before saving it.
+ * The OpenRouter key field. It checks the key with OpenRouter before saving it, and turns away
+ * OpenAI keys, which Laneway no longer uses.
  */
 export function ApiKeyForm(props: {
   onSaved: () => void;
@@ -22,30 +20,30 @@ export function ApiKeyForm(props: {
 }) {
   const [value, setValue] = createSignal('');
   const [status, setStatus] = createSignal<'idle' | 'checking' | 'invalid'>('idle');
-  const provider = () => detectKeyProvider(value());
+  const kind = () => detectKeyKind(value());
+  const canSave = () => kind() === 'openrouter' && status() !== 'checking';
 
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
-    const _provider = provider();
-    if (!_provider || status() === 'checking') return;
+    if (!canSave()) return;
 
     setStatus('checking');
-    const result = await checkApiKey(_provider, value());
+    const result = await checkApiKey(value());
     if (result === 'invalid') {
       setStatus('invalid');
       return;
     }
 
-    setApiKey(_provider, value());
+    setApiKey(value());
     setStatus('idle');
-    showSuccess(`${KEY_PROVIDER_NAMES[_provider]} key saved.`);
+    showSuccess('OpenRouter key saved.');
     props.onSaved();
   }
 
   return (
     <form class={cn('flex flex-col gap-2', props.class)} onSubmit={handleSubmit}>
       <label for="api-key-input" class="text-sm font-medium">
-        API key
+        OpenRouter API key
       </label>
       <div class="flex gap-2">
         <Input
@@ -53,9 +51,11 @@ export function ApiKeyForm(props: {
           data-1p-ignore // disable 1Password extension
           autocomplete="off"
           type="password"
-          placeholder="sk-or-… or sk-…"
+          placeholder="sk-or-…"
           aria-describedby="api-key-hint"
-          aria-invalid={status() === 'invalid' || (value().trim() !== '' && !provider())}
+          aria-invalid={
+            status() === 'invalid' || (value().trim() !== '' && !kind()) || kind() === 'openai'
+          }
           class="min-w-0 flex-1"
           value={value()}
           onInput={(event) => {
@@ -63,7 +63,7 @@ export function ApiKeyForm(props: {
             setStatus('idle');
           }}
         />
-        <Button type="submit" disabled={!provider() || status() === 'checking'}>
+        <Button type="submit" disabled={!canSave()}>
           {status() === 'checking' ? 'Checking…' : (props.submitLabel ?? 'Save key')}
         </Button>
       </div>
@@ -71,49 +71,38 @@ export function ApiKeyForm(props: {
         <Switch
           fallback={
             <>
-              OpenRouter works with every model here. An OpenAI key works with OpenAI models
-              only. Get one from{' '}
+              <Show when={apiKeys.openaiKeyRemoved}>
+                Laneway now reaches every model, OpenAI's included, through OpenRouter, so your
+                old OpenAI key was removed.{' '}
+              </Show>
+              One OpenRouter key works with every model here. Get one from{' '}
               <a
-                class={linkClass}
+                class="text-main underline underline-offset-4"
                 href="https://openrouter.ai/keys"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 OpenRouter
-              </a>{' '}
-              or{' '}
-              <a
-                class={linkClass}
-                href="https://platform.openai.com/api-keys"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                OpenAI
               </a>
               .
             </>
           }
         >
-          <Match when={status() === 'invalid' && provider()}>
-            {(name) => (
-              <span role="alert" class="text-danger">
-                {KEY_PROVIDER_NAMES[name()]} rejected this key. Check it and try again.
-              </span>
-            )}
+          <Match when={status() === 'invalid'}>
+            <span role="alert" class="text-danger">
+              OpenRouter rejected this key. Check it and try again.
+            </span>
           </Match>
-          <Match when={value().trim() !== '' && !provider()}>
-            This does not look like an OpenRouter (sk-or-…) or OpenAI (sk-…) key.
+          <Match when={kind() === 'openai'}>
+            This is an OpenAI key. Laneway now uses OpenRouter, which also runs OpenAI's models.
           </Match>
-          <Match when={provider() === 'openrouter'}>
+          <Match when={value().trim() !== '' && !kind()}>
+            This does not look like an OpenRouter key. They start with sk-or-.
+          </Match>
+          <Match when={kind() === 'openrouter'}>
             <span class="inline-flex items-center gap-1.5">
               <IconCircleCheck class="size-4 text-success" />
               OpenRouter key. Works with every model.
-            </span>
-          </Match>
-          <Match when={provider() === 'openai'}>
-            <span class="inline-flex items-center gap-1.5">
-              <IconCircleCheck class="size-4 text-success" />
-              OpenAI key. Works with OpenAI models. Add OpenRouter in Settings for the rest.
             </span>
           </Match>
         </Switch>

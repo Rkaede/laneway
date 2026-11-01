@@ -27,12 +27,21 @@ export type MessageProps = {
   };
 };
 
-export type ProviderId = 'openai' | 'openrouter';
+export type ProviderId = 'openrouter';
 
 export type Provider = {
   id: ProviderId;
   modelId: string;
   primary?: boolean;
+};
+
+/** A text-to-speech model on OpenRouter, written to public/speech-models.json at build time. */
+export type SpeechModel = {
+  id: string;
+  title: string;
+  voices: string[];
+  /** US dollars per character of input. */
+  price: number;
 };
 
 export type Creator = {
@@ -187,5 +196,3 @@ export type SpeedDialItem = {
   title?: string; // Display name
   sessionType?: 'chat' | 'note';
 };
-
-export type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';

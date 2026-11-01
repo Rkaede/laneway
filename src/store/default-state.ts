@@ -45,14 +45,12 @@ interface State {
     };
     tts: {
       enabled: boolean;
-      service: string;
-      openai: {
-        voice: string;
-      };
+      /** An OpenRouter speech model id, from public/speech-models.json. */
+      model: string;
+      voice: string;
     };
     sidebarOpen: boolean;
     generateTitles: boolean;
-    openRouterUsage: 'always' | 'fallback';
     theme: Theme;
     hasSeenWelcome: boolean;
     messages: {
@@ -95,7 +93,7 @@ export function createDefaultState(): State {
   const imageAttachment = examples.imageAttachment();
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     sessions: [story.session, imageAttachment.session],
     chats: [...story.chats, ...imageAttachment.chats],
     draftSession: {
@@ -185,12 +183,9 @@ export function createDefaultState(): State {
       },
       tts: {
         enabled: true,
-        service: 'openai',
-        openai: {
-          voice: 'alloy',
-        },
+        model: 'hexgrad/kokoro-82m',
+        voice: 'af_heart',
       },
-      openRouterUsage: 'fallback',
       sidebarOpen: true,
       generateTitles: true,
       theme: 'system',

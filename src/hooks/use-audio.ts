@@ -1,7 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
-import { generateSpeech } from '~/services/tts/openai-tts';
 import { speechChunks } from '~/services/tts/speech-text';
 import { store } from '~/store';
 import { hash } from '~/util';
@@ -50,13 +49,13 @@ export function createAudio({ id, text }: { id?: string; text?: string | (() => 
   async function playChunk(currentPlayback: number) {
     const player = audio;
     if (!player) return;
-    const voice = store.settings.tts.openai.voice ?? 'alloy';
+    const { model, voice } = store.settings.tts;
     const content = chunks[chunkIndex];
     setStatus('loading');
     setTtsState({ status: 'loading', playingId: id ?? null });
 
     try {
-      const hashId = hash(content + 'openai' + voice).toString();
+      const hashId = hash(content + model + voice).toString();
       const cache =
         typeof caches === 'undefined' ? undefined : await caches.open(TTS_CACHE_NAME);
       const cachedResponse = await cache?.match(hashId);
@@ -64,7 +63,8 @@ export function createAudio({ id, text }: { id?: string; text?: string | (() => 
       if (cachedResponse) {
         audioBuffer = await cachedResponse.arrayBuffer();
       } else {
-        audioBuffer = await generateSpeech(content, voice);
+        const speech = await import('~/services/tts/speech');
+        audioBuffer = await speech.generateSpeech(content, model, voice);
         await cache?.put(hashId, new Response(audioBuffer));
       }
       if (currentPlayback !== playback) return;

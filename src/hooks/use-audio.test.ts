@@ -6,7 +6,7 @@ const originalSelf = Object.getOwnPropertyDescriptor(globalThis, 'self');
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const { createAudio } = await import('./use-audio');
 const { apiKeys, setApiKeys } = await import('../store/keys');
-const originalKey = apiKeys.openai;
+const originalKey = apiKeys.openrouter;
 const originalAudio = Object.getOwnPropertyDescriptor(globalThis, 'Audio');
 const originalCaches = Object.getOwnPropertyDescriptor(globalThis, 'caches');
 
@@ -64,9 +64,12 @@ beforeEach(() => {
     configurable: true,
     value: { open: openCache },
   });
-  fetchSpeech = spyOn(globalThis, 'fetch').mockResolvedValue(new Response());
+  // The AI SDK rejects an empty body, so every request gets a fresh one with audio bytes.
+  fetchSpeech = spyOn(globalThis, 'fetch').mockImplementation(
+    (async () => new Response(new Uint8Array([1, 2, 3]))) as unknown as typeof fetch,
+  );
   spyOn(console, 'error').mockImplementation(() => {});
-  setApiKeys('openai', 'test-key');
+  setApiKeys('openrouter', 'test-key');
 });
 
 afterEach(() => {
@@ -75,7 +78,7 @@ afterEach(() => {
   mock.restore();
   restoreGlobal('Audio', originalAudio);
   restoreGlobal('caches', originalCaches);
-  setApiKeys('openai', originalKey);
+  setApiKeys('openrouter', originalKey);
 });
 
 afterAll(() => restoreGlobal('self', originalSelf));

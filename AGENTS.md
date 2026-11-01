@@ -45,8 +45,13 @@ The design system lives in `src/styles/`, with `src/styles/loom.css` as its entr
 
 The app uses AI SDK 7 (`ai`, `@ai-sdk/openai`).
 
-- Create OpenAI and OpenRouter models with `provider.chat(modelId)`. The default Responses API
-  stores conversations server-side and is not supported by OpenRouter.
+- Every request goes to OpenRouter through `createOpenAI({ baseURL: OPENROUTER_URL })`. There is
+  no direct OpenAI access and no OpenAI key.
+- Create chat models with `provider.chat(modelId)`. The default Responses API stores
+  conversations server-side and is not supported by OpenRouter.
+- Text to speech uses `generateSpeech` with `provider.speech(modelId)`. Load the AI SDK lazily,
+  as `src/services/llm.ts` and `src/services/tts/speech.ts` do; `src/services/llm.test.ts`
+  checks it stays out of the startup bundle.
 - Read `fullStream`, not `textStream`. `textStream` hides API failures behind a generic
   `NoOutputGeneratedError`.
 - Usage fields are `inputTokens` and `outputTokens`. The mock stream in
@@ -61,6 +66,8 @@ The app uses AI SDK 7 (`ai`, `@ai-sdk/openai`).
 
 - Models are defined in `scripts/data/models/*.ts`. `bun run dev` and `bun run build` merge them
   with OpenRouter's data and write `public/models.json`, along with the presets and assistants.
+- Speech models come from `scripts/data/speech-models.ts`, which keeps OpenRouter's speech models
+  that list voices and can return MP3, and writes `public/speech-models.json`.
 - To retire a model, set `deprecated: true` instead of deleting it. The command menu and the
   Models page hide it, while old sessions can still resolve it.
 - `bun scripts/compare-models.ts` lists recent OpenRouter models from supported providers that

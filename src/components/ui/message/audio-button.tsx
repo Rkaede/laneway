@@ -20,7 +20,7 @@ const ariaLabels = {
   playing: 'Stop audio',
   loading: 'Loading audio',
   error: 'Audio failed to load. Click to retry',
-  unavailable: 'Audio unavailable - OpenAI API key required',
+  unavailable: 'Audio unavailable - add an OpenRouter key',
 } as const;
 
 export function AudioButton(props: AudioButtonProps) {

@@ -17,7 +17,7 @@ await Bun.write(
   stubs,
   `export default (props) => props.text;
 export const store = { settings: { messages: { showAvatars: false, showModelTitle: false } } };
-export const apiKeys = {};
+export const anyKeysSet = () => false;
 export const createAudio = () => ({});
 export const ModelIcon = () => null;
 export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag = ModelIcon,

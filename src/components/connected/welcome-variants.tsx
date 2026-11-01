@@ -30,9 +30,9 @@ function Statement() {
     <div class="flex flex-col gap-4">
       <Heading>Every model. One window. Your own keys.</Heading>
       <p class="max-w-xl text-muted">
-        Laneway talks straight to OpenAI and OpenRouter from your browser. Your chat history is
-        stored locally, while prompts and conversation context are sent to your chosen
-        providers.
+        Laneway talks straight to OpenRouter from your browser, which reaches models from
+        OpenAI, Anthropic, Google and more. Your chat history is stored locally, while prompts
+        and conversation context are sent to OpenRouter and the model's provider.
       </p>
       <ul class="flex flex-wrap gap-x-5 gap-y-2">
         <For each={points}>
@@ -121,7 +121,7 @@ function FeatureGrid() {
     {
       icon: IconSpeaker,
       title: 'Text to speech',
-      text: 'Listen to any reply with an OpenAI key.',
+      text: 'Listen to any reply in a voice you pick.',
     },
     {
       icon: IconSearch,
@@ -154,7 +154,7 @@ function Steps() {
   const steps = [
     {
       title: 'Add an API key',
-      text: 'OpenAI or OpenRouter. It stays in your browser.',
+      text: 'One OpenRouter key. It stays in your browser.',
     },
     {
       title: 'Pick a model',

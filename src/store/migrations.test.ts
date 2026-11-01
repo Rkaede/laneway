@@ -17,7 +17,7 @@ describe('store migrations', () => {
       const state = createLegacyState();
       state.schemaVersion = version;
       state.sessions[0].title = 'Saved session';
-      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 1 };
+      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 2 };
       delete state.settings.messages;
       delete state.settings.completions;
       delete state.featureFlags;
@@ -49,7 +49,7 @@ describe('store migrations', () => {
         showModelTitle: true,
         [key]: false,
       });
-      expect(store.schemaVersion).toBe(1);
+      expect(store.schemaVersion).toBe(2);
     },
   );
 
@@ -63,8 +63,15 @@ describe('store migrations', () => {
       state.featureFlags = { completions: true };
       state.speedDial = [];
       state.settings.noteModel = { type: 'assistant', referenceId: 'saved-assistant' };
+      const expected = {
+        ...JSON.parse(JSON.stringify(state)),
+        settings: {
+          ...JSON.parse(JSON.stringify(state.settings)),
+          tts: { ...createDefaultState().settings.tts, enabled: false },
+        },
+        schemaVersion: 2,
+      };
       state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
-      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 1 };
       const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
 
       migrateStore(store, setStore);
@@ -87,7 +94,24 @@ describe('store migrations', () => {
     expect(set).not.toHaveBeenCalled();
   });
 
-  it.each([1, 2])('does not rewrite schema version %s', (schemaVersion) => {
+  it('moves speech to an OpenRouter model and drops the OpenRouter usage setting', () => {
+    const state = JSON.parse(JSON.stringify(createDefaultState()));
+    state.schemaVersion = 1;
+    state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
+    state.settings.openRouterUsage = 'always';
+    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+
+    migrateStore(store, setStore);
+
+    expect(store.settings.tts).toEqual({
+      ...createDefaultState().settings.tts,
+      enabled: false,
+    });
+    expect(store.settings).not.toHaveProperty('openRouterUsage');
+    expect(store.schemaVersion).toBe(2);
+  });
+
+  it.each([2, 3])('does not rewrite schema version %s', (schemaVersion) => {
     const state = createDefaultState();
     state.schemaVersion = schemaVersion;
     const set = mock(() => {});
@@ -99,6 +123,6 @@ describe('store migrations', () => {
   });
 
   it('initializes new and reset stores at the current schema version', () => {
-    expect(createDefaultState().schemaVersion).toBe(1);
+    expect(createDefaultState().schemaVersion).toBe(2);
   });
 });

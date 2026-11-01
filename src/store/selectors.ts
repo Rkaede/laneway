@@ -6,7 +6,7 @@ import { apiKeys } from './keys';
 import { models } from './models';
 
 export const anyKeysSet = () => {
-  return !!apiKeys?.openai || !!apiKeys?.openrouter;
+  return !!apiKeys?.openrouter;
 };
 
 export const selectModelById = (id: string | Accessor<string | undefined>) => {

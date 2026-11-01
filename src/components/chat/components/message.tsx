@@ -13,7 +13,7 @@ import { StatsPopover } from '~/components/ui/stats-popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import { createAudio } from '~/hooks/use-audio';
 import { store } from '~/store/index';
-import { apiKeys } from '~/store/keys';
+import { anyKeysSet } from '~/store/selectors';
 import type { ImagePart, MessageProps, TextPart } from '~/types';
 import { cn } from '~/util';
 
@@ -156,7 +156,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
         <div class="mt-2 flex items-center gap-[1px]">
           <Show when={props.tts}>
             <Show
-              when={apiKeys.openai === '' || apiKeys.openai === undefined}
+              when={!anyKeysSet()}
               fallback={
                 <AudioButton status={audio.status()} onClick={() => handleClickTTS()} />
               }
@@ -165,9 +165,7 @@ export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }
                 <TooltipTrigger as="span" tabIndex={0} class="inline-flex cursor-default">
                   <AudioButton status="unavailable" onClick={() => handleClickTTS()} />
                 </TooltipTrigger>
-                <TooltipContent>
-                  {apiKeys.openai ? '' : 'OpenAI API key is required'}
-                </TooltipContent>
+                <TooltipContent>Add an OpenRouter key to listen</TooltipContent>
               </Tooltip>
             </Show>
           </Show>

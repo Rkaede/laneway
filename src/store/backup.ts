@@ -131,7 +131,12 @@ export function parseBackup(serialized: string): Backup {
   }
   const raw = legacy ? data : data.state;
   valid(isObject(raw));
-  valid(raw.schemaVersion === undefined || raw.schemaVersion === 0 || raw.schemaVersion === 1);
+  valid(
+    raw.schemaVersion === undefined ||
+      (typeof raw.schemaVersion === 'number' &&
+        raw.schemaVersion >= 0 &&
+        raw.schemaVersion <= createDefaultState().schemaVersion),
+  );
   const sessionShape = { id: '', title: '', type: '', created: 0, chats: [''] };
   valid(
     matchesShape(raw, {

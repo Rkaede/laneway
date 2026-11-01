@@ -58,7 +58,7 @@ afterEach(() => {
 
 describe('session submission', () => {
   it('asks for a key instead of sending, then sends the kept draft once one is saved', async () => {
-    setApiKeys({ openai: '', openrouter: '' });
+    setApiKeys({ openrouter: '' });
     const session = createSession();
 
     await session.handleSubmit();
