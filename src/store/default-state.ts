@@ -67,9 +67,9 @@ const defaultPreset: PresetProps = {
   presetDescription: 'Good enough',
   templateId: 'daily-driver',
   chats: [
-    { modelId: 'openai/gpt-5-mini', status: 'idle' },
-    { modelId: 'anthropic/claude-sonnet-4.5', status: 'idle' },
-    { modelId: 'google/gemini-2.5-flash', status: 'idle' },
+    { modelId: 'openai/gpt-6.1-terra', status: 'idle' },
+    { modelId: 'anthropic/claude-sonnet-5.5', status: 'idle' },
+    { modelId: 'google/gemini-3.8-flash', status: 'idle' },
   ],
 };
 
@@ -80,9 +80,22 @@ const flagshipModels: PresetProps = {
   presetDescription: 'Compare frontier models.',
   templateId: 'flagship-models',
   chats: [
-    { modelId: 'openai/gpt-5', status: 'idle' },
-    { modelId: 'anthropic/claude-opus-4.1', status: 'idle' },
-    { modelId: 'google/gemini-2.5-pro', status: 'idle' },
+    { modelId: 'openai/gpt-6.1-sol', status: 'idle' },
+    { modelId: 'anthropic/claude-opus-5.5', status: 'idle' },
+    { modelId: 'google/gemini-4-argon', status: 'idle' },
+  ],
+};
+
+const topShelf: PresetProps = {
+  id: 'top-shelf',
+  type: 'chat',
+  presetTitle: 'Top Shelf',
+  presetDescription: 'The best each lab makes. Priced like it.',
+  templateId: 'top-shelf',
+  chats: [
+    { modelId: 'openai/gpt-6-astra', status: 'idle' },
+    { modelId: 'anthropic/claude-fable-5.1', status: 'idle' },
+    { modelId: 'google/gemini-4-argon', status: 'idle' },
   ],
 };
 
@@ -106,7 +119,7 @@ export function createDefaultState(): State {
     draftChats: [
       {
         id: 'draft-chat',
-        modelId: 'openai/gpt-4.1',
+        modelId: 'openai/gpt-6.1-terra',
         status: 'idle',
         messages: [],
       },
@@ -127,32 +140,32 @@ export function createDefaultState(): State {
         title: 'Flagship models',
       },
       {
-        id: 'claude-sonnet-4.6-dial',
+        id: 'claude-sonnet-5.5-dial',
         type: 'model',
-        referenceId: 'anthropic/claude-sonnet-4.6',
+        referenceId: 'anthropic/claude-sonnet-5.5',
         sessionType: 'chat',
         title: 'Best of the vibecheck',
       },
       {
-        id: 'gpt-4.1-dial',
+        id: 'gpt-6-luna-dial',
         type: 'model',
-        referenceId: 'openai/gpt-4.1',
+        referenceId: 'openai/gpt-6-luna',
         sessionType: 'chat',
         title: 'Small & fast',
       },
       {
-        id: 'sonar-reasoning-pro-dial',
+        id: 'sonar-pro-search-dial',
         type: 'model',
-        referenceId: 'perplexity/sonar-reasoning-pro',
+        referenceId: 'perplexity/sonar-pro-search',
         sessionType: 'chat',
-        title: 'Online reasoning model',
+        title: 'Online search',
       },
       {
-        id: 'gemini-2.5-pro-dial',
+        id: 'gemini-4-argon-dial',
         type: 'model',
-        referenceId: 'google/gemini-2.5-pro',
+        referenceId: 'google/gemini-4-argon',
         sessionType: 'chat',
-        title: 'Gemini Pro 2.5 Preview',
+        title: "Google's flagship",
       },
     ],
     dialogs: {
@@ -168,18 +181,18 @@ export function createDefaultState(): State {
       completions: false,
     },
     settings: {
-      systemModel: 'openai/gpt-4.1',
+      systemModel: 'openai/gpt-6-luna',
       noteModel: {
         type: 'model',
-        referenceId: 'openai/gpt-4.1',
+        referenceId: 'openai/gpt-6.1-terra',
       },
       completions: {
         enabled: false,
-        model: 'openai/gpt-4.1-nano',
+        model: 'openai/gpt-6-luna',
       },
       defaultSession: {
         type: 'model',
-        id: 'openai/gpt-4.1',
+        id: 'openai/gpt-6.1-terra',
       },
       tts: {
         enabled: true,
@@ -195,7 +208,7 @@ export function createDefaultState(): State {
         showModelTitle: false,
       },
     },
-    presets: [...clone([defaultPreset, flagshipModels])],
+    presets: [...clone([defaultPreset, flagshipModels, topShelf])],
     assistants: [],
   };
 }

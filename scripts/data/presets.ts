@@ -9,15 +9,36 @@ export const presets: PresetProps[] = [
     templateId: 'flagship-models',
     chats: [
       {
-        modelId: 'openai/gpt-5.4',
+        modelId: 'openai/gpt-6.1-sol',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-opus-4.6',
+        modelId: 'anthropic/claude-opus-5.5',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-3.1-pro-preview',
+        modelId: 'google/gemini-4-argon',
+        status: 'idle',
+      },
+    ],
+  },
+  {
+    id: 'top-shelf',
+    type: 'chat',
+    presetTitle: 'Top Shelf',
+    presetDescription: 'The best each lab makes. Priced like it.',
+    templateId: 'top-shelf',
+    chats: [
+      {
+        modelId: 'openai/gpt-6-astra',
+        status: 'idle',
+      },
+      {
+        modelId: 'anthropic/claude-fable-5.1',
+        status: 'idle',
+      },
+      {
+        modelId: 'google/gemini-4-argon',
         status: 'idle',
       },
     ],
@@ -30,15 +51,15 @@ export const presets: PresetProps[] = [
     templateId: 'daily-driver',
     chats: [
       {
-        modelId: 'openai/gpt-5-mini',
+        modelId: 'openai/gpt-6.1-terra',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-sonnet-4.5',
+        modelId: 'anthropic/claude-sonnet-5.5',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-flash',
+        modelId: 'google/gemini-3.8-flash',
         status: 'idle',
       },
     ],
@@ -51,15 +72,15 @@ export const presets: PresetProps[] = [
     templateId: 'ux-writer-default',
     chats: [
       {
-        modelId: 'openai/gpt-4.1',
+        modelId: 'openai/gpt-6.1-sol',
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-sonnet-4.6',
+        modelId: 'anthropic/claude-sonnet-5.5',
         status: 'idle',
       },
       {
-        modelId: 'google/gemini-2.5-pro',
+        modelId: 'google/gemini-4-argon',
         status: 'idle',
       },
     ],

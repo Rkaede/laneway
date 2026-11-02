@@ -9,7 +9,7 @@ import { clone } from '~/util';
 const defaultAssistant: AssistantProps = {
   id: 'default',
   title: 'New Assistant',
-  modelId: 'openai/gpt-4o',
+  modelId: 'openai/gpt-6.1-terra',
   systemPrompt: 'You are a helpful assistant.',
   profileImage: '/icons/openai.svg',
 };

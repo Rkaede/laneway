@@ -23,6 +23,7 @@ export const deepseek: Partial<ModelProps>[] = [
   {
     id: 'deepseek/deepseek-v3.2-speciale',
     title: 'DeepSeek V3.2 Speciale',
+    deprecated: true,
   },
   {
     id: 'deepseek/deepseek-v4-flash',

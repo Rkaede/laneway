@@ -264,22 +264,21 @@ describe('generateModels catalogue', () => {
   );
 
   it('resolves bundled presets, defaults and examples against available models', async () => {
-    // OpenRouter IDs verified on 2026-10-28; no live API calls in unit tests.
+    // OpenRouter IDs verified on 2026-11-02; no live API calls in unit tests.
     const availableIds = [
-      'anthropic/claude-opus-4.1',
-      'anthropic/claude-opus-4.6',
-      'anthropic/claude-sonnet-4.5',
+      'anthropic/claude-fable-5.1',
+      'anthropic/claude-opus-5.5',
       'anthropic/claude-sonnet-4.6',
+      'anthropic/claude-sonnet-5.5',
       'google/gemini-2.5-flash',
-      'google/gemini-2.5-pro',
-      'google/gemini-3.1-pro-preview',
-      'openai/gpt-4.1',
-      'openai/gpt-4.1-nano',
+      'google/gemini-3.8-flash',
+      'google/gemini-4-argon',
       'openai/gpt-4o',
-      'openai/gpt-5',
-      'openai/gpt-5-mini',
-      'openai/gpt-5.4',
-      'perplexity/sonar-reasoning-pro',
+      'openai/gpt-6-astra',
+      'openai/gpt-6-luna',
+      'openai/gpt-6.1-sol',
+      'openai/gpt-6.1-terra',
+      'perplexity/sonar-pro-search',
       'x-ai/grok-4.20',
       'x-ai/grok-4.20-multi-agent',
     ];
