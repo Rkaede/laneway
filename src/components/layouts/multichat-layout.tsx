@@ -35,8 +35,9 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
     setSessionInput(value, props.sessionId);
   }
 
-  // Only before the first real chat, while the draft is still empty.
+  // Only once a key is saved, before the first real chat, while the draft is still empty.
   const showStarters = () =>
+    anyKeysSet() &&
     !props.sessionId &&
     !store.draftSession.input &&
     store.sessions.every((s) => s.created === -1);

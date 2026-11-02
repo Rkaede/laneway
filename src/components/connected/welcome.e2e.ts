@@ -18,6 +18,7 @@ test('sends new visitors to the welcome page once, then New Chat opens a chat', 
   const editor = page.getByRole('textbox', { name: 'Chat message input' });
   await expect(editor).toBeVisible();
   await expect(page.getByText('Add an API key to start chatting.')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Starter prompts' })).toHaveCount(0);
 
   await page.reload();
   await expect(page).not.toHaveURL(/\/welcome$/);
@@ -36,7 +37,7 @@ test('asks for a key on send and sends the kept message once it is saved', async
 
   // The key dialog hides the page behind it from the accessibility tree, editor included.
   const editor = page.getByRole('textbox', { name: 'Chat message input', includeHidden: true });
-  await page.getByRole('button', { name: starter }).click();
+  await editor.pressSequentially(starter);
   await expect(editor).toHaveText(starter);
   await editor.press('Enter');
 
@@ -81,6 +82,9 @@ test('starts a chat once the key is saved, and offers one when the key is alread
   const editor = page.getByRole('textbox', { name: 'Chat message input' });
   await expect(editor).toBeVisible();
   await expect(page).not.toHaveURL(/\/welcome$/);
+  // Starter prompts wait for a key, and picking one fills the composer.
+  await page.getByRole('button', { name: starter }).click();
+  await expect(editor).toHaveText(starter);
 
   await page.goto('/welcome');
   await expect(page.getByText('Your OpenRouter key is saved.')).toBeVisible();
