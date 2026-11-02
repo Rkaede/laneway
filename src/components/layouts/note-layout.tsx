@@ -4,7 +4,6 @@ import { Component, For, lazy, Show } from 'solid-js';
 import { ChatPanel } from '~/components/chat/chat-panel';
 import { KeyNotice } from '~/components/connected/api-key-dialog';
 import { useSession } from '~/components/connected/session-provider';
-import { SpeedDial } from '~/components/connected/speed-dial';
 import { IconSendHorizontal, IconSquare } from '~/components/icons/ui';
 import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
@@ -19,7 +18,7 @@ export function NoteLayout(props: { sessionId?: string }) {
 
   return (
     <div class="grid size-full min-h-0 grid-cols-1 grid-rows-2 md:grid-cols-2 md:grid-rows-1">
-      <div class="min-h-0 min-w-0">
+      <div class="min-h-0 min-w-0 border-b border-neutral-6 md:border-r md:border-b-0">
         <div class="grid h-full bg-surface-sunken p-3">
           <TextEditor
             onInput={(value) => setSessionInput(value, props.sessionId)}
@@ -69,8 +68,8 @@ export function NoteLayout(props: { sessionId?: string }) {
       </div>
 
       <ScrollPanel>
-        <Show when={props.sessionId} fallback={<BlankSession />}>
-          <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center">
+          <Show when={props.sessionId} fallback={<BlankSession />}>
             <Show when={session.chats}>
               {(c) => (
                 <For each={c()}>
@@ -90,8 +89,8 @@ export function NoteLayout(props: { sessionId?: string }) {
                 </For>
               )}
             </Show>
-          </div>
-        </Show>
+          </Show>
+        </div>
       </ScrollPanel>
     </div>
   );
@@ -99,22 +98,15 @@ export function NoteLayout(props: { sessionId?: string }) {
 
 const BlankSession: Component = (props: { attachments?: File[] }) => {
   return (
-    <div class="grid h-full flex-1 justify-center">
-      <div class="col-span-full row-span-full">
-        <For each={store.draftChats}>
-          {(chat) => (
-            <ChatPanel
-              chat={chat}
-              sessionId={store.draftSession.id}
-              attachments={props.attachments}
-              variant="note"
-            />
-          )}
-        </For>
-      </div>
-      <div class="col-span-full row-span-full flex h-full items-center justify-center gap-4 px-6">
-        <SpeedDial items={store.speedDial} />
-      </div>
-    </div>
+    <For each={store.draftChats}>
+      {(chat) => (
+        <ChatPanel
+          chat={chat}
+          sessionId={store.draftSession.id}
+          attachments={props.attachments}
+          variant="note"
+        />
+      )}
+    </For>
   );
 };
