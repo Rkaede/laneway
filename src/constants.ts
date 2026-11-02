@@ -1,4 +1,5 @@
 export const OPENROUTER_URL = 'https://openrouter.ai/api/v1';
+export const OPENROUTER_KEYS_URL = 'https://openrouter.ai/keys';
 
 // Theme ids match users' saved settings. System follows the operating system preference,
 // and unknown ids fall back to it.

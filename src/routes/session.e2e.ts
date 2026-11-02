@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 for (const type of ['chat', 'note'] as const) {
   test(`switching ${type} sessions isolates drafts and attachments`, async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('heading', { name: 'Laneway', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Ask GPT, Claude and Gemini at once.' }).waitFor();
     await page.evaluate(async (type) => {
       const storePath = '/src/store/index.tsx';
       const { setStore }: typeof import('../store') = await import(

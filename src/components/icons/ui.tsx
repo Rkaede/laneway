@@ -15,6 +15,7 @@ export { default as IconClipboard } from 'lucide-solid/icons/clipboard';
 export { default as IconCopy } from 'lucide-solid/icons/copy';
 export { default as DollarSignIcon } from 'lucide-solid/icons/dollar-sign';
 export { default as IconDownload } from 'lucide-solid/icons/download';
+export { default as IconExternalLink } from 'lucide-solid/icons/external-link';
 export { default as IconEyeOff } from 'lucide-solid/icons/eye-off';
 export { default as IconFileSliders } from 'lucide-solid/icons/file-sliders';
 export { default as IconGlobe } from 'lucide-solid/icons/globe';

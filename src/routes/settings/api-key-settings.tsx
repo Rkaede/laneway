@@ -1,4 +1,5 @@
 import { Input } from '~/components/ui';
+import { OPENROUTER_KEYS_URL } from '~/constants';
 import { apiKeys, setApiKey } from '~/store/keys';
 
 import { Section, Setting } from './shared';
@@ -22,7 +23,7 @@ export function APIKeySetting() {
               You can get a key from the{' '}
               <a
                 class="text-main underline underline-offset-4"
-                href="https://openrouter.ai/keys"
+                href={OPENROUTER_KEYS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >

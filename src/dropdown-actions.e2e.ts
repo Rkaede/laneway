@@ -37,7 +37,9 @@ for (const input of ['Enter', 'Space', 'click'] as const) {
   for (const type of ['assistant', 'preset'] as const) {
     test(`${type} Delete responds to ${input} without opening the editor`, async ({ page }) => {
       await page.goto('/');
-      await page.getByRole('heading', { name: 'Laneway', exact: true }).waitFor();
+      await page
+        .getByRole('heading', { name: 'Ask GPT, Claude and Gemini at once.' })
+        .waitFor();
       if (type === 'assistant') {
         await page.evaluate(async () => {
           const storePath = '/src/store/index.tsx';
