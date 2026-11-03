@@ -8,7 +8,10 @@ Just another AI chat app 🤷‍♂️
 
 Head over to <https://laneway.app> to use the app directly.
 
-![Laneway Example](https://files.laneway.app/laneway-main.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/multi-model-dark.webp">
+  <img alt="Laneway sends one prompt to GPT-6.1 Sol, Claude Opus 5.5 and Gemini 4 Argon, and all three answers stream in side by side." src="docs/images/multi-model-light.webp">
+</picture>
 
 ## Features
 
