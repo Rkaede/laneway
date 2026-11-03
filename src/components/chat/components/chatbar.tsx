@@ -5,6 +5,8 @@ import { ModelIcon } from '~/components/connected/model-icon';
 import type { AssistantProps, ModelProps } from '~/types';
 import { cn } from '~/util';
 
+import { FollowToggle } from './stream-controls';
+
 type ChatbarProps = {
   assistant?: AssistantProps;
   model?: ModelProps;
@@ -12,6 +14,8 @@ type ChatbarProps = {
   type?: 'assistant' | 'model';
   isFirst?: boolean;
   isLast?: boolean;
+  /** Shows the follow toggle when set. */
+  follow?: { following: boolean; onToggle: () => void };
 };
 
 export const Chatbar: Component<ChatbarProps> = (props) => {
@@ -38,6 +42,11 @@ export const Chatbar: Component<ChatbarProps> = (props) => {
           </Show>
         </div>
       </div>
+      <Show when={props.follow}>
+        {(follow) => (
+          <FollowToggle following={follow().following} onToggle={follow().onToggle} />
+        )}
+      </Show>
     </div>
   );
 };

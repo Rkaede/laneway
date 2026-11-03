@@ -1,5 +1,5 @@
 // Default state factory and constants
-import type { Theme } from '~/constants';
+import type { StreamDisplayMode, Theme } from '~/constants';
 import * as examples from '~/store/examples';
 import type {
   AssistantProps,
@@ -57,6 +57,9 @@ export interface State {
       showAvatars: boolean;
       showModelTitle: boolean;
     };
+    streaming: {
+      display: StreamDisplayMode;
+    };
   };
 }
 
@@ -106,7 +109,7 @@ export function createDefaultState(): State {
   const imageAttachment = examples.imageAttachment();
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     sessions: [story.session, imageAttachment.session],
     chats: [...story.chats, ...imageAttachment.chats],
     draftSession: {
@@ -206,6 +209,9 @@ export function createDefaultState(): State {
       messages: {
         showAvatars: false,
         showModelTitle: false,
+      },
+      streaming: {
+        display: 'live',
       },
     },
     presets: [...clone([defaultPreset, flagshipModels, topShelf])],

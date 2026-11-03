@@ -10,7 +10,7 @@ import {
   SwitchLabel,
   SwitchThumb,
 } from '~/components/ui';
-import { getTheme, THEMES } from '~/constants';
+import { getStreamDisplayMode, getTheme, STREAM_DISPLAY_MODES, THEMES } from '~/constants';
 import { setStore, store } from '~/store';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -31,6 +31,31 @@ export function GeneralSettings() {
         >
           <SelectTrigger aria-label="Theme" class="w-1/2">
             <SelectValue<(typeof THEMES)[number]>>
+              {(state) => state.selectedOption().label}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
+      </Setting>
+      <Setting
+        title="Streaming Display"
+        description="How an answer appears while it is written. Each lane also has a toggle to follow new output."
+      >
+        <Select
+          options={[...STREAM_DISPLAY_MODES]}
+          optionValue="id"
+          optionTextValue="label"
+          value={getStreamDisplayMode(store.settings.streaming.display)}
+          onChange={(value) => value && setStore('settings', 'streaming', 'display', value.id)}
+          itemComponent={(props) => (
+            <SelectItem item={props.item}>
+              {props.item.rawValue.label}
+              <span class="ml-2 text-xs text-muted">{props.item.rawValue.description}</span>
+            </SelectItem>
+          )}
+        >
+          <SelectTrigger class="w-1/2">
+            <SelectValue<(typeof STREAM_DISPLAY_MODES)[number]>>
               {(state) => state.selectedOption().label}
             </SelectValue>
           </SelectTrigger>

@@ -47,6 +47,7 @@ import * as SpeedDialStories from './speed-dial.stories';
 import * as SpeedDialOptionStories from './speed-dial-option.stories';
 import * as StarterPromptsStories from './starter-prompts.stories';
 import * as StatsPopoverStories from './stats-popover.stories';
+import * as StreamControlsStories from './stream-controls.stories';
 import * as SwitchStories from './switch.stories';
 import * as TagStories from './tag.stories';
 import * as TemplateCollectionStories from './template-collection.stories';
@@ -111,6 +112,7 @@ export const storyMap: Record<string, StoryGroup> = {
   'speed-dial-option': { title: 'SpeedDialOption', stories: SpeedDialOptionStories },
   'starter-prompts': { title: 'StarterPrompts', stories: StarterPromptsStories },
   'stats-popover': { title: 'StatsPopover', stories: StatsPopoverStories },
+  'stream-controls': { title: 'StreamControls', stories: StreamControlsStories },
   switch: { title: 'Switch', stories: SwitchStories },
   tag: { title: 'Tag', stories: TagStories },
   'template-collection': { title: 'Template Collection', stories: TemplateCollectionStories },

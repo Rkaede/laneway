@@ -65,4 +65,11 @@ export function migrateStore(store: State, setStore: SetStoreFunction<State>) {
     );
     setStore('schemaVersion', 2);
   }
+
+  if ((store.schemaVersion ?? 0) < 3) {
+    if (store.settings.streaming === undefined) {
+      setStore('settings', 'streaming', defaults.settings.streaming);
+    }
+    setStore('schemaVersion', 3);
+  }
 }

@@ -17,7 +17,7 @@ describe('store migrations', () => {
       const state = createLegacyState();
       state.schemaVersion = version;
       state.sessions[0].title = 'Saved session';
-      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 2 };
+      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 3 };
       delete state.settings.messages;
       delete state.settings.completions;
       delete state.featureFlags;
@@ -49,7 +49,7 @@ describe('store migrations', () => {
         showModelTitle: true,
         [key]: false,
       });
-      expect(store.schemaVersion).toBe(2);
+      expect(store.schemaVersion).toBe(3);
     },
   );
 
@@ -69,7 +69,7 @@ describe('store migrations', () => {
           ...JSON.parse(JSON.stringify(state.settings)),
           tts: { ...createDefaultState().settings.tts, enabled: false },
         },
-        schemaVersion: 2,
+        schemaVersion: 3,
       };
       state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
       const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
@@ -132,10 +132,31 @@ describe('store migrations', () => {
       enabled: false,
     });
     expect(store.settings).not.toHaveProperty('openRouterUsage');
-    expect(store.schemaVersion).toBe(2);
+    expect(store.schemaVersion).toBe(3);
   });
 
-  it.each([2, 3])('does not rewrite schema version %s', (schemaVersion) => {
+  it('adds the streaming display setting to older stores and keeps a saved one', () => {
+    const state = JSON.parse(JSON.stringify(createDefaultState()));
+    state.schemaVersion = 2;
+    delete state.settings.streaming;
+    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+
+    migrateStore(store, setStore);
+
+    expect(store.settings.streaming).toEqual({ display: 'live' });
+    expect(store.schemaVersion).toBe(3);
+
+    const saved = JSON.parse(JSON.stringify(createDefaultState()));
+    saved.schemaVersion = 2;
+    saved.settings.streaming = { display: 'paragraphs' };
+    const [kept, setKept] = createStore<ReturnType<typeof createDefaultState>>(saved);
+
+    migrateStore(kept, setKept);
+
+    expect(kept.settings.streaming.display).toBe('paragraphs');
+  });
+
+  it.each([3, 4])('does not rewrite schema version %s', (schemaVersion) => {
     const state = createDefaultState();
     state.schemaVersion = schemaVersion;
     const set = mock(() => {});
@@ -147,6 +168,6 @@ describe('store migrations', () => {
   });
 
   it('initializes new and reset stores at the current schema version', () => {
-    expect(createDefaultState().schemaVersion).toBe(2);
+    expect(createDefaultState().schemaVersion).toBe(3);
   });
 });

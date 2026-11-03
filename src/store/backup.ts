@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { createStore, reconcile, type SetStoreFunction } from 'solid-js/store';
 
+import { getStreamDisplayMode } from '~/constants';
 import { imageCache } from '~/services/image-cache';
 import type { ImagePart, MessageProps } from '~/types';
 import { download, filenameDate } from '~/util';
@@ -166,6 +167,10 @@ export function parseBackup(serialized: string): Backup {
   migrateStore(migrated, setMigrated);
   const defaults = createDefaultState();
   valid(matchesShape(migrated.settings, defaults.settings));
+  valid(
+    getStreamDisplayMode(migrated.settings.streaming.display).id ===
+      migrated.settings.streaming.display,
+  );
   valid(matchesShape(migrated.featureFlags, defaults.featureFlags));
   valid(matchesShape(migrated.speedDial, [{ id: '' }]));
   state.dialogs = defaults.dialogs;

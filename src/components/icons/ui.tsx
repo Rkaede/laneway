@@ -1,4 +1,5 @@
 export { IconGithub } from './github';
+export { default as IconArrowDown } from 'lucide-solid/icons/arrow-down';
 export { default as IconArrowUp } from 'lucide-solid/icons/arrow-up';
 export { default as IconBan } from 'lucide-solid/icons/ban';
 export { default as IconBot } from 'lucide-solid/icons/bot';
@@ -24,6 +25,7 @@ export { default as IconInfo } from 'lucide-solid/icons/info';
 export { default as IconKey } from 'lucide-solid/icons/key';
 export { default as IconLayoutGrid } from 'lucide-solid/icons/layout-grid';
 export { default as IconGallery } from 'lucide-solid/icons/library-big';
+export { default as IconListEnd } from 'lucide-solid/icons/list-end';
 export { default as IconListRestart } from 'lucide-solid/icons/list-restart';
 export { default as IconLoaderCircle } from 'lucide-solid/icons/loader-circle';
 export { default as MaximizeIcon } from 'lucide-solid/icons/maximize';
