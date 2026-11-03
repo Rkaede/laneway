@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 name: release-please
@@ -15,10 +16,9 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         with:
-          # this assumes that you have created a personal access token
-          # (PAT) and configured it as a GitHub action secret named
-          # `MY_RELEASE_PLEASE_TOKEN` (this secret name is not important).
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          # Uses the workflow's built-in token, so there is no secret to
+          # rotate. It needs "Allow GitHub Actions to create and approve pull
+          # requests" turned on in the repository's Actions settings.
           # this is a built-in strategy in release-please, see "Action Inputs"
           # for more options
           release-type: simple
