@@ -4,6 +4,7 @@ import { createEffect, Show } from 'solid-js';
 import { SessionProvider } from '~/components/connected/session-provider';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
+import { useScrollToMessage } from '~/hooks/use-scroll-to-message';
 import { store } from '~/store';
 import { newDraftSession } from '~/store/actions';
 import { anyKeysSet, selectRouteSession } from '~/store/selectors';
@@ -33,6 +34,7 @@ export function Session() {
   });
 
   const activeSession = selectRouteSession(() => params.id);
+  useScrollToMessage(() => Boolean(params.id && activeSession()));
 
   // New visitors without a key see the welcome page once. After that the root route is always a
   // chat, and sending without a key asks for one.

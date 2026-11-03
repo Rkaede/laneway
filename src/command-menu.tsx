@@ -1,6 +1,15 @@
 import { isMac } from '@solid-primitives/platform';
 import { useNavigate, useParams } from '@solidjs/router';
-import { createEffect, createSignal, For, Match, onCleanup, Show, Switch } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  Match,
+  onCleanup,
+  Show,
+  Switch,
+} from 'solid-js';
 
 import {
   CommandDialog,
@@ -14,15 +23,77 @@ import {
 
 import { shouldIgnoreShortcut } from './command-shortcuts';
 import { ModelIcon } from './components/connected/model-icon';
-import { IconLayoutGrid } from './components/icons/ui';
+import { IconChat, IconLayoutGrid, IconSquarePen } from './components/icons/ui';
 import { store } from './store';
 import { actions } from './store/actions';
 import { models } from './store/models';
+import {
+  recentSessions,
+  type SearchHit,
+  searchSessions,
+  type SearchSnippet,
+  sessionHref,
+} from './store/search';
 import { tinykeys } from './tinykeys';
-import type { SessionTemplate } from './types';
+import type { SessionTemplate, SessionType } from './types';
+
+const SEARCH_RESULT_PREFIX = 'search-result:';
+
+function formatSessionDate(created: number) {
+  const date = new Date(created);
+  const sameYear = date.getFullYear() === new Date().getFullYear();
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: sameYear ? undefined : 'numeric',
+  });
+}
+
+function SessionIcon(props: { type: SessionType }) {
+  return (
+    <Show when={props.type === 'note'} fallback={<IconChat class="mr-2 size-4 shrink-0" />}>
+      <IconSquarePen class="mr-2 size-4 shrink-0" />
+    </Show>
+  );
+}
+
+function Snippet(props: { snippet: SearchSnippet }) {
+  return (
+    <span class="truncate text-xs text-muted">
+      {props.snippet.before}
+      <mark class="bg-transparent font-semibold text-main">{props.snippet.match}</mark>
+      {props.snippet.after}
+    </span>
+  );
+}
+
+function SessionResult(props: {
+  value: string;
+  sessionId: string;
+  title: string;
+  type: SessionType;
+  created: number;
+  hit?: SearchHit;
+  onOpen: (href: string) => void;
+}) {
+  return (
+    <CommandItem
+      value={props.value}
+      onSelect={() => props.onOpen(sessionHref(props.sessionId, props.hit?.messageId))}
+    >
+      <SessionIcon type={props.type} />
+      <span class="flex min-w-0 flex-1 flex-col">
+        <span class="truncate">{props.title}</span>
+        <Show when={props.hit?.snippet}>{(snippet) => <Snippet snippet={snippet()} />}</Show>
+      </span>
+      <span class="ml-2 shrink-0 text-xs text-muted">{formatSessionDate(props.created)}</span>
+    </CommandItem>
+  );
+}
 
 export function CommandMenu() {
   const [open, setOpen] = createSignal(false);
+  const [query, setQuery] = createSignal('');
   const navigate = useNavigate();
   const params = useParams();
 
@@ -117,7 +188,29 @@ export function CommandMenu() {
     },
   ];
 
+  const results = createMemo(() =>
+    searchSessions(
+      query(),
+      { sessions: store.sessions, chats: store.chats, assistants: store.assistants },
+      models,
+    ),
+  );
+  const recent = () => recentSessions(store.sessions);
+  const searching = () => query().trim() !== '';
+
+  function openSession(href: string) {
+    navigate(href);
+    setOpen(false);
+  }
+
+  function handleOpenChange(isOpen: boolean) {
+    setOpen(isOpen);
+    if (!isOpen) setQuery('');
+  }
+
   function caseInsensitiveFilter(value: string, search: string, keywords?: string[]) {
+    // Session results are already matched by the search, so cmdk must not filter them again.
+    if (value.startsWith(SEARCH_RESULT_PREFIX)) return 1;
     const searchLower = search.toLowerCase();
     const valueLower = value.toLowerCase();
     return valueLower.includes(searchLower) ||
@@ -129,10 +222,46 @@ export function CommandMenu() {
   onCleanup(tinykeys(window, keyMap));
 
   return (
-    <CommandDialog open={open()} onOpenChange={setOpen} filter={caseInsensitiveFilter}>
-      <CommandInput placeholder="Search commands, presets, models and assistants..." />
+    <CommandDialog open={open()} onOpenChange={handleOpenChange} filter={caseInsensitiveFilter}>
+      <CommandInput
+        placeholder="Search chats, notes, commands, presets, models and assistants..."
+        onValueChange={setQuery}
+      />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
+        <Show when={searching() && results().length > 0}>
+          <CommandGroup heading="Chats and notes">
+            <For each={results()}>
+              {(hit) => (
+                <SessionResult
+                  value={`${SEARCH_RESULT_PREFIX}${hit.sessionId}`}
+                  sessionId={hit.sessionId}
+                  title={hit.title}
+                  type={hit.type}
+                  created={hit.created}
+                  hit={hit}
+                  onOpen={openSession}
+                />
+              )}
+            </For>
+          </CommandGroup>
+        </Show>
+        <Show when={!searching() && recent().length > 0}>
+          <CommandGroup heading="Recent chats and notes">
+            <For each={recent()}>
+              {(session) => (
+                <SessionResult
+                  value={`recent:${session.id}:${session.title}`}
+                  sessionId={session.id}
+                  title={session.title}
+                  type={session.type}
+                  created={session.created}
+                  onOpen={openSession}
+                />
+              )}
+            </For>
+          </CommandGroup>
+        </Show>
         <CommandGroup heading="Actions">
           <For each={actionArray()}>
             {(item) => (
