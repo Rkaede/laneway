@@ -1,7 +1,7 @@
 import { isMac } from '@solid-primitives/platform';
 import { Component, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 
-import { IconPlus, IconSendHorizontal, IconSquare } from '~/components/icons/ui';
+import { IconArrowUp, IconPlus, IconSquare } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 import config from '~/config';
 import { cn } from '~/util';
@@ -9,6 +9,14 @@ import { cn } from '~/util';
 import { Thumbnail } from '../ui';
 import { validateAttachmentFiles } from './attachment-files';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
+
+// A 36px circle inset 8px (7px plus the 1px border) has an 18px radius, which is concentric with
+// the composer's 26px corner. Change these together with --composer-radius.
+const composerButton = 'my-1.75 size-9 shrink-0 rounded-full p-0';
+const composerAction = cn(
+  composerButton,
+  'bg-main text-inverse transition-transform hover:scale-105',
+);
 
 interface PromptProps {
   attachments?: File[];
@@ -123,9 +131,9 @@ export const ChatInput: Component<PromptProps> = (props) => {
             handleSubmit();
           }}
           class={cn(
-            'relative flex flex-1 items-end gap-1 rounded-composer border border-composer-border bg-composer pt-0 pr-4 shadow-composer transition-[color,box-shadow] focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
+            'relative flex flex-1 items-end gap-1 rounded-composer border border-composer-border bg-composer pt-0 pr-1.75 shadow-composer transition-[color,box-shadow] focus-within:border-field-focus focus-within:ring-(length:--field-focus-ring-w) focus-within:ring-border-focus/50',
             isDragging() && 'border-field-focus ring-2 ring-border-focus/50',
-            props.hasVision ? 'pl-1.5' : 'pl-4',
+            props.hasVision ? 'pl-1.75' : 'pl-5',
             props.class,
           )}
         >
@@ -135,10 +143,10 @@ export const ChatInput: Component<PromptProps> = (props) => {
               size="icon"
               disabled={props.isLoading}
               title={`Attach or drop PNG, JPEG, GIF or WebP images (up to ${config.attachments.maxSize / 1024 / 1024} MiB each)`}
-              class="my-3 size-7 shrink-0 p-0 text-faint hover:text-main"
+              class={cn(composerButton, 'text-faint hover:text-main')}
               onClick={() => fileInputRef?.click()}
             >
-              <IconPlus class="size-4" />
+              <IconPlus class="size-5" />
               <span class="sr-only">Attach files</span>
             </Button>
             <input
@@ -151,9 +159,10 @@ export const ChatInput: Component<PromptProps> = (props) => {
               onChange={handleFileSelect}
             />
           </Show>
-          <div class="min-w-0 flex-1">
+          <div class="min-w-0 flex-1 self-center text-base">
             <TextEditor
               initialValue={props.input}
+              placeholder="Ask anything..."
               onInput={(value) => props.onInput(value)}
               onSubmit={handleSubmit}
               onPaste={handlePasteFile}
@@ -169,9 +178,9 @@ export const ChatInput: Component<PromptProps> = (props) => {
                 size="icon"
                 disabled={!props.input?.trim()}
                 title={`Send message (${isMac ? '⌘' : 'Ctrl'} + Enter)`}
-                class="my-3 size-7 shrink-0 rounded-full bg-main p-0 text-inverse transition-transform hover:scale-110"
+                class={composerAction}
               >
-                <IconSendHorizontal class="size-4" />
+                <IconArrowUp class="size-5" />
                 <span class="sr-only">Send message</span>
               </Button>
             }
@@ -179,10 +188,10 @@ export const ChatInput: Component<PromptProps> = (props) => {
             <Button
               variant="default"
               size="icon"
-              class="absolute right-0 bottom-0 m-1.5 mb-3 size-7 rounded-full bg-main text-inverse transition-transform hover:scale-110"
+              class={composerAction}
               onClick={props.onCancel}
             >
-              <IconSquare class="size-3" fill="currentColor" />
+              <IconSquare class="size-3.5" fill="currentColor" />
               <span class="sr-only">Stop</span>
             </Button>
           </Show>

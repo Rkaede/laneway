@@ -1,5 +1,6 @@
 export { IconGithub } from './github';
 export { default as IconArrowLeft } from 'lucide-solid/icons/arrow-left';
+export { default as IconArrowUp } from 'lucide-solid/icons/arrow-up';
 export { default as IconBan } from 'lucide-solid/icons/ban';
 export { default as IconBot } from 'lucide-solid/icons/bot';
 export { default as IconBox } from 'lucide-solid/icons/box';
