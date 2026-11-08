@@ -119,7 +119,7 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
             </Show>
           </SidebarItems>
         </div>
-        <div class="flex-1 overflow-auto border-b" inert={!props.open}>
+        <div class="flex-1 overflow-auto" inert={!props.open}>
           <Show when={store.sessions.length === 0}>
             <div role="status" class="px-4 py-6 text-sm text-muted">
               <p>No chats or notes yet.</p>
