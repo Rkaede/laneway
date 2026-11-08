@@ -31,7 +31,9 @@ const modelCardVariants = cva(
 export const ModelCard: ParentComponent<ModelIconProps> = (props) => {
   return (
     <HoverCard>
-      <HoverCardTrigger href="#">
+      {/* Only hovering does anything, so drop the link's hand cursor. Inherit rather than force an
+          arrow, because on speed dial cards the icon sits inside a clickable button. */}
+      <HoverCardTrigger href="#" class="cursor-[inherit]">
         <div class={modelCardVariants({ variant: props.variant })}>{props.children}</div>
       </HoverCardTrigger>
       <HoverCardContent class="w-auto min-w-[280px] p-0">
