@@ -5,10 +5,15 @@ import { storyMap } from './stories';
 
 export default function StoryPage() {
   const params = useParams<{ story: string }>();
+  // An own-property check, so ids such as "constructor" do not resolve to Object.prototype.
+  const currentStory = () =>
+    Object.hasOwn(storyMap, params.story) ? storyMap[params.story] : undefined;
 
   return (
     <Show
-      when={storyMap[params.story]}
+      when={currentStory()}
+      // Keyed, so each story gets a new scroll container that starts at the top.
+      keyed
       fallback={
         <div class="flex h-full items-center justify-center">
           <p class="text-muted">Story not found</p>
@@ -17,9 +22,9 @@ export default function StoryPage() {
     >
       {(story) => (
         <div class="h-full overflow-auto px-10 py-6">
-          <h1 class="mb-6 text-3xl font-medium">{story().title}</h1>
+          <h1 class="mb-6 text-3xl font-medium">{story.title}</h1>
           <div class="flex flex-col gap-6">
-            <For each={Object.entries(story().stories)}>
+            <For each={Object.entries(story.stories)}>
               {([name, Component]) => (
                 <div>
                   <h3 class="mb-4 text-lg font-semibold">{name}</h3>
