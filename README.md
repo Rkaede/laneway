@@ -26,10 +26,13 @@ Head over to <https://laneway.app> to use the app directly.
 
 ## Building and Running Locally
 
-Both `bun run dev` and `bun run build` fetch model data from
-<https://openrouter.ai/api/v1/models>, so they need network access to `openrouter.ai`.
-For offline development or builds, save a copy of the raw API response as `models.json`
-in the repository root; the scripts use this file instead of fetching.
+Both `bun run dev` and `bun run build` fetch model data from two OpenRouter endpoints, so
+they need network access to `openrouter.ai`. For offline development or builds, save a copy
+of each raw API response in the repository root; the scripts use a file instead of fetching
+when it exists:
+
+- `models.json` from <https://openrouter.ai/api/v1/models>
+- `speech-models.json` from <https://openrouter.ai/api/v1/models?output_modalities=speech>
 
 ### Installation
 
