@@ -73,7 +73,7 @@ export const openai: Partial<ModelProps>[] = [
     legacy: true,
   },
 
-  // latest
+  // GPT-5 onwards, plus gpt-oss. Entries marked deprecated are retired; the rest are current.
   { id: 'openai/gpt-5-codex', title: 'GPT-5 Codex', deprecated: true },
   { id: 'openai/gpt-5-chat', title: 'GPT-5 Chat', deprecated: true },
   { id: 'openai/gpt-5', title: 'GPT-5' },

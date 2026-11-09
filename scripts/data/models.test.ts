@@ -6,15 +6,26 @@ import { assistants } from './assistants';
 import { fetchModels, generateModels, modelsBase } from './models';
 import { presets } from './presets';
 
+// The generator reports its progress and its warnings on the console. Keep them out of the test
+// output; mock.restore() puts the real console back after each test.
+beforeEach(() => {
+  spyOn(console, 'info').mockImplementation(() => {});
+  spyOn(console, 'log').mockImplementation(() => {});
+});
+
 afterEach(() => {
   mock.restore();
 });
+
+const warning = (id: string | undefined, reason: 'has expired on' | 'is missing from') =>
+  `warning: ${id} is not marked deprecated but ${reason} OpenRouter. Writing it as deprecated.`;
+// The trailing space keeps one ID from matching a longer one, such as gpt-4.1 and gpt-4.1-mini.
+const anyWarningFor = (id: string | undefined) => expect.stringContaining(`warning: ${id} `);
 
 describe('fetchModels', () => {
   const data = { data: [{ id: 'openai/gpt-4o' }] };
 
   beforeEach(() => {
-    spyOn(console, 'info').mockImplementation(() => {});
     spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -82,7 +93,6 @@ describe('generateModels catalogue', () => {
 
   beforeEach(() => {
     spyOn(fs, 'existsSync').mockReturnValue(false);
-    spyOn(console, 'log').mockImplementation(() => {});
   });
 
   it('generates current text chat models with metadata and OpenRouter routing', async () => {
@@ -106,22 +116,26 @@ describe('generateModels catalogue', () => {
     const models = (await generateModels()).filter((model) => !model.deprecated);
 
     for (const id of currentIds) {
-      expect(models.find((model) => model.id === id)).toMatchObject({
+      const model = models.find((model) => model.id === id);
+      expect(model).toMatchObject({
         id,
-        provider: [{ id: 'openrouter', modelId: id, primary: false }],
         created: 1771342990,
         contextLength: 128000,
         maxCompletionTokens: 4096,
         vision: true,
         pricing: { prompt: 0.000003, completion: 0.000015, image: 0, request: 0 },
       });
+      // The app reads neither OpenRouter's architecture nor a primary flag, so models.json
+      // carries neither.
+      expect(model?.provider).toEqual([{ id: 'openrouter', modelId: id }]);
+      expect(model).not.toHaveProperty('architecture');
     }
   });
 
   it('reaches every model through OpenRouter only', () => {
     for (const model of modelsBase.filter((m) => m.id !== 'aperture/glados')) {
       if (model.id === undefined) throw new Error('Expected a model ID');
-      expect(model.provider).toEqual([{ id: 'openrouter', modelId: model.id, primary: false }]);
+      expect(model.provider).toEqual([{ id: 'openrouter', modelId: model.id }]);
     }
   });
 
@@ -140,7 +154,7 @@ describe('generateModels catalogue', () => {
     expect(model?.title).toBe(title);
   });
 
-  it('keeps missing and deprecated models for saved references and warns about them', async () => {
+  it('keeps missing and deprecated models for saved references and warns only about unmarked ones', async () => {
     spyOn(globalThis, 'fetch').mockResolvedValue(
       Response.json({
         data: [
@@ -160,13 +174,30 @@ describe('generateModels catalogue', () => {
     expect(models.filter((model) => !model.deprecated).map((model) => model.id)).toEqual([
       'openai/gpt-4o',
     ]);
-    for (const model of models.filter((model) => model.id !== 'openai/gpt-4o')) {
+    const unavailable = models.filter((model) => model.id !== 'openai/gpt-4o');
+    for (const model of unavailable) {
       expect(model).toMatchObject({
         ...modelsBase.find((base) => base.id === model.id),
         deprecated: true,
       });
-      expect(console.log).toHaveBeenCalledWith('warning: model not on openrouter', model.id);
     }
+
+    // Entries already marked deprecated were retired on purpose, so they are not reported,
+    // whether OpenRouter has dropped them or still lists them, as it does o1-mini here.
+    const marked = new Set(modelsBase.filter((base) => base.deprecated).map((base) => base.id));
+    expect(marked.has('openai/o1-mini')).toBe(true);
+    expect(marked.has('openai/gpt-4.1')).toBe(false);
+    for (const model of unavailable.filter((model) => marked.has(model.id))) {
+      expect(console.log).not.toHaveBeenCalledWith(anyWarningFor(model.id));
+    }
+
+    // Everything else was expected to be available, so each one is reported with the reason.
+    const unexpected = unavailable.filter((model) => !marked.has(model.id));
+    for (const model of unexpected) {
+      const reason = model.id === 'openai/gpt-4.1' ? 'has expired on' : 'is missing from';
+      expect(console.log).toHaveBeenCalledWith(warning(model.id, reason));
+    }
+    expect(console.log).toHaveBeenCalledTimes(unexpected.length);
     expect(models.find((model) => model.id === 'openai/gpt-4o')).toMatchObject({
       created: 1771342990,
       contextLength: 128000,
@@ -197,14 +228,11 @@ describe('generateModels catalogue', () => {
         ...modelsBase.find((model) => model.id === 'openai/gpt-4o'),
         deprecated: true,
       });
-      expect(console.log).toHaveBeenCalledWith('warning: model not on openrouter', model?.id);
+      expect(console.log).toHaveBeenCalledWith(warning(model?.id, 'has expired on'));
     } else {
       expect(model?.deprecated).not.toBe(true);
       expect(model?.contextLength).toBe(128000);
-      expect(console.log).not.toHaveBeenCalledWith(
-        'warning: model not on openrouter',
-        model?.id,
-      );
+      expect(console.log).not.toHaveBeenCalledWith(anyWarningFor(model?.id));
     }
   });
 

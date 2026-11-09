@@ -24,8 +24,9 @@ export const anthropic: Partial<ModelProps>[] = [
     legacy: true,
     deprecated: true,
   },
-  // current models
+  // deprecated, without the legacy flag
   { id: 'anthropic/claude-3.5-haiku', title: 'Claude 3.5 Haiku', deprecated: true },
+  // current models
   { id: 'anthropic/claude-sonnet-4.5', title: 'Claude Sonnet 4.5' },
   { id: 'anthropic/claude-opus-4.1', title: 'Claude Opus 4.1' },
   { id: 'anthropic/claude-opus-4.5', title: 'Claude Opus 4.5' },

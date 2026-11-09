@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 
-import type { Architecture, ModelProps, ModelTags } from '../../src/types';
+import type { ModelProps, ModelTags } from '../../src/types';
 // models
 import { anthropic } from './models/anthropic';
 import { deepseek } from './models/deepseek';
@@ -100,9 +100,7 @@ const defaults = {
 
 function mapBase(base: Array<Partial<ModelProps>>, defaultsKey: keyof typeof defaults) {
   return base.map((model) => {
-    const provider = model.id
-      ? [{ id: 'openrouter' as const, modelId: model.id, primary: false }]
-      : [];
+    const provider = model.id ? [{ id: 'openrouter' as const, modelId: model.id }] : [];
 
     return {
       ...defaults[defaultsKey],
@@ -135,7 +133,7 @@ if (isDevelopment) {
     },
     icon: 'Aperture',
     title: 'GLaDOS',
-    provider: [{ id: 'openrouter', modelId: 'aperture/glados', primary: true }],
+    provider: [{ id: 'openrouter', modelId: 'aperture/glados' }],
   });
 }
 
@@ -146,12 +144,7 @@ export const generateModels = async () => {
     if (model.id === 'aperture/glados') {
       return {
         ...model,
-        architecture: {
-          modality: 'text->text',
-          tokenizer: 'standard-tokenizer',
-          instruct_type: null,
-        },
-        created: 1011079824, // Feb 1, 2024
+        created: 1011079824, // Jan 15, 2002
         description: 'AI assistant from Aperture Science.',
         contextLength: 16384,
         maxCompletionTokens: 4096,
@@ -173,7 +166,14 @@ export const generateModels = async () => {
       !routerModel ||
       (routerModel.expiration_date && Date.parse(routerModel.expiration_date) <= Date.now())
     ) {
-      console.log('warning: model not on openrouter', model.id);
+      // Entries marked deprecated were retired on purpose. An unmarked one that OpenRouter no
+      // longer offers is news, because it drops out of the app's model lists.
+      if (!model.deprecated) {
+        const reason = routerModel ? 'has expired on' : 'is missing from';
+        console.log(
+          `warning: ${model.id} is not marked deprecated but ${reason} OpenRouter. Writing it as deprecated.`,
+        );
+      }
       return { ...model, deprecated: true };
     }
 
@@ -212,7 +212,6 @@ export const generateModels = async () => {
 
     const updated = {
       ...model,
-      architecture: routerModel.architecture as Architecture,
       created: routerModel.created,
       description: routerModel.description,
       contextLength: routerModel.context_length,

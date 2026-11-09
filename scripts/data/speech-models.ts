@@ -8,7 +8,7 @@ import type { SpeechModel } from '../../src/types';
 const PCM_ONLY_PREFIXES = ['heygen/', 'google/'];
 
 /** OpenRouter leaves speech models out of the default model list, so they are fetched apart. */
-export async function fetchSpeechModels() {
+async function fetchSpeechModels() {
   // Local copy for offline development, like models.json.
   const localPath = path.resolve('./speech-models.json');
   if (existsSync(localPath)) {
