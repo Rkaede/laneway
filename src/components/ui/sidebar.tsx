@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import { type JSX, type ParentComponent, Show } from 'solid-js';
+import { children, type JSX, type ParentComponent, Show } from 'solid-js';
 
 import { cn } from '~/util';
 
@@ -21,6 +21,10 @@ export const SidebarItems: ParentComponent<{ class?: string }> = (props) => {
 };
 
 export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) => {
+  // JSX passed as a prop is built again on every read, so resolve each one once.
+  const icon = children(() => props.icon);
+  const dropdown = children(() => props.dropdown);
+
   return (
     <li>
       <a
@@ -32,8 +36,8 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
         )}
       >
         <div class="flex flex-1 items-center gap-1 text-nav">
-          <Show when={props.icon}>
-            <span>{props.icon}</span>
+          <Show when={icon()}>
+            <span>{icon()}</span>
           </Show>
           <span class="truncate">{props.children}</span>
         </div>
@@ -43,8 +47,8 @@ export const SidebarLinkItem: ParentComponent<SidebarLinkItemProps> = (props) =>
             <span class="sr-only text-xs motion-reduce:not-sr-only">Loading…</span>
           </div>
         </Show>
-        <Show when={props.dropdown && props.isLoading !== true}>
-          <div class="flex h-6 shrink-0 items-center">{props.dropdown}</div>
+        <Show when={dropdown() && props.isLoading !== true}>
+          <div class="flex h-6 shrink-0 items-center">{dropdown()}</div>
         </Show>
       </a>
     </li>
@@ -72,6 +76,9 @@ const sidebarItem = cva(
 );
 
 export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
+  const icon = children(() => props.icon);
+  const dropdown = children(() => props.dropdown);
+
   return (
     <li>
       <button
@@ -79,12 +86,12 @@ export const SidebarItem: ParentComponent<SidebarItemProps> = (props) => {
         class={cn(sidebarItem({ active: props.active, size: props.size }), props.class)}
         type="button"
       >
-        <Show when={props.icon}>
-          <span>{props.icon}</span>
+        <Show when={icon()}>
+          <span>{icon()}</span>
         </Show>
         <span class="flex-1 truncate">{props.children}</span>
-        <Show when={props.dropdown}>
-          <div class="flex h-6 shrink-0 items-center">{props.dropdown}</div>
+        <Show when={dropdown()}>
+          <div class="flex h-6 shrink-0 items-center">{dropdown()}</div>
         </Show>
       </button>
     </li>
@@ -102,7 +109,6 @@ export type SidebarItemProps = VariantProps<typeof sidebarItem> & {
 export type SidebarLinkItemProps = {
   active?: boolean;
   href: string;
-  sessionId?: string;
   class?: string;
   icon?: JSX.Element;
   dropdown?: JSX.Element;
