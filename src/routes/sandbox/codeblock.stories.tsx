@@ -1,3 +1,4 @@
+import { CodeHighlighter } from '~/components/ui/code-highlighter';
 import { CodeBlock } from '~/components/ui/codeblock';
 
 import { Cell, CellHeader, Cells } from './story-components';
@@ -44,5 +45,35 @@ const person: Person = {
         />
       </Cell>
     </Cells>
+  );
+}
+
+export function EdgeCases() {
+  return (
+    <Cells>
+      <Cell>
+        <CellHeader>Plain text</CellHeader>
+        <CodeBlock language="plaintext" code="No highlighting here." />
+      </Cell>
+      <Cell>
+        <CellHeader>Unsupported language</CellHeader>
+        <CodeBlock language="not-a-language" code="Falls back to plain text." />
+      </Cell>
+      <Cell>
+        <CellHeader>Long line</CellHeader>
+        <CodeBlock
+          language="javascript"
+          code={`const message = "${'A long string that does not fit on one line. '.repeat(6)}";`}
+        />
+      </Cell>
+    </Cells>
+  );
+}
+
+export function HighlighterOnly() {
+  return (
+    <CodeHighlighter language="typescript" code={`export const answer: number = 42;`}>
+      <p class="p-2 text-xs text-muted">CodeHighlighter renders its children below the code.</p>
+    </CodeHighlighter>
   );
 }

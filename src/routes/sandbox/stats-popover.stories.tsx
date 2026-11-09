@@ -1,4 +1,4 @@
-import { StatsPopoverContent } from '~/components/ui/stats-popover';
+import { StatsPopover, StatsPopoverContent } from '~/components/ui/stats-popover';
 
 import { Cell, CellHeader, Cells } from './story-components';
 
@@ -32,5 +32,21 @@ export function States() {
         />
       </Cell>
     </Cells>
+  );
+}
+
+export function Trigger() {
+  return (
+    <div>
+      <StatsPopover
+        stats={{
+          promptTokens: 150,
+          completionTokens: 250,
+          totalTokens: 400,
+          created: Date.now(),
+          timeTaken: 2500,
+        }}
+      />
+    </div>
   );
 }

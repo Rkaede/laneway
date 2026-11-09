@@ -1,6 +1,9 @@
 import { createSignal, For } from 'solid-js';
 
+import { Button } from '~/components/ui/button';
 import { Lightbox } from '~/components/ui/lightbox/lightbox';
+
+import { sampleImageUrl } from './story-fixtures';
 
 // Optimized sample images with different sizes
 const sampleImages = [
@@ -95,6 +98,41 @@ export function GalleryWithLightbox() {
         open={open()}
         onClose={() => setOpen(false)}
       />
+    </div>
+  );
+}
+
+export function SingleImage() {
+  const [open, setOpen] = createSignal(false);
+  const image = { src: sampleImageUrl('Single'), alt: 'One image', width: 1200, height: 800 };
+
+  return (
+    <div>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open, with no arrows or thumbnails
+      </Button>
+      <Lightbox images={[image]} open={open()} onClose={() => setOpen(false)} />
+    </div>
+  );
+}
+
+export function StoredImages() {
+  const [open, setOpen] = createSignal(false);
+  const images = ['One', 'Two'].map((label) => ({
+    src: label,
+    storageId: sampleImageUrl(label),
+    sourceType: 'path' as const,
+    alt: label,
+    width: 1200,
+    height: 800,
+  }));
+
+  return (
+    <div>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open images loaded through LocalImage
+      </Button>
+      <Lightbox images={images} open={open()} onClose={() => setOpen(false)} />
     </div>
   );
 }
