@@ -3,11 +3,11 @@ public/models.json
 public/presets.json
 public/assistants.json
 public/speech-models.json
-speech-models.json
+/speech-models.json
 
 # Local copy of the models from openrouter.
 # Used in offline development. 
-models.json
+/models.json
 
 # playwright
 test-results
