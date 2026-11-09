@@ -17,12 +17,7 @@ export const SwitchControl = <T extends ValidComponent = 'input'>(
 
   return (
     <>
-      <SwitchPrimitive.Input
-        class={cn(
-          '[&:focus-visible+div]:border-border-focus [&:focus-visible+div]:ring-[3px] [&:focus-visible+div]:ring-border-focus/50 [&:focus-visible+div]:outline-hidden',
-          local.class,
-        )}
-      />
+      <SwitchPrimitive.Input class="[&:focus-visible+div]:border-border-focus [&:focus-visible+div]:ring-[3px] [&:focus-visible+div]:ring-border-focus/50 [&:focus-visible+div]:outline-hidden" />
       <SwitchPrimitive.Control
         class={cn(
           'inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-neutral-8 shadow-xs transition-[color,background-color,box-shadow] data-[checked]:bg-brand data-[disabled]:opacity-50',

@@ -1,6 +1,8 @@
 import { cva, VariantProps } from 'class-variance-authority';
 import { JSX } from 'solid-js';
 
+import { cn } from '~/util';
+
 // Scrolling with flexbox layouts can be hard. This component tries to wrangle all the different
 // scrolling states along with styling features into a single component.
 const scrollPanelVariants = cva('flex min-h-full flex-col-reverse overflow-auto', {
@@ -16,7 +18,7 @@ export function ScrollPanel(props: ScrollPanelProps) {
   return (
     <div
       data-component="ScrollPanel"
-      class={scrollPanelVariants({ class: props.class, debug: props.debug })}
+      class={cn(scrollPanelVariants({ debug: props.debug }), props.class)}
     >
       <div class="relative flex-1">
         {props.children}

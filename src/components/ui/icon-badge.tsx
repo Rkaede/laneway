@@ -1,18 +1,22 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps, ParentComponent } from 'solid-js';
 import { splitProps } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
+import { cn } from '~/util';
 
 import { icons } from './badge';
 import { roleColorVariants } from './role-colors';
+
+const defaultVariant = 'free';
 
 const iconBadgeVariants = cva('inline-flex items-center transition-colors', {
   variants: {
     variant: roleColorVariants('text'),
   },
   defaultVariants: {
-    variant: 'free',
+    variant: defaultVariant,
   },
 });
 
@@ -28,17 +32,15 @@ export const IconBadge: ParentComponent<IconBadgeProps> = (props) => {
     'aria-label': local.label ?? local.variant ?? undefined,
   };
 
-  const Icon = icons[local.variant!];
-
   return (
     <Tooltip placement="top">
       <TooltipTrigger
         as="span"
-        class={iconBadgeVariants({ variant: local.variant, class: local.class })}
+        class={cn(iconBadgeVariants({ variant: local.variant }), local.class)}
         {...accessibilityProps}
         {...rest}
       >
-        <Icon class="size-[14px]" />
+        <Dynamic component={icons[local.variant ?? defaultVariant]} class="size-[14px]" />
       </TooltipTrigger>
       <TooltipContent>{local.variant}</TooltipContent>
     </Tooltip>

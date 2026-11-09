@@ -1,6 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
-import { Show, splitProps } from 'solid-js';
+import { children, Show, splitProps } from 'solid-js';
+
+import { cn } from '~/util';
 
 import { IconGlobe, IconSquarePen } from '../icons/ui';
 import { roleColorVariants } from './role-colors';
@@ -44,9 +46,12 @@ export const Tag: ParentComponent<TagProps> = (props) => {
     return null;
   };
 
+  // JSX passed as a prop is built again on every read, so resolve the icon once.
+  const icon = children(() => local.icon || defaultIcon());
+
   return (
-    <span class={tagVariants({ variant: local.variant, class: local.class })} {...rest}>
-      <Show when={local.icon || defaultIcon()}>{local.icon || defaultIcon()}</Show>
+    <span class={cn(tagVariants({ variant: local.variant }), local.class)} {...rest}>
+      <Show when={icon()}>{icon()}</Show>
       {local.children}
     </span>
   );

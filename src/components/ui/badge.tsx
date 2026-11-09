@@ -10,6 +10,8 @@ import WifiIcon from 'lucide-solid/icons/wifi';
 import type { ComponentProps, JSX, ParentComponent } from 'solid-js';
 import { mergeProps, Show, splitProps } from 'solid-js';
 
+import { cn } from '~/util';
+
 import { roleColorVariants } from './role-colors';
 
 const tagVariants = cva('inline-flex items-center gap-1 rounded-badge text-xs font-medium', {
@@ -57,7 +59,7 @@ export const Badge: ParentComponent<BadgeProps> = (props) => {
 
   return (
     <span
-      class={tagVariants({ variant: local.variant, subtle: local.subtle, class: local.class })}
+      class={cn(tagVariants({ variant: local.variant, subtle: local.subtle }), local.class)}
       {...rest}
     >
       <Show when={local.showIcon && local.variant}>

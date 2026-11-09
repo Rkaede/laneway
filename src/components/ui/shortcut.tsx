@@ -3,6 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { Component, ComponentProps } from 'solid-js';
 import { splitProps } from 'solid-js';
 
+import { cn } from '~/util';
+
 const shortcutVariants = cva('ml-auto text-xs font-medium text-muted', {
   variants: {
     variant: {
@@ -29,7 +31,7 @@ export const Shortcut: Component<ShortcutProps> = (props) => {
   }
 
   return (
-    <span class={shortcutVariants({ variant: local.variant, class: local.class })} {...rest}>
+    <span class={cn(shortcutVariants({ variant: local.variant }), local.class)} {...rest}>
       {formattedShortcut()}
     </span>
   );
