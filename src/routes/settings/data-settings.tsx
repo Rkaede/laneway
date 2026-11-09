@@ -6,7 +6,7 @@ import { deleteData, setStore, store } from '~/store';
 import { exportBackup, parseBackup, restoreBackup } from '~/store/backup';
 import { deleteKeys } from '~/store/keys';
 
-import { Section, Setting } from './shared';
+import { Section, Setting, SettingControl } from './shared';
 
 export function Data() {
   const [busy, setBusy] = createSignal(false);
@@ -62,7 +62,7 @@ export function Data() {
         title="Delete Data"
         description="Removes all data from your browser except for the API keys."
       >
-        <div class="flex justify-end">
+        <SettingControl>
           <Button
             variant="destructive"
             disabled={busy()}
@@ -72,14 +72,14 @@ export function Data() {
           >
             Delete Data
           </Button>
-        </div>
+        </SettingControl>
       </Setting>
       <Setting
         inline
         title="Delete API Keys"
         description="Removes the API keys from your browser."
       >
-        <div class="flex justify-end">
+        <SettingControl>
           <Button
             variant="destructive"
             disabled={busy()}
@@ -90,25 +90,25 @@ export function Data() {
           >
             Delete Keys
           </Button>
-        </div>
+        </SettingControl>
       </Setting>
       <Setting
         inline
         title="Export Data"
         description="Back up chats, notes, images, and settings. API keys are excluded."
       >
-        <div class="flex justify-end">
+        <SettingControl>
           <Button variant="outline" disabled={busy()} onClick={exportData}>
             Export Data
           </Button>
-        </div>
+        </SettingControl>
       </Setting>
       <Setting
         inline
         title="Import Data"
         description="Replace your data with a backup file. API keys are kept."
       >
-        <div class="flex justify-end">
+        <SettingControl>
           <input
             ref={fileInput}
             type="file"
@@ -124,7 +124,7 @@ export function Data() {
           <Button variant="outline" disabled={busy()} onClick={() => fileInput.click()}>
             Import Data
           </Button>
-        </div>
+        </SettingControl>
       </Setting>
       {error() && (
         <p role="alert" class="text-sm text-danger">
