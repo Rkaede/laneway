@@ -6,7 +6,6 @@ import { store } from '~/store';
 import type { SessionProps as StoreSessionProps } from '~/types';
 
 export interface SessionContextValue {
-  sessionId: () => string;
   cancelChats: () => void;
   isLoading: () => boolean;
 }
@@ -14,7 +13,6 @@ export interface SessionContextValue {
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
 
 interface SessionProps extends ParentProps {
-  sessionId?: string;
   session: StoreSessionProps;
 }
 
@@ -39,7 +37,6 @@ export function SessionProvider(props: SessionProps) {
   return (
     <SessionContext.Provider
       value={{
-        sessionId: () => props.sessionId ?? props.session.id,
         cancelChats,
         isLoading,
       }}

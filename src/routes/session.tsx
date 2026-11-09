@@ -42,7 +42,7 @@ export function Session() {
     <Show when={!showWelcome()} fallback={<Navigate href="/welcome" />}>
       <Show when={activeSession()} keyed fallback={<NotFound session />}>
         {(session) => (
-          <SessionProvider sessionId={params.id} session={session}>
+          <SessionProvider session={session}>
             <Show
               when={session.type === 'note'}
               fallback={<MultiChatLayout sessionId={params.id} />}

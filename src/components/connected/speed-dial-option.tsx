@@ -2,7 +2,7 @@ import type { ComponentProps, ParentComponent } from 'solid-js';
 import { For, Show, splitProps } from 'solid-js';
 
 import { Tag, type TagProps } from '~/components/ui/tag';
-import { selectModelById } from '~/store/selectors';
+import { models } from '~/store/models';
 import { cn } from '~/util';
 
 import { AvatarGroup } from '../ui';
@@ -13,10 +13,8 @@ type ChatCardProps = ComponentProps<'button'> & {
   title?: string;
   subtitle?: string;
   tags?: Array<string>;
-  sessionType?: 'note' | 'chat';
   onClick?: () => void;
   models?: Array<string>;
-  online?: boolean;
   showSubtitle?: boolean;
 };
 
@@ -37,9 +35,7 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
     'tags',
     'children',
     'onClick',
-    'online',
     'models',
-    'sessionType',
     'showSubtitle',
   ]);
 
@@ -58,15 +54,14 @@ export const SpeedDialOption: ParentComponent<ChatCardProps> = (props) => {
           <div class="flex flex-1 items-center gap-1 truncate overflow-hidden font-medium">
             {local.title}
           </div>
-          <div class="">
+          <div>
             <Show when={local.models}>
               <AvatarGroup>
                 <For each={local.models}>
-                  {/* {(modelId) => <Avatar modelId={modelId} size="sm" variant="flat" />} */}
                   {(modelId) => {
-                    const model = selectModelById(modelId)();
+                    const model = models.find((m) => m.id === modelId);
                     return (
-                      <ModelCard model={model} class="size-4" variant="light">
+                      <ModelCard model={model} variant="light">
                         <ModelIcon modelId={modelId} class="size-4" />
                       </ModelCard>
                     );

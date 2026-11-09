@@ -9,7 +9,7 @@ import { Button, ScrollPanel } from '~/components/ui';
 import { createSession } from '~/hooks/use-session';
 import { store } from '~/store';
 import { setSessionInput } from '~/store/actions';
-import { anyKeysSet, selectChatById } from '~/store/selectors';
+import { anyKeysSet } from '~/store/selectors';
 const TextEditor = lazy(() => import('../ui/text-editor/text-editor'));
 
 export function NoteLayout(props: { sessionId?: string }) {
@@ -74,17 +74,10 @@ export function NoteLayout(props: { sessionId?: string }) {
               {(c) => (
                 <For each={c()}>
                   {(chatId) => {
-                    const chat = selectChatById(chatId)();
+                    const chat = store.chats.find((item) => item.id === chatId);
 
                     if (!chat) return null;
-                    return (
-                      <ChatPanel
-                        chat={chat}
-                        sessionId={session.id}
-                        attachments={session.attachments}
-                        variant="note"
-                      />
-                    );
+                    return <ChatPanel chat={chat} variant="note" />;
                   }}
                 </For>
               )}
@@ -96,17 +89,8 @@ export function NoteLayout(props: { sessionId?: string }) {
   );
 }
 
-const BlankSession: Component = (props: { attachments?: File[] }) => {
+const BlankSession: Component = () => {
   return (
-    <For each={store.draftChats}>
-      {(chat) => (
-        <ChatPanel
-          chat={chat}
-          sessionId={store.draftSession.id}
-          attachments={props.attachments}
-          variant="note"
-        />
-      )}
-    </For>
+    <For each={store.draftChats}>{(chat) => <ChatPanel chat={chat} variant="note" />}</For>
   );
 };

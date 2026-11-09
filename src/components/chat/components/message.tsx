@@ -7,8 +7,8 @@ import type { MessageProps } from '~/types';
 
 import { messageText, MessageView } from './message-view';
 
-export const Message: Component<MessageProps & { tts?: boolean; copy?: boolean }> = (props) => {
-  const [local, rest] = splitProps(props, ['tts', 'copy']);
+export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
+  const [local, rest] = splitProps(props, ['tts']);
 
   const audio = createAudio({
     id: props.id,

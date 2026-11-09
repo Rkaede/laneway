@@ -31,7 +31,6 @@ function Panel(props: { chat: ChatProps; attachments?: File[]; variant?: 'chat' 
   return (
     <div class="flex max-w-[70ch]">
       <ChatPanel
-        sessionId="story-session"
         isExample
         chat={props.chat}
         attachments={props.attachments}

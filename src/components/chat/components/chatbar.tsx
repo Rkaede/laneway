@@ -1,17 +1,15 @@
 import { type Component, Show } from 'solid-js';
 
-import { ModelCard, ModelIcon } from '~/components/connected';
-import type { AssistantProps, ChatProps, ModelProps, Provider } from '~/types';
+import { ModelCard } from '~/components/connected/model-card';
+import { ModelIcon } from '~/components/connected/model-icon';
+import type { AssistantProps, ModelProps } from '~/types';
 import { cn } from '~/util';
 
 type ChatbarProps = {
-  chat: ChatProps;
   assistant?: AssistantProps;
   model?: ModelProps;
-  provider?: Provider;
   class?: string;
   type?: 'assistant' | 'model';
-  sessionType?: 'chat' | 'note';
   isFirst?: boolean;
   isLast?: boolean;
 };
@@ -20,16 +18,15 @@ export const Chatbar: Component<ChatbarProps> = (props) => {
   return (
     <div
       class={cn(
-        'fade-out-below border-l-none sticky top-0 z-10 flex h-11 justify-between border-r border-b border-border bg-surface p-2 px-4',
+        'fade-out-below sticky top-0 z-10 flex h-11 justify-between border-r border-b border-border bg-surface p-2 px-4',
         'group-first-of-type:border-l',
-        'group-last-of-type:border-r',
         props.isFirst ? 'rounded-bl-md' : '',
         props.isLast ? 'rounded-br-md' : '',
         props.class,
       )}
     >
       <div class="flex items-center gap-2">
-        <ModelCard model={props.model} class="size-6">
+        <ModelCard model={props.model}>
           <ModelIcon modelId={props.model?.id} class="size-6" />
         </ModelCard>
         <div class="flex flex-col gap-[2px]">

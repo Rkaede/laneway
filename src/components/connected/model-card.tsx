@@ -8,9 +8,8 @@ import { DollarSignIcon, MaximizeIcon } from '../icons/ui';
 import { Price, Separator, Tag, Tokens } from '../ui';
 import { ModelIcon } from './model-icon';
 
-type ModelIconProps = {
+type ModelCardProps = {
   model?: ModelProps;
-  class?: string;
 } & VariantProps<typeof modelCardVariants>;
 
 const modelCardVariants = cva(
@@ -28,7 +27,7 @@ const modelCardVariants = cva(
   },
 );
 
-export const ModelCard: ParentComponent<ModelIconProps> = (props) => {
+export const ModelCard: ParentComponent<ModelCardProps> = (props) => {
   return (
     <HoverCard>
       {/* Only hovering does anything, so drop the link's hand cursor. Inherit rather than force an

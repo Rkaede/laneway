@@ -2,14 +2,9 @@ import { useNavigate } from '@solidjs/router';
 import { createSignal, For, ParentComponent, Show } from 'solid-js';
 
 import { createMessage } from '~/hooks/message-utils';
-import { setStore, store } from '~/store';
-import {
-  addMessageToSessionChats,
-  autonameChat,
-  setAssistant,
-  setSessionInput,
-} from '~/store/actions';
-import { anyKeysSet, selectChatById, selectSessionById } from '~/store/selectors';
+import { store } from '~/store';
+import { addMessageToSessionChats, autonameChat, setSessionInput } from '~/store/actions';
+import { anyKeysSet, selectSessionById } from '~/store/selectors';
 
 import { ChatInput } from '../chat/chat-input';
 import { ChatPanel } from '../chat/chat-panel';
@@ -98,14 +93,12 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
             <ChatPanelLayout numChats={s().chats.length}>
               <For each={s().chats}>
                 {(chatId, index) => {
-                  const chat = selectChatById(chatId)();
+                  const chat = store.chats.find((c) => c.id === chatId);
                   if (!chat) return null;
 
                   return (
                     <ChatPanel
                       chat={chat}
-                      sessionId={s().id}
-                      onChangeAssistant={(id) => setAssistant(id, chat.id)}
                       attachments={attachments()}
                       isExample={s().created === -1}
                       isFirst={index() === 0}
@@ -148,7 +141,7 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
   );
 };
 
-export const ChatPanelLayout: ParentComponent<{ numChats: number }> = (props) => {
+const ChatPanelLayout: ParentComponent<{ numChats: number }> = (props) => {
   return (
     <div
       class="group/panels relative grid flex-1 justify-center px-4"
@@ -161,19 +154,13 @@ export const ChatPanelLayout: ParentComponent<{ numChats: number }> = (props) =>
   );
 };
 
-export function BlankSession(props: { attachments?: File[] }) {
-  function handleAssistantChange(id: string, chatId: string) {
-    setStore('draftChats', (c) => c.id === chatId, 'assistantId', id);
-  }
-
+function BlankSession(props: { attachments?: File[] }) {
   return (
     <ChatPanelLayout numChats={store.draftChats.length}>
       <For each={store.draftChats}>
         {(chat, index) => (
           <ChatPanel
             chat={chat}
-            sessionId={store.draftSession.id}
-            onChangeAssistant={(id) => handleAssistantChange(id, chat.id)}
             attachments={props.attachments}
             isFirst={index() === 0}
             isLast={index() === store.draftChats.length - 1}
