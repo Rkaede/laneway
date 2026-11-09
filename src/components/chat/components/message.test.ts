@@ -19,8 +19,9 @@ await Bun.write(
   stubs,
   `export default (props) => props.text;
 export const ModelIcon = () => null;
+export const LocalImage = (props) => '[image alt=' + props.alt + ']';
 export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag = ModelIcon,
-  Lightbox = ModelIcon, LocalImage = ModelIcon, AudioButton = ModelIcon, CopyButton = ModelIcon,
+  Lightbox = ModelIcon, AudioButton = ModelIcon, CopyButton = ModelIcon,
   StatsPopover = ModelIcon, Tooltip = ModelIcon, TooltipContent = ModelIcon, TooltipTrigger = ModelIcon;
 `,
 );
@@ -73,6 +74,23 @@ describe('MessageView', () => {
 
     expect(html).toContain('First part');
     expect(html).toContain('Second part');
+  });
+
+  it('names each image after its file', () => {
+    const html = renderToString(() =>
+      MessageView({
+        id: 'images',
+        role: 'user',
+        content: [
+          { type: 'image', image: { filename: 'holiday.png', storageId: 'first' } },
+          { type: 'text', text: 'Two photos' },
+          { type: 'image', image: { filename: 'receipt.jpg', storageId: 'second' } },
+        ],
+      }),
+    );
+
+    expect(html).toContain('[image alt=holiday.png]');
+    expect(html).toContain('[image alt=receipt.jpg]');
   });
 
   it('shows the model title only when asked to', () => {

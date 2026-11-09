@@ -1,6 +1,6 @@
 import { type Component, createSignal, type ParentComponent, Show } from 'solid-js';
 
-import { ModelIcon } from '~/components/connected';
+import { ModelIcon } from '~/components/connected/model-icon';
 import { IconBan, IconUser } from '~/components/icons/ui';
 import { Avatar, Tag } from '~/components/ui';
 import { Lightbox } from '~/components/ui/lightbox/lightbox';
@@ -74,12 +74,7 @@ export const MessageView: Component<MessageViewProps> = (props) => {
   };
 
   return (
-    <MessageContainer
-      role={props.role}
-      content={props.content}
-      id={props.id}
-      showAvatars={props.showAvatars}
-    >
+    <MessageContainer role={props.role} showAvatars={props.showAvatars}>
       <Show when={lightboxOpen()}>
         <Lightbox
           images={lightboxImages()}
@@ -127,6 +122,7 @@ export const MessageView: Component<MessageViewProps> = (props) => {
                 return (
                   <LocalImage
                     src={part.image.storageId}
+                    alt={part.image.filename}
                     sourceType={part.image.sourceType}
                     onClick={() => handleImageClick(part, imageIndex)}
                     class={cn(
@@ -173,7 +169,9 @@ export const MessageView: Component<MessageViewProps> = (props) => {
   );
 };
 
-const MessageContainer: ParentComponent<MessageProps & { showAvatars?: boolean }> = (props) => {
+const MessageContainer: ParentComponent<
+  Pick<MessageProps, 'role'> & { showAvatars?: boolean }
+> = (props) => {
   return (
     <div
       class="max-w-full rounded-xl py-bubble-y"
