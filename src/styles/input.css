@@ -1,6 +1,6 @@
 @layer components {
   .input {
-    @apply w-full min-w-0 rounded-md border border-border bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
+    @apply w-full min-w-0 rounded-md border border-border-emphasis bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
 
     &::placeholder {
       @apply text-placeholder;
@@ -26,14 +26,6 @@
       @apply border-danger ring-danger/20;
     }
 
-    &[data-hint='true'] {
-      @apply border-dashed border-success ring-0;
-    }
-
-    &[data-hint='true']:focus-visible {
-      @apply border-success ring-0;
-    }
-
     &[type='number'] {
       appearance: textfield;
     }
@@ -46,9 +38,5 @@
 
   .input-md {
     @apply h-input-md px-input-x-md py-input-y-md text-sm;
-  }
-
-  .input-lg {
-    @apply h-input-lg px-input-x-lg py-input-y-lg text-lg;
   }
 }

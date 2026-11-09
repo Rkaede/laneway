@@ -19,7 +19,7 @@ export const TextArea = <T extends ValidComponent = 'textarea'>(
 
   return (
     <TextFieldPrimitive
-      class={cn('input min-h-[60px] border-border-emphasis px-3 py-2 text-sm', local.class)}
+      class={cn('input min-h-[60px] px-3 py-2 text-sm', local.class)}
       {...rest}
     />
   );
