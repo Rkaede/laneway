@@ -1,9 +1,10 @@
 import { A, useLocation } from '@solidjs/router';
 import MoonIcon from 'lucide-solid/icons/moon';
 import SunIcon from 'lucide-solid/icons/sun';
-import { For, type ParentComponent } from 'solid-js';
+import { createSignal, For, onCleanup, type ParentComponent } from 'solid-js';
 
 import { Button } from '~/components/ui/button';
+import { getTheme } from '~/constants';
 import { useApplyTheme } from '~/hooks/use-theme';
 import { setStore, store } from '~/store';
 import { cn } from '~/util';
@@ -16,7 +17,17 @@ const stories = Object.entries(storyMap)
 
 const SandboxLayout: ParentComponent = (props) => {
   const location = useLocation();
-  const isDark = () => store.settings.theme === 'dark';
+  const preference = window.matchMedia('(prefers-color-scheme: dark)');
+  const [prefersDark, setPrefersDark] = createSignal(preference.matches);
+  const syncPreference = () => setPrefersDark(preference.matches);
+  preference.addEventListener('change', syncPreference);
+  onCleanup(() => preference.removeEventListener('change', syncPreference));
+
+  // Resolved the way applyTheme resolves it, so the toggle matches the page under System.
+  const isDark = () => {
+    const theme = getTheme(store.settings.theme);
+    return theme.id === 'system' ? prefersDark() : theme.id === 'dark';
+  };
 
   // The sandbox is its own route outside the app layout, so it applies the theme itself.
   useApplyTheme();
