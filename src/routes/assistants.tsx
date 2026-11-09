@@ -19,7 +19,7 @@ import {
   TemplatePage,
   TemplateValidationError,
 } from './template-collection';
-import { createTemplateEditor, fetchTemplateGallery } from './template-helpers';
+import { createTemplateEditor, loadTemplateGallery } from './template-helpers';
 
 export default function Assistants() {
   const [selectedAssistant, setSelectedAssistant] = createSignal<AssistantProps | null>(null);
@@ -29,7 +29,7 @@ export default function Assistants() {
   const [assistantToDelete, setAssistantToDelete] = createSignal<string | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = createSignal(false);
   const [galleryAssistants] = createResource(() =>
-    fetchTemplateGallery<AssistantProps>('/assistants.json'),
+    loadTemplateGallery<AssistantProps>('/assistants.json'),
   );
 
   function handleAdd() {

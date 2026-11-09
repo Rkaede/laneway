@@ -37,12 +37,12 @@ import {
   TemplatePage,
   TemplateValidationError,
 } from './template-collection';
-import { createTemplateEditor, fetchTemplateGallery } from './template-helpers';
+import { createTemplateEditor, loadTemplateGallery } from './template-helpers';
 
 const fetchPresetGallery = async () => {
   const [presets, assistants] = await Promise.all([
-    fetchTemplateGallery<PresetProps>('/presets.json'),
-    fetchTemplateGallery<AssistantProps>('/assistants.json'),
+    loadTemplateGallery<PresetProps>('/presets.json'),
+    loadTemplateGallery<AssistantProps>('/assistants.json'),
   ]);
   return { presets, assistants };
 };
@@ -305,6 +305,7 @@ const PresetDetails: Component<{
           <SettingTitle>Name</SettingTitle>
           <TextField id="name">
             <Input
+              aria-label="Name"
               value={localPreset.presetTitle}
               onInput={(e) => setLocalPreset('presetTitle', e.target.value)}
             />
@@ -316,6 +317,7 @@ const PresetDetails: Component<{
           <SettingDescription>Provide a brief description of this preset.</SettingDescription>
           <TextField>
             <TextArea
+              aria-label="Description"
               class="resize-none"
               placeholder="Enter a description for this preset..."
               rows="3"
@@ -331,6 +333,7 @@ const PresetDetails: Component<{
           </SettingDescription>
           <TextField>
             <TextArea
+              aria-label="Input"
               class="resize-none"
               placeholder=""
               rows="6"
@@ -342,11 +345,7 @@ const PresetDetails: Component<{
             Example: <i>Improve the writing of the following. Give 5 options.</i>
           </div>
         </div>
-        <AssistantList
-          presetId={props.initialPreset.id}
-          localPreset={localPreset}
-          setLocalPreset={setLocalPreset}
-        />
+        <AssistantList localPreset={localPreset} setLocalPreset={setLocalPreset} />
       </FormContainer>
       <div class="pt-6">
         <Show when={!localPreset.chats?.length}>
@@ -366,7 +365,6 @@ const PresetDetails: Component<{
 };
 
 const AssistantList: Component<{
-  presetId: string;
   localPreset: PresetProps;
   setLocalPreset: (updater: (prev: PresetProps) => PresetProps) => void;
 }> = (props) => {
@@ -413,7 +411,6 @@ const AssistantList: Component<{
                 <Assistant
                   assistantId={chat.assistantId}
                   modelId={chat.modelId}
-                  presetId={props.presetId}
                   onDelete={() => handleDelete(index())}
                 />
               )}
@@ -428,7 +425,6 @@ const AssistantList: Component<{
 const Assistant: Component<{
   assistantId?: string;
   modelId?: string;
-  presetId: string;
   onDelete: () => void;
 }> = (props) => {
   const assistant = selectAssistantById(() => props.assistantId);

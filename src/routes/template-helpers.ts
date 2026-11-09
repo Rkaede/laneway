@@ -4,12 +4,33 @@ import { createStore } from 'solid-js/store';
 
 import { clone } from '~/util';
 
+type Fetcher = (path: string) => Promise<Response>;
+
 export async function fetchTemplateGallery<T>(
   path: string,
-  fetcher: (path: string) => Promise<Response> = fetch,
+  fetcher: Fetcher = fetch,
 ): Promise<T[]> {
   const response = await fetcher(path);
+  if (!response.ok) throw new Error(`${path} responded with HTTP ${response.status}.`);
   return response.json();
+}
+
+/**
+ * Loads a gallery for a page. A gallery that cannot be loaded is logged and treated as empty, so
+ * the error never reaches the resource: reading an errored resource throws to the root boundary.
+ */
+export async function loadTemplateGallery<T>(path: string, fetcher?: Fetcher): Promise<T[]> {
+  try {
+    return await fetchTemplateGallery<T>(path, fetcher);
+  } catch (error) {
+    console.error(`Could not load ${path}:`, error);
+    return [];
+  }
+}
+
+/** An item with no title matches an empty search, so it stays listed and can be edited. */
+export function matchesTemplateSearch(title: string | undefined, searchTerm: string) {
+  return (title ?? '').toLowerCase().includes(searchTerm.toLowerCase());
 }
 
 export function createTemplateEditor<T extends object>(options: {

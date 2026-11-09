@@ -30,6 +30,8 @@ import {
 import { PageTitle, SectionDescription } from '~/components/ui/forms';
 import { Input } from '~/components/ui/input';
 
+import { matchesTemplateSearch } from './template-helpers';
+
 export function TemplatePage<T>(props: {
   title: string;
   description: string;
@@ -43,10 +45,7 @@ export function TemplatePage<T>(props: {
 }) {
   const [searchTerm, setSearchTerm] = createSignal('');
   const filteredItems = () =>
-    props.items.filter(
-      (item) =>
-        props.getTitle(item)?.toLowerCase().includes(searchTerm().toLowerCase()) ?? false,
-    );
+    props.items.filter((item) => matchesTemplateSearch(props.getTitle(item), searchTerm()));
 
   return (
     <div class="mx-auto flex h-full max-w-5xl flex-col gap-8 px-10 py-6">
@@ -60,6 +59,7 @@ export function TemplatePage<T>(props: {
           <Input
             type="text"
             placeholder="Search..."
+            aria-label={`Search ${props.title.toLowerCase()}`}
             class="pl-10"
             value={searchTerm()}
             onInput={(e) => setSearchTerm(e.currentTarget.value)}
@@ -101,19 +101,17 @@ export function TemplateCard(props: {
   onDelete: () => void;
   children: JSX.Element;
 }) {
-  const [open, setOpen] = createSignal(false);
-
   return (
     <Card variant="solid" onClick={props.onEdit}>
       <CardHeader class="flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="flex items-center gap-2 text-lg font-semibold">
           {props.title}
         </CardTitle>
-        <DropdownMenu open={open()} onOpenChange={setOpen}>
+        <DropdownMenu>
           <DropdownMenuTrigger
             as={Button}
             class="flex size-6 items-center justify-center rounded-md p-0 text-muted hover:bg-surface-hover hover:text-main"
-            data-open={open()}
+            aria-label="Assistant or preset actions"
             variant="ghost"
             size="icon"
             onClick={(e: MouseEvent) => e.stopPropagation()}

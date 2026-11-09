@@ -1,12 +1,19 @@
-import { describe, expect, it } from 'bun:test';
+import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { createRoot } from 'solid-js';
 
 import { validateAssistant, validatePreset } from '~/store/editor-validation';
 import type { AssistantProps, PresetProps } from '~/types';
 
-import { createTemplateEditor, fetchTemplateGallery } from './template-helpers';
+import {
+  createTemplateEditor,
+  fetchTemplateGallery,
+  loadTemplateGallery,
+  matchesTemplateSearch,
+} from './template-helpers';
 
 describe('template gallery', () => {
+  afterEach(() => mock.restore());
+
   it.each(['/assistants.json', '/presets.json'])('loads %s', async (path) => {
     const templates = [{ id: 'template' }];
     const result = await fetchTemplateGallery(path, async (requestedPath) => {
@@ -28,6 +35,51 @@ describe('template gallery', () => {
     await expect(
       fetchTemplateGallery('/presets.json', async () => new Response('invalid JSON')),
     ).rejects.toBeInstanceOf(SyntaxError);
+  });
+
+  it('rejects an HTTP error instead of reading its body as a gallery', async () => {
+    await expect(
+      fetchTemplateGallery('/presets.json', async () =>
+        Response.json({ error: 'Not found' }, { status: 404 }),
+      ),
+    ).rejects.toThrow('/presets.json responded with HTTP 404.');
+  });
+
+  it.each<[string, () => Promise<Response>]>([
+    ['a network failure', () => Promise.reject(new Error('Offline'))],
+    ['an HTTP error', async () => new Response('Not found', { status: 404 })],
+    ['a page served in place of the JSON', async () => new Response('<!doctype html>')],
+  ])('logs %s and loads an empty gallery for the page', async (_name, fetcher) => {
+    const logged = spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(await loadTemplateGallery('/assistants.json', fetcher)).toEqual([]);
+    expect(logged).toHaveBeenCalledTimes(1);
+    expect(logged.mock.calls[0][0]).toContain('/assistants.json');
+  });
+
+  it('keeps one gallery when the other fails to load', async () => {
+    spyOn(console, 'error').mockImplementation(() => {});
+    const templates = [{ id: 'template' }];
+
+    const [presets, assistants] = await Promise.all([
+      loadTemplateGallery('/presets.json', async () => Response.json(templates)),
+      loadTemplateGallery('/assistants.json', () => Promise.reject(new Error('Offline'))),
+    ]);
+
+    expect(presets).toEqual(templates);
+    expect(assistants).toEqual([]);
+  });
+});
+
+describe('template search', () => {
+  it('lists an untitled item until a search is entered', () => {
+    expect(matchesTemplateSearch(undefined, '')).toBe(true);
+    expect(matchesTemplateSearch(undefined, 'team')).toBe(false);
+  });
+
+  it('matches titles whatever the case', () => {
+    expect(matchesTemplateSearch('Daily Driver', 'DRIVER')).toBe(true);
+    expect(matchesTemplateSearch('Daily Driver', 'writer')).toBe(false);
   });
 });
 
