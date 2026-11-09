@@ -8,7 +8,9 @@ import type { Component } from 'solid-js';
 import { renderToString } from 'solid-js/web';
 import { JsxEmit, ModuleKind, ScriptTarget, transpileModule } from 'typescript';
 
-import type { MessageProps } from '~/types';
+import type { ModelProps } from '~/types';
+
+import type { MessageViewProps } from './message-view';
 
 const directory = await mkdtemp(join(tmpdir(), 'laneway-message-'));
 afterAll(() => rm(directory, { recursive: true, force: true }));
@@ -16,9 +18,6 @@ const stubs = join(directory, 'stubs.mjs');
 await Bun.write(
   stubs,
   `export default (props) => props.text;
-export const store = { settings: { messages: { showAvatars: false, showModelTitle: false } } };
-export const anyKeysSet = () => false;
-export const createAudio = () => ({});
 export const ModelIcon = () => null;
 export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag = ModelIcon,
   Lightbox = ModelIcon, LocalImage = ModelIcon, AudioButton = ModelIcon, CopyButton = ModelIcon,
@@ -27,7 +26,7 @@ export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag 
 );
 
 // Compile Solid JSX for SSR and stub UI/services to isolate when message text appears.
-const source = (await Bun.file(new URL('./message.tsx', import.meta.url)).text()).replace(
+const source = (await Bun.file(new URL('./message-view.tsx', import.meta.url)).text()).replace(
   /(['"])(~\/[^'"]+)\1/g,
   (_match, quote, name: string) => {
     const specifier =
@@ -43,24 +42,26 @@ const jsx = transpileModule(source, {
   },
 }).outputText;
 const compiled = transformSync(jsx, { presets: [['babel-preset-solid', { generate: 'ssr' }]] });
-if (!compiled?.code) throw new Error('Failed to compile Message');
+if (!compiled?.code) throw new Error('Failed to compile MessageView');
 const code = compiled.code.replace(/from (['"])([^'"]+)\1/g, (_match, quote, name: string) => {
   return `from ${quote}${import.meta.resolve(name)}${quote}`;
 });
-const filename = join(directory, 'message.mjs');
+const filename = join(directory, 'message-view.mjs');
 await Bun.write(filename, code);
-const { Message }: { Message: Component<MessageProps> } = await import(filename);
+const { MessageView }: { MessageView: Component<MessageViewProps> } = await import(filename);
 
-describe('Message', () => {
+describe('MessageView', () => {
   it.each(['user', 'assistant'] as const)('renders %s text synchronously', (role) => {
-    const html = renderToString(() => Message({ id: 'text', role, content: 'Hello there' }));
+    const html = renderToString(() =>
+      MessageView({ id: 'text', role, content: 'Hello there' }),
+    );
 
     expect(html).toContain('Hello there');
   });
 
   it.each(['user', 'assistant'] as const)('renders %s text parts synchronously', (role) => {
     const html = renderToString(() =>
-      Message({
+      MessageView({
         id: 'parts',
         role,
         content: [
@@ -72,5 +73,19 @@ describe('Message', () => {
 
     expect(html).toContain('First part');
     expect(html).toContain('Second part');
+  });
+
+  it('shows the model title only when asked to', () => {
+    const message = {
+      id: 'title',
+      role: 'assistant',
+      content: 'Hello',
+      model: { title: 'Test Model' } as ModelProps,
+    } as const;
+
+    expect(renderToString(() => MessageView({ ...message, showModelTitle: true }))).toContain(
+      'Test Model',
+    );
+    expect(renderToString(() => MessageView(message))).not.toContain('Test Model');
   });
 });

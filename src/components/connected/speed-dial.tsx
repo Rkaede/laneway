@@ -1,147 +1,80 @@
 import type { Component } from 'solid-js';
-import { createMemo, For } from 'solid-js';
+import { createMemo } from 'solid-js';
 
-import { Shortcut } from '~/components/ui';
 import { useActionContext } from '~/hooks/use-action-context';
 import { store } from '~/store';
 import { actions } from '~/store/actions';
 import { models } from '~/store/models';
 import type { SpeedDialItem } from '~/types';
 
-import { SpeedDialOption } from './speed-dial-option';
+import { type SpeedDialCard, SpeedDialView } from './speed-dial-view';
 
 interface SpeedDialProps {
   items: SpeedDialItem[];
 }
 
+function modelTags(modelId: string | undefined) {
+  const tags = models.find((m) => m.id === modelId)?.tags;
+  return (['online', 'free', 'new'] as const).filter((tag) => tags?.includes(tag));
+}
+
+function toCard(item: SpeedDialItem): SpeedDialCard {
+  const noteTag = item.sessionType === 'note' ? ['note'] : [];
+
+  if (item.type === 'model') {
+    const model = models.find((m) => m.id === item.referenceId);
+    return {
+      id: item.id,
+      title: model?.title,
+      subtitle: item.title ?? model?.creator.name,
+      models: item.referenceId ? [item.referenceId] : [],
+      tags: ['model', ...modelTags(item.referenceId), ...noteTag],
+    };
+  }
+
+  if (item.type === 'assistant') {
+    const assistant = store.assistants.find((a) => a.id === item.referenceId);
+    return {
+      id: item.id,
+      title: assistant?.title,
+      subtitle: item.title ?? assistant?.subtitle,
+      models: assistant?.modelId ? [assistant.modelId] : [],
+      tags: ['assistant', ...modelTags(assistant?.modelId), ...noteTag],
+    };
+  }
+
+  if (item.type === 'preset') {
+    const preset = store.presets.find((p) => p.id === item.referenceId);
+    const online = preset?.chats.some((c) => modelTags(c.modelId).includes('online'));
+    return {
+      id: item.id,
+      title: preset?.presetTitle,
+      subtitle: item.title ?? preset?.presetDescription,
+      models: preset?.chats
+        .map((c) => c.modelId)
+        .filter((id): id is string => id !== undefined),
+      tags: online ? ['preset', 'online'] : ['preset'],
+    };
+  }
+
+  return { id: item.id, title: '', subtitle: '' };
+}
+
 export const SpeedDial: Component<SpeedDialProps> = (props) => {
   const context = useActionContext();
 
-  return (
-    <div class="flex flex-col gap-2 self-center">
-      <div
-        class="grid max-w-[720px] grid-cols-3 flex-wrap justify-center gap-4"
-        style={{
-          'grid-template-columns': 'repeat(auto-fit, minmax(210px, 210px))',
-          'grid-auto-rows': '1fr',
-        }}
-      >
-        <For each={props.items.filter((item) => item.referenceId !== '')}>
-          {(item) => {
-            const record = createMemo(() => {
-              if (item.type === 'model') {
-                const model = models.find((m) => m.id === item.referenceId);
-                const tags = ['model'];
+  const visibleItems = () =>
+    props.items.filter((item) => item.referenceId !== '' && item.sessionType && item.type);
 
-                if (model?.tags?.includes('online')) {
-                  tags.push('online');
-                }
+  const cards = createMemo(() => visibleItems().map(toCard));
 
-                if (model?.tags?.includes('free')) {
-                  tags.push('free');
-                }
+  function handleSelect(id: string) {
+    const item = visibleItems().find((candidate) => candidate.id === id);
+    if (!item) return;
 
-                if (model?.tags?.includes('new')) {
-                  tags.push('new');
-                }
+    const action = item.sessionType === 'note' ? actions.newNote : actions.newSession;
+    action.fn(context, { referenceId: item.referenceId, type: item.type });
+  }
 
-                if (item.sessionType === 'note') {
-                  tags.push('note');
-                }
-
-                return {
-                  title: model?.title,
-                  subtitle: item.title ?? model?.creator.name,
-                  models: item.referenceId ? [item.referenceId] : [],
-                  tags,
-                };
-              }
-              if (item.type === 'assistant') {
-                const assistant = store.assistants.find((a) => a.id === item.referenceId);
-                const tags = ['assistant'];
-                const model = models.find((m) => m.id === assistant?.modelId);
-                if (model?.tags?.includes('online')) {
-                  tags.push('online');
-                }
-
-                if (model?.tags?.includes('free')) {
-                  tags.push('free');
-                }
-
-                if (model?.tags?.includes('new')) {
-                  tags.push('new');
-                }
-
-                if (item.sessionType === 'note') {
-                  tags.push('note');
-                }
-
-                return {
-                  title: assistant?.title,
-                  subtitle: item.title ?? assistant?.subtitle,
-                  models: assistant?.modelId ? [assistant?.modelId] : [],
-                  tags,
-                };
-              }
-
-              if (item.type === 'preset') {
-                const preset = store.presets.find((p) => p.id === item.referenceId);
-                const tags = ['preset'];
-
-                const online = preset?.chats.some((c) => {
-                  const model = models.find((m) => m.id === c.modelId);
-                  return model?.tags?.includes('online');
-                });
-
-                if (online) {
-                  tags.push('online');
-                }
-
-                return {
-                  title: preset?.presetTitle,
-                  subtitle: item.title ?? preset?.presetDescription,
-                  models: preset?.chats
-                    .map((c) => c.modelId)
-                    .filter((id): id is string => id !== undefined),
-                  tags,
-                };
-              }
-
-              return { title: '', subtitle: '' };
-            });
-
-            if (!item.sessionType || !item.type) return null;
-            return (
-              <SpeedDialOption
-                title={record().title}
-                subtitle={record().subtitle}
-                showSubtitle
-                tags={record().tags}
-                sessionType={item.sessionType}
-                models={record().models}
-                online={record().tags?.includes('online')}
-                onClick={() => {
-                  if (item.sessionType === 'note') {
-                    actions.newNote.fn(context, {
-                      referenceId: item.referenceId,
-                      type: item.type,
-                    });
-                    return;
-                  } else {
-                    actions.newSession.fn(context, {
-                      referenceId: item.referenceId,
-                      type: item.type,
-                    });
-                  }
-                }}
-              />
-            );
-          }}
-        </For>
-      </div>
-      <div class="self-center text-xs text-muted">
-        <Shortcut variant="solid">$mod+K</Shortcut> for more options.
-      </div>
-    </div>
-  );
+  return <SpeedDialView cards={cards()} onSelect={handleSelect} />;
 };

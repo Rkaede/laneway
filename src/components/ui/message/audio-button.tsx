@@ -8,7 +8,7 @@ import {
 } from '~/components/icons/ui';
 import { Button } from '~/components/ui/button';
 
-interface AudioButtonProps {
+export interface AudioButtonProps {
   text?: string;
   id?: string;
   onClick?: () => void;
