@@ -40,10 +40,10 @@ export const CardHeader = (props: ComponentProps<'div'>) => {
   return <div class={cn('flex flex-col space-y-1.5 p-6', local.class)} {...rest} />;
 };
 
-export const CardTitle: ParentComponent<ComponentProps<'h1'>> = (props) => {
+export const CardTitle: ParentComponent<ComponentProps<'h3'>> = (props) => {
   const [local, rest] = splitProps(props, ['class']);
 
-  return <h1 class={cn('leading-none font-semibold tracking-tight', local.class)} {...rest} />;
+  return <h3 class={cn('leading-none font-semibold tracking-tight', local.class)} {...rest} />;
 };
 
 export const CardContent = (props: ComponentProps<'div'>) => {

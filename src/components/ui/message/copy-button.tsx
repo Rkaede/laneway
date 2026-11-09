@@ -12,6 +12,7 @@ export function CopyButton(props: { text: string }) {
       size="toolbar"
       onClick={() => copyToClipboard(props.text)}
       title="Copy to clipboard"
+      aria-label="Copy to clipboard"
     >
       <Show when={isCopied()} fallback={<IconCopy class="size-4" />}>
         <IconCheck class="size-4" />
