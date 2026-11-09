@@ -21,14 +21,18 @@ export function ApiKeyForm(props: {
   const [status, setStatus] = createSignal<ApiKeyFormStatus>('idle');
 
   async function handleSubmit() {
+    const key = value();
     setStatus('checking');
-    const result = await checkApiKey(value());
+    const result = await checkApiKey(key);
+    // The field stays editable during the check. An edit has already reset the status, and the
+    // result no longer describes what the field holds.
+    if (value() !== key) return;
     if (result === 'invalid') {
       setStatus('invalid');
       return;
     }
 
-    setApiKey(value());
+    setApiKey(key);
     setStatus('idle');
     showSuccess('OpenRouter key saved.');
     props.onSaved();
