@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js';
+import { createSignal, onCleanup, Show } from 'solid-js';
 
 import { ApiKeyDialogView, KeyNoticeView } from '~/components/connected/api-key-dialog-view';
 import {
@@ -100,6 +100,8 @@ export function Options() {
 export function Interactive() {
   const [value, setValue] = createSignal('');
   const [status, setStatus] = createSignal<ApiKeyFormStatus>('idle');
+  let rejection: ReturnType<typeof setTimeout> | undefined;
+  onCleanup(() => clearTimeout(rejection));
 
   return (
     <Cells class="max-w-lg">
@@ -118,7 +120,8 @@ export function Interactive() {
           }}
           onSubmit={() => {
             setStatus('checking');
-            setTimeout(() => setStatus('invalid'), 1000);
+            clearTimeout(rejection);
+            rejection = setTimeout(() => setStatus('invalid'), 1000);
           }}
         />
       </Cell>

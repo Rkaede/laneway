@@ -17,8 +17,9 @@ import { noop } from '~/util';
 import { Cell, CellHeader, Cells } from './story-components';
 
 const href = '/sandbox/sidebar';
-const icon = <IconChat class="mr-2 size-4" />;
-const dropdown = <MoreHorizontalIcon class="size-4" />;
+// Factories, because an element is one DOM node and can only sit in one item at a time.
+const icon = () => <IconChat class="mr-2 size-4" />;
+const dropdown = () => <MoreHorizontalIcon class="size-4" />;
 
 const Frame: ParentComponent = (props) => (
   <div class="w-full max-w-60 rounded-md border border-sidebar-border bg-sidebar p-2 text-sidebar-fg">
@@ -81,7 +82,7 @@ export function ButtonItems() {
             <SidebarItem
               onClick={noop}
               icon={<IconSettings class="mr-2 size-4" />}
-              dropdown={dropdown}
+              dropdown={dropdown()}
             >
               Settings
             </SidebarItem>
@@ -113,13 +114,13 @@ export function LinkItems() {
         <CellHeader>Icon and dropdown</CellHeader>
         <Frame>
           <SidebarItems>
-            <SidebarLinkItem href={href} icon={icon}>
+            <SidebarLinkItem href={href} icon={icon()}>
               With icon
             </SidebarLinkItem>
-            <SidebarLinkItem href={href} dropdown={dropdown}>
+            <SidebarLinkItem href={href} dropdown={dropdown()}>
               With dropdown
             </SidebarLinkItem>
-            <SidebarLinkItem href={href} dropdown={dropdown} isLoading>
+            <SidebarLinkItem href={href} dropdown={dropdown()} isLoading>
               Loading hides the dropdown
             </SidebarLinkItem>
           </SidebarItems>
