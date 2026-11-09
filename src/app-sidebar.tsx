@@ -1,5 +1,13 @@
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
-import { type Component, createEffect, createSignal, For, on, Show } from 'solid-js';
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  on,
+  Show,
+} from 'solid-js';
 
 import { requestApiKey } from '~/components/connected/api-key-request';
 import {
@@ -15,7 +23,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -51,11 +58,9 @@ type GroupTitle = keyof typeof groupTitles;
 function SessionGroup(props: {
   sessions: SessionProps[];
   title: GroupTitle;
-  activeSession?: string;
+  loadingSessions: Set<string | undefined>;
 }) {
   const location = useLocation();
-  const loadingSessions = () =>
-    store.chats.filter((c) => c.controller instanceof AbortController).map((c) => c.sessionId);
 
   return (
     <Show when={!(props.sessions.length === 0)}>
@@ -66,10 +71,9 @@ function SessionGroup(props: {
               const active = () => location.pathname.endsWith(`/${session.id}`);
               return (
                 <SidebarLinkItem
-                  isLoading={loadingSessions().includes(session.id)}
+                  isLoading={props.loadingSessions.has(session.id)}
                   href={`/session/${session.id}`}
                   active={active()}
-                  sessionId={session.id}
                   dropdown={<SidebarItemDropdown sessionId={session.id} />}
                 >
                   {session.title}
@@ -96,6 +100,14 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
   }
 
   const groups = () => groupByDate(store.sessions);
+  const loadingSessions = createMemo(
+    () =>
+      new Set(
+        store.chats
+          .filter((c) => c.controller instanceof AbortController)
+          .map((c) => c.sessionId),
+      ),
+  );
 
   return (
     <div data-component="Sidebar" class="relative flex h-full">
@@ -128,7 +140,13 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
           </Show>
           <For each={Object.entries(groups())}>
             {([title, sessions]) => {
-              return <SessionGroup sessions={sessions} title={title as GroupTitle} />;
+              return (
+                <SessionGroup
+                  sessions={sessions}
+                  title={title as GroupTitle}
+                  loadingSessions={loadingSessions()}
+                />
+              );
             }}
           </For>
         </div>
@@ -203,7 +221,7 @@ function SidebarItemDropdown(props: { sessionId?: string }) {
       <DropdownMenuTrigger
         as={Button}
         aria-label="Chat or note actions"
-        class="flex size-6 items-center justify-center rounded-md p-0 text-muted opacity-0 transition-none group-hover:opacity-100 hover:text-main data-[open='true']:opacity-100"
+        class="flex size-6 items-center justify-center rounded-md p-0 text-muted opacity-0 transition-none group-hover:opacity-100 hover:text-main focus-visible:opacity-100 data-[open='true']:opacity-100"
         data-open={open()}
         variant="ghost"
         size="icon"
@@ -273,10 +291,11 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
             {session()?.type === 'note' ? 'Rename Note' : 'Rename Chat'}
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription>
+        <div class="text-sm text-muted">
           <div class="flex flex-col gap-2">
             <div class="flex gap-2">
               <Input
+                aria-label="Title"
                 value={title()}
                 onInput={(e) => {
                   setTitle(e.target.value);
@@ -284,7 +303,7 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
               />
             </div>
           </div>
-        </DialogDescription>
+        </div>
         <DialogFooter>
           <Button type="submit" disabled={!title().trim() || !session()}>
             Rename
