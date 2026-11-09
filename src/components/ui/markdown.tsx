@@ -42,7 +42,7 @@ const Markdown: Component<{ text: string }> = (props) => {
               fallback={
                 <CodeBlock
                   code={
-                    /* @ts-ignore: this is a depencency bug */
+                    /* @ts-ignore: this is a dependency bug */
                     codeProps.node.children[0]?.value ?? ''
                   }
                   language={codeProps.class?.replace(/^language-/, '') ?? 'plaintext'}
@@ -52,7 +52,7 @@ const Markdown: Component<{ text: string }> = (props) => {
               <span class="inline-block max-w-full overflow-x-auto align-bottom">
                 <span class="mx-[0.2em] inline-block rounded-tag border bg-surface-sunken px-1 align-baseline font-mono text-sm">
                   {
-                    /* @ts-ignore: this is a depencency bug */
+                    /* @ts-ignore: this is a dependency bug */
                     codeProps.node.children[0]?.value ?? ''
                   }
                 </span>
@@ -62,11 +62,11 @@ const Markdown: Component<{ text: string }> = (props) => {
         },
       }}
       class={cn(
-        'prose prose-p:leading-relaxed prose-pre:m-0 prose-pre:rounded-none prose-pre:p-0 prose-pre:leading-snug',
+        'prose prose-p:leading-relaxed',
         // Keep list items close together, including loose lists where each item wraps a paragraph.
         'prose-ol:my-3 prose-ul:my-3 prose-li:my-0.5 prose-li:leading-relaxed [&_li>p]:my-0',
         // Typography's default palette is cleared by Loom, so point the prose vars at theme tokens.
-        '[--tw-prose-body:var(--main)] [--tw-prose-bold:var(--main)] [--tw-prose-bullets:var(--faint)] [--tw-prose-captions:var(--muted)] [--tw-prose-code:var(--main)] [--tw-prose-counters:var(--muted)] [--tw-prose-headings:var(--main)] [--tw-prose-hr:var(--border)] [--tw-prose-kbd:var(--main)] [--tw-prose-lead:var(--muted)] [--tw-prose-links:var(--link)] [--tw-prose-pre-bg:var(--surface-sunken)] [--tw-prose-pre-code:var(--main)] [--tw-prose-quote-borders:var(--border-emphasis)] [--tw-prose-quotes:var(--main)] [--tw-prose-td-borders:var(--border)] [--tw-prose-th-borders:var(--border-emphasis)]',
+        '[--tw-prose-body:var(--main)] [--tw-prose-bold:var(--main)] [--tw-prose-bullets:var(--faint)] [--tw-prose-captions:var(--muted)] [--tw-prose-code:var(--main)] [--tw-prose-counters:var(--muted)] [--tw-prose-headings:var(--main)] [--tw-prose-hr:var(--border)] [--tw-prose-kbd:var(--main)] [--tw-prose-lead:var(--muted)] [--tw-prose-links:var(--link)] [--tw-prose-quote-borders:var(--border-emphasis)] [--tw-prose-quotes:var(--main)] [--tw-prose-td-borders:var(--border)] [--tw-prose-th-borders:var(--border-emphasis)]',
       )}
     >
       {props.text}

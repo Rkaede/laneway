@@ -15,14 +15,6 @@
       @apply border-danger ring-danger/20;
     }
 
-    &.btn-validation-warning {
-      @apply border-warning-border ring-warning-border;
-    }
-
-    &.btn-loading {
-      @apply cursor-wait;
-    }
-
     svg {
       @apply pointer-events-none shrink-0;
 
@@ -65,10 +57,6 @@
     @apply hover:bg-surface-hover hover:text-main;
   }
 
-  .btn-plain {
-    @apply bg-transparent text-brand hover:bg-brand-subtle;
-  }
-
   .btn.btn-link {
     @apply w-fit px-0 text-sm text-main underline-offset-4 hover:underline;
   }
@@ -78,7 +66,7 @@
   }
 
   .btn-xs {
-    @apply h-6 gap-1 rounded-button px-2 text-xs;
+    @apply h-6 gap-1 px-2 text-xs;
 
     svg {
       &:not([class*='size-']) {
@@ -88,34 +76,10 @@
   }
 
   .btn-lg {
-    @apply h-10 rounded-button px-6;
-  }
-
-  .btn-icon {
-    @apply size-9;
+    @apply h-10 px-6;
   }
 
   .btn-icon-sm {
     @apply size-8;
-  }
-
-  .btn-icon-lg {
-    @apply size-10;
-  }
-
-  .btn-tab {
-    @apply rounded-sm px-3 py-2 text-xs font-medium text-main;
-
-    &:hover {
-      @apply bg-surface-hover;
-    }
-  }
-
-  .btn-tab-active {
-    @apply bg-surface-pressed text-main;
-
-    &:hover {
-      @apply bg-surface-pressed;
-    }
   }
 }

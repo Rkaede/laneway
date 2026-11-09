@@ -10,7 +10,6 @@ type Image = {
   alt: string;
   width: number;
   height: number;
-  fullSizeSrc?: string;
   thumbnailSrc?: string;
   storageId?: string;
   sourceType?: 'store' | 'path';

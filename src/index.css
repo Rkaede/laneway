@@ -74,13 +74,6 @@ html {
   }
 }
 
-.stack {
-  display: flex;
-  min-height: 0;
-  flex-direction: column;
-  gap: calc(var(--spacing) * 2);
-}
-
 /* Fades scrolling content into the page surface. */
 .fade-out-below::after {
   content: '';

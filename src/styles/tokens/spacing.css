@@ -5,9 +5,6 @@
 
 @theme {
   --spacing-input-x-md: 0.75rem;
-  --spacing-input-x-lg: 1rem;
   --spacing-input-y-md: 0.25rem;
-  --spacing-input-y-lg: 0.375rem;
   --spacing-input-md: 2rem;
-  --spacing-input-lg: 2.5rem;
 }

@@ -1,4 +1,3 @@
-// Start of Selection
 import './text-editor.css';
 
 import { defaultKeymap, history, redo, undo } from '@codemirror/commands';
@@ -21,7 +20,6 @@ const fetchSuggestion = async (input: EditorState) => {
   if (!text || text.trim() === '') return '';
 
   const completion = await getCompletion(text);
-  // or make an async API call here based on editor state
   return completion ?? '';
 };
 type TextEditorProps = {
