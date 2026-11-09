@@ -45,13 +45,15 @@ it('allows only the current Tailscale preview hostname', async () => {
   expect(await loadAllowedHosts()).toEqual(['laneway.tail123.ts.net']);
 });
 
-it('caches catalogues with a network-first fallback without caching provider APIs', async () => {
+it('precaches models and keeps a network-first fallback for galleries, not provider APIs', async () => {
   const createPWA = spyOn(pwa, 'VitePWA');
 
   try {
     await loadAllowedHosts();
-    const rules = createPWA.mock.calls[0]?.[0]?.workbox?.runtimeCaching ?? [];
+    const options = createPWA.mock.calls[0]?.[0];
+    const rules = options?.workbox?.runtimeCaching ?? [];
 
+    expect(options?.includeAssets).toContain('models.json');
     expect(rules).toHaveLength(1);
     const [rule] = rules;
     expect(rule).toMatchObject({
@@ -59,14 +61,14 @@ it('caches catalogues with a network-first fallback without caching provider API
       options: {
         cacheName: 'laneway-catalogues',
         networkTimeoutSeconds: 3,
-        expiration: { maxEntries: 3 },
+        expiration: { maxEntries: 2 },
       },
     });
     expect(typeof rule.urlPattern).toBe('function');
     const matches = rule.urlPattern as (context: { url: URL; sameOrigin: boolean }) => boolean;
     const origin = 'https://laneway.example';
 
-    for (const path of ['/models.json', '/assistants.json', '/presets.json']) {
+    for (const path of ['/assistants.json', '/presets.json']) {
       expect(matches({ url: new URL(path, origin), sameOrigin: true })).toBe(true);
       for (const host of ['https://openrouter.ai', 'https://api.openai.com']) {
         expect(matches({ url: new URL(path, host), sameOrigin: false })).toBe(false);
@@ -77,7 +79,9 @@ it('caches catalogues with a network-first fallback without caching provider API
       'https://openrouter.ai/api/v1/chat/completions',
       'https://api.openai.com/v1/chat/completions',
       `${origin}/api/v1/models`,
-      `${origin}/models.json/extra`,
+      // Precached, so the runtime rule must not also claim it.
+      `${origin}/models.json`,
+      `${origin}/presets.json/extra`,
       `${origin}/other.json`,
     ]) {
       const url = new URL(value);

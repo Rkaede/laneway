@@ -48,17 +48,19 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      // models.json is read on every load and only changes with a build, so it is precached with
+      // the app code. It then answers without waiting for the network.
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'models.json'],
       workbox: {
         runtimeCaching: [
           {
             urlPattern: ({ url, sameOrigin }) =>
-              sameOrigin && /^\/(?:models|assistants|presets)\.json$/.test(url.pathname),
+              sameOrigin && /^\/(?:assistants|presets)\.json$/.test(url.pathname),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'laneway-catalogues',
               networkTimeoutSeconds: 3,
-              expiration: { maxEntries: 3 },
+              expiration: { maxEntries: 2 },
             },
           },
         ],
