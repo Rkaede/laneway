@@ -53,6 +53,65 @@ describe('model sorting', () => {
     },
   );
 
+  it.each(['contextLength', 'maxCompletionTokens', 'pricing-context', 'pricing-output'])(
+    'treats null and NaN %s as missing',
+    (column) => {
+      const numbers = (value: number) => ({
+        contextLength: value,
+        maxCompletionTokens: value,
+        pricing: pricing(value, value),
+      });
+      const models = [
+        // JSON has no undefined or NaN, so an unknown number can arrive as null.
+        model('null', numbers(null as unknown as number)),
+        model('higher', numbers(20)),
+        model('nan', numbers(NaN)),
+        model('zero', numbers(0)),
+        model('missing'),
+        model('lower', numbers(10)),
+      ];
+
+      expect(
+        [...models].sort((a, b) => compareModels(a, b, column, 'ASC')).map((m) => m.id),
+      ).toEqual(['zero', 'lower', 'higher', 'null', 'nan', 'missing']);
+      expect(
+        [...models].sort((a, b) => compareModels(a, b, column, 'DESC')).map((m) => m.id),
+      ).toEqual(['higher', 'lower', 'zero', 'null', 'nan', 'missing']);
+    },
+  );
+
+  it.each(['title', 'creator'])(
+    'sorts %s alphabetically whatever the case, with numbers by value',
+    (column) => {
+      const names = [
+        'gpt-oss-120b',
+        'Sonar Pro',
+        'GPT-4o',
+        'Grok 4.20',
+        'Gemini 2.5 Pro',
+        'Grok 4.3',
+      ];
+      const models = names.map((name) =>
+        model(name, { creator: { id: name, name, website: '', icon: '' } }),
+      );
+      const sorted = [
+        'Gemini 2.5 Pro',
+        'GPT-4o',
+        'gpt-oss-120b',
+        'Grok 4.3',
+        'Grok 4.20',
+        'Sonar Pro',
+      ];
+
+      expect(
+        [...models].sort((a, b) => compareModels(a, b, column, 'ASC')).map((m) => m.id),
+      ).toEqual(sorted);
+      expect(
+        [...models].sort((a, b) => compareModels(a, b, column, 'DESC')).map((m) => m.id),
+      ).toEqual(sorted.toReversed());
+    },
+  );
+
   it('uses the selected pricing field', () => {
     const models = [
       model('a', { pricing: pricing(1, 2) }),
