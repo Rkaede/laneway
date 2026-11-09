@@ -1,4 +1,3 @@
-// todo: we should be using own own text field?
 import { TextField } from '@kobalte/core/text-field';
 import type { Component } from 'solid-js';
 
@@ -31,6 +30,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
         <div>
           <SettingTitle>Name</SettingTitle>
           <Input
+            aria-label="Name"
             value={props.name}
             onInput={(e) => props.onNameChange((e.currentTarget as HTMLInputElement).value)}
           />
@@ -38,6 +38,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
         <div>
           <SettingTitle>Description</SettingTitle>
           <Input
+            aria-label="Description"
             value={props.subtitle}
             onInput={(e) => props.onSubtitleChange((e.currentTarget as HTMLInputElement).value)}
           />
@@ -59,6 +60,7 @@ export const ChatSettings: Component<ChatSettingsProps> = (props) => {
         <SettingDescription>Leave blank to use the model's default.</SettingDescription>
         <TextField>
           <TextArea
+            aria-label="System Prompt"
             class="resize-none"
             placeholder="You are a helpful assistant."
             rows="6"
