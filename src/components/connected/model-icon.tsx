@@ -16,8 +16,9 @@ type ModelIcons = keyof typeof modelIcons;
 type CreatorIcons = keyof typeof creatorIcons;
 
 export const ModelIcon: Component<ModelIconProps> = (props) => {
+  const selectedModel = selectModelById(() => props.modelId);
   const icon = createMemo(() => {
-    const model = selectModelById(() => props.modelId)();
+    const model = selectedModel();
 
     if (model?.icon) {
       const modelIcon = modelIcons[model.icon as ModelIcons];
