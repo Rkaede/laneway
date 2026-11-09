@@ -4,6 +4,8 @@ import { IconX } from '~/components/icons/ui';
 import { Dialog, DialogContent } from '~/components/ui/dialog';
 import { cn } from '~/util';
 
+import { openPreviewOnKey } from './thumbnail-keys';
+
 interface ThumbnailProps {
   file: string;
   onRemove?: () => void;
@@ -14,9 +16,7 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
   const [isDialogOpen, setIsDialogOpen] = createSignal(false);
 
   const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      setIsDialogOpen(true);
-    }
+    openPreviewOnKey(event, () => setIsDialogOpen(true));
   };
 
   return (
@@ -60,7 +60,10 @@ export const Thumbnail: Component<ThumbnailProps> = (props) => {
       </div>
 
       <Dialog open={isDialogOpen()} onOpenChange={setIsDialogOpen}>
-        <DialogContent class="flex items-center justify-center sm:max-h-[90vh] sm:max-w-[90vw]">
+        <DialogContent
+          class="flex items-center justify-center sm:max-h-[90vh] sm:max-w-[90vw]"
+          aria-label={props.alt}
+        >
           <img src={props.file} alt={props.alt} class="max-h-full max-w-full object-contain" />
         </DialogContent>
       </Dialog>
