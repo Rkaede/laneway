@@ -30,7 +30,7 @@ export const SpeedDial: Component = () => {
       id: nanoid(),
       type: 'model',
       referenceId: defaultItem?.id ?? '',
-      title: defaultItem?.creator.name ?? '',
+      // No title: the card then shows the creator of whichever model is selected.
       sessionType: 'chat', // Default session type
     };
     setStore('speedDial', (items) => [...items, newItem]);
@@ -98,7 +98,7 @@ export const SpeedDial: Component = () => {
                     </SelectItem>
                   )}
                 >
-                  <SelectTrigger class="w-[80px]">
+                  <SelectTrigger aria-label="Session type" class="w-[80px]">
                     <SelectValue<string>>
                       {(state) => sessionTypes[state.selectedOption()]}
                     </SelectValue>
@@ -116,6 +116,7 @@ export const SpeedDial: Component = () => {
                   }}
                 />
                 <Input
+                  aria-label="Shortcut title"
                   value={item.title}
                   onInput={(e) => updateSpeedDialItem(item.id, 'title', e.currentTarget.value)}
                   placeholder="title"
@@ -126,6 +127,7 @@ export const SpeedDial: Component = () => {
                     onClick={() => moveSpeedDialItem(item.id, 'up')}
                     size="icon"
                     disabled={index() === 0}
+                    aria-label="Move shortcut up"
                   >
                     <IconChevronUp class="size-4" />
                   </Button>
@@ -134,6 +136,7 @@ export const SpeedDial: Component = () => {
                     onClick={() => moveSpeedDialItem(item.id, 'down')}
                     size="icon"
                     disabled={index() === store.speedDial.length - 1}
+                    aria-label="Move shortcut down"
                   >
                     <IconChevronDown class="size-4" />
                   </Button>
@@ -141,7 +144,8 @@ export const SpeedDial: Component = () => {
                     variant="ghost"
                     onClick={() => removeSpeedDialItem(item.id)}
                     size="icon"
-                    class="hover:bg-danger"
+                    class="hover:bg-danger hover:text-danger-fg"
+                    aria-label="Delete shortcut"
                   >
                     <IconTrash class="size-4" />
                   </Button>
