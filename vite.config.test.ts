@@ -92,6 +92,20 @@ it('precaches models and keeps a network-first fallback for galleries, not provi
   }
 });
 
+it('precaches the self-hosted fonts along with the app code', async () => {
+  const createPWA = spyOn(pwa, 'VitePWA');
+
+  try {
+    await loadAllowedHosts();
+    const options = createPWA.mock.calls[0]?.[0];
+
+    // Setting globPatterns replaces Workbox's default, so js, css and html must stay listed.
+    expect(options?.workbox?.globPatterns).toEqual(['**/*.{js,css,html,woff2}']);
+  } finally {
+    createPWA.mockRestore();
+  }
+});
+
 async function loadBuildInfo(env: Record<string, string | undefined> = {}) {
   const directory = await mkdtemp(join(tmpdir(), 'laneway-vite-config-'));
   directories.push(directory);

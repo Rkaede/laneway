@@ -52,6 +52,9 @@ export default defineConfig({
       // the app code. It then answers without waiting for the network.
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'models.json'],
       workbox: {
+        // Workbox precaches only js, css and html by default, which leaves the self-hosted
+        // fonts out and an offline app on system fonts.
+        globPatterns: ['**/*.{js,css,html,woff2}'],
         runtimeCaching: [
           {
             urlPattern: ({ url, sameOrigin }) =>
