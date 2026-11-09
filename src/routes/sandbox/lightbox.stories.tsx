@@ -1,40 +1,21 @@
-import { createSignal, For } from 'solid-js';
+import { createSignal, For, Show } from 'solid-js';
 
 import { Button } from '~/components/ui/button';
 import { Lightbox } from '~/components/ui/lightbox/lightbox';
 
 import { sampleImageUrl } from './story-fixtures';
 
-// Optimized sample images with different sizes
-const sampleImages = [
-  {
-    // Use smaller images with query parameters for thumbnails
-    src: 'https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=80&w=1200',
-    alt: 'Mountain landscape with a lake',
-    width: 1200,
-    height: 800,
-    // Thumbnail version for better performance
-    thumbnailSrc: 'https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=60&w=400',
-    // Full size version for download and fullscreen viewing
-    fullSizeSrc: 'https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=100&w=2670',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1682695796954-bad0d0f59ff1?q=80&w=1200',
-    alt: 'Sunset over the ocean',
-    width: 1200,
-    height: 800,
-    thumbnailSrc: 'https://images.unsplash.com/photo-1682695796954-bad0d0f59ff1?q=60&w=400',
-    fullSizeSrc: 'https://images.unsplash.com/photo-1682695796954-bad0d0f59ff1?q=100&w=2670',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1682686581221-c126206d12f0?q=80&w=1200',
-    alt: 'Forest with fog',
-    width: 1200,
-    height: 800,
-    thumbnailSrc: 'https://images.unsplash.com/photo-1682686581221-c126206d12f0?q=60&w=400',
-    fullSizeSrc: 'https://images.unsplash.com/photo-1682686581221-c126206d12f0?q=100&w=2670',
-  },
-];
+const sampleImages = ['One', 'Two', 'Three'].map((label) => ({
+  src: sampleImageUrl(label),
+  // A separate image, so the grid and the thumbnail strip show that they read thumbnailSrc.
+  thumbnailSrc: sampleImageUrl(`${label} thumbnail`, '#3f7d6e'),
+  alt: `Sample image ${label.toLowerCase()}`,
+  width: 1200,
+  height: 800,
+}));
+
+// Each story mounts the lightbox only while it is open, as MessageView does. The lightbox keeps
+// the image it was last showing, so one left mounted would reopen there, not at initialIndex.
 
 export function WithInitialIndex() {
   const [open, setOpen] = createSignal(false);
@@ -57,12 +38,14 @@ export function WithInitialIndex() {
           )}
         </For>
       </div>
-      <Lightbox
-        images={sampleImages}
-        initialIndex={1}
-        open={open()}
-        onClose={() => setOpen(false)}
-      />
+      <Show when={open()}>
+        <Lightbox
+          images={sampleImages}
+          initialIndex={1}
+          open={open()}
+          onClose={() => setOpen(false)}
+        />
+      </Show>
     </div>
   );
 }
@@ -92,12 +75,14 @@ export function GalleryWithLightbox() {
           )}
         </For>
       </div>
-      <Lightbox
-        images={sampleImages}
-        initialIndex={currentIndex()}
-        open={open()}
-        onClose={() => setOpen(false)}
-      />
+      <Show when={open()}>
+        <Lightbox
+          images={sampleImages}
+          initialIndex={currentIndex()}
+          open={open()}
+          onClose={() => setOpen(false)}
+        />
+      </Show>
     </div>
   );
 }
@@ -111,7 +96,9 @@ export function SingleImage() {
       <Button variant="outline" onClick={() => setOpen(true)}>
         Open, with no arrows or thumbnails
       </Button>
-      <Lightbox images={[image]} open={open()} onClose={() => setOpen(false)} />
+      <Show when={open()}>
+        <Lightbox images={[image]} open={open()} onClose={() => setOpen(false)} />
+      </Show>
     </div>
   );
 }
@@ -132,7 +119,9 @@ export function StoredImages() {
       <Button variant="outline" onClick={() => setOpen(true)}>
         Open images loaded through LocalImage
       </Button>
-      <Lightbox images={images} open={open()} onClose={() => setOpen(false)} />
+      <Show when={open()}>
+        <Lightbox images={images} open={open()} onClose={() => setOpen(false)} />
+      </Show>
     </div>
   );
 }
