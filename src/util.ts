@@ -44,8 +44,9 @@ export function download(data: string | Blob, filename: string) {
 export function filenameDate(date: Date = new Date()) {
   const offset = date.getTimezoneOffset();
   const localDate = new Date(date.getTime() - offset * 60 * 1000);
-  const formattedDate = localDate.toISOString().split('T')[0];
-  const formattedTime = localDate.toTimeString().split(' ')[0].replace(/:/g, '-');
+  // The shifted date reads as local time in UTC, so take both parts from the ISO string.
+  const [formattedDate, time] = localDate.toISOString().split('T');
+  const formattedTime = time.slice(0, 8).replace(/:/g, '-');
   return `${formattedDate}_${formattedTime}`;
 }
 

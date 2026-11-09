@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
-import { cn, download, formatResponseTime, groupByDate } from './util';
+import { cn, download, filenameDate, formatResponseTime, groupByDate } from './util';
 
 describe('download', () => {
   const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
@@ -42,6 +42,27 @@ describe('download', () => {
       expect(revokeUrl).not.toHaveBeenCalled();
       await Bun.sleep(10);
       expect(revokeUrl).toHaveBeenCalledWith('blob:backup');
+    },
+  );
+});
+
+describe('filenameDate', () => {
+  const originalTimeZone = process.env.TZ;
+
+  // `bun test` runs in UTC unless TZ is set, and deleting TZ does not switch it back.
+  afterEach(() => {
+    process.env.TZ = originalTimeZone ?? 'UTC';
+  });
+
+  it.each(['Australia/Melbourne', 'America/Los_Angeles', 'Asia/Kolkata', 'UTC'])(
+    'uses the local date and time in %s',
+    (timeZone) => {
+      process.env.TZ = timeZone;
+
+      expect(filenameDate(new Date(2026, 0, 15, 14, 30, 5))).toBe('2026-01-15_14-30-05');
+      // Late and early enough that the UTC date is a different day in the zones above.
+      expect(filenameDate(new Date(2026, 0, 15, 23, 59, 59))).toBe('2026-01-15_23-59-59');
+      expect(filenameDate(new Date(2026, 0, 15, 0, 0, 0))).toBe('2026-01-15_00-00-00');
     },
   );
 });
