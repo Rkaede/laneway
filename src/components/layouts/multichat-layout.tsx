@@ -55,6 +55,9 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
     isSubmitting = true;
 
     try {
+      // Caching attachments takes a while and the route can change meanwhile, so the message
+      // goes to the session it was written in.
+      const sessionId = props.sessionId;
       const _attachments = attachments();
       const _isDraft = session()?.id === undefined;
       const inputValue = session()?.input ?? store.draftSession.input;
@@ -68,10 +71,10 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
       });
 
       if (!message) return;
-      setSessionInput('', props.sessionId);
-      const id = addMessageToSessionChats(message, props.sessionId);
+      setSessionInput('', sessionId);
+      const id = addMessageToSessionChats(message, sessionId);
 
-      if (!props.sessionId) {
+      if (!sessionId) {
         navigate(`/session/${id}`);
         if (store.settings.generateTitles) {
           autonameChat(id, inputValue);
