@@ -18,6 +18,8 @@ type SortableHeaderProps = {
   align?: 'left' | 'center' | 'right';
 };
 
+const ariaSort = { ASC: 'ascending', DESC: 'descending' } as const;
+
 const SortableHeader: ParentComponent<SortableHeaderProps> = (props) => (
   <th
     class={`cursor-pointer border-b px-2 py-2 text-left text-xs font-medium text-muted hover:text-main`}
@@ -25,14 +27,22 @@ const SortableHeader: ParentComponent<SortableHeaderProps> = (props) => (
       'text-center': props.align === 'center',
       'text-right': props.align === 'right',
     }}
+    aria-sort={props.sortDirection && ariaSort[props.sortDirection]}
     onClick={() => props.handleSort(props.column)}
   >
-    <div class="inline-flex items-center gap-1">
+    {/*
+      The button adds keyboard access; its click bubbles to the cell, so the whole cell still
+      sorts. A button does not inherit text-align or text-rendering unless told to.
+    */}
+    <button
+      type="button"
+      class="inline-flex items-center gap-1 [text-align:inherit] [text-rendering:inherit]"
+    >
       {props.children}
       {props.sortDirection === 'ASC' && <IconChevronUp class="size-4" />}
       {props.sortDirection === 'DESC' && <IconChevronDown class="size-4" />}
-      {props.sortDirection === undefined && <div class="size-4" />}
-    </div>
+      {props.sortDirection === undefined && <span class="size-4" />}
+    </button>
   </th>
 );
 
@@ -114,10 +124,10 @@ export default function ModelList() {
                 sortDirection={sortColumn() === 'pricing-context' ? sortDirection() : undefined}
                 align="right"
               >
-                <div class="flex flex-col items-end">
+                <span class="flex flex-col items-end">
                   <span>Input Cost</span>
                   <span class="text-xs">per million tokens</span>
-                </div>
+                </span>
               </SortableHeader>
               <SortableHeader
                 column="pricing-output"
@@ -125,10 +135,10 @@ export default function ModelList() {
                 sortDirection={sortColumn() === 'pricing-output' ? sortDirection() : undefined}
                 align="right"
               >
-                <div class="flex flex-col items-end">
+                <span class="flex flex-col items-end">
                   <span>Output Cost</span>
                   <span class="text-xs">per million tokens</span>
-                </div>
+                </span>
               </SortableHeader>
             </tr>
           </thead>
