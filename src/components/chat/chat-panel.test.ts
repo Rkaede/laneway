@@ -24,8 +24,7 @@ const jsx = transpileModule(
   const createAnimatedText = (text) => ({ animatedText: text });
   const useChat = () => ({
     assistant: () => undefined,
-    model: () => undefined,
-    provider: () => undefined,
+    model: () => ({ id: 'test-model' }),
     isApiKeyConfigured: () => true,
   });
   const store = { settings: { tts: { enabled: false } } };
@@ -33,7 +32,7 @@ const jsx = transpileModule(
   const AlertApiKey = () => null;
   const AlertError = () => null;
   const AlertNoVision = () => null;
-  const Message = (props) => props.content;
+  const Message = (props) => props.content + '[model:' + (props.model?.id ?? 'none') + ']';
   ${source}
   `,
   {
@@ -53,12 +52,10 @@ const directory = await mkdtemp(join(tmpdir(), 'laneway-chat-panel-'));
 afterAll(() => rm(directory, { recursive: true, force: true }));
 const filename = join(directory, 'chat-panel.mjs');
 await Bun.write(filename, code);
-const { ChatPanel }: { ChatPanel: Component<{ sessionId: string; chat: ChatProps }> } =
-  await import(filename);
+const { ChatPanel }: { ChatPanel: Component<{ chat: ChatProps }> } = await import(filename);
 const render = (chat: Partial<ChatProps>) =>
   renderToString(() =>
     ChatPanel({
-      sessionId: 'session',
       chat: { id: 'chat', messages: [], status: 'idle', ...chat },
     }),
   );
@@ -86,5 +83,18 @@ describe('ChatPanel loading indicator', () => {
 
   it.each(['idle', 'error', 'canceled'] as const)('hides the loader when %s', (status) => {
     expect(render({ status })).not.toContain('[loader]');
+  });
+});
+
+describe('ChatPanel message model', () => {
+  it('gives the streaming message the same model as finished messages', () => {
+    const html = render({
+      status: 'loading',
+      messages: [{ id: 'done', role: 'assistant', content: 'Finished response' }],
+      latest: { id: 'reply', role: 'assistant', content: 'Partial response' },
+    });
+
+    expect(html).toContain('Finished response[model:test-model]');
+    expect(html).toContain('Partial response[model:test-model]');
   });
 });

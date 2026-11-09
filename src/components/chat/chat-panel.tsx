@@ -7,7 +7,7 @@ import { useChat } from '~/hooks/use-chat';
 import { store } from '~/store';
 import { modelsLoaded } from '~/store/models';
 import { anyKeysSet } from '~/store/selectors';
-import type { ChatProps, MessageProps } from '~/types';
+import type { ChatProps, MessageProps, ModelProps } from '~/types';
 
 import { AlertApiKey, AlertError, AlertNoVision, Chatbar, Message } from './components';
 
@@ -51,7 +51,7 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           </For>
 
           <Show when={props.chat.latest}>
-            {(message) => <IncomingMessage message={message()} />}
+            {(message) => <IncomingMessage message={message()} model={chat.model()} />}
           </Show>
 
           <Show when={props.chat.status === 'loading' && !props.chat.latest?.content}>
@@ -84,9 +84,16 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
   );
 };
 
-function IncomingMessage(props: { message: MessageProps }) {
+function IncomingMessage(props: { message: MessageProps; model?: ModelProps }) {
   const text = createAnimatedText(() => props.message.content as string, {
     type: 'word',
   });
-  return <Message content={text.animatedText()} role="assistant" id={props.message.id} />;
+  return (
+    <Message
+      content={text.animatedText()}
+      role="assistant"
+      id={props.message.id}
+      model={props.model}
+    />
+  );
 }
