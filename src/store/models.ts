@@ -42,6 +42,9 @@ export async function fetchModels() {
 
 export const [models, setModels] = createStore<ModelProps[]>([]);
 
+/** Until this is true, a model that does not resolve says nothing about the model or its key. */
+export const modelsLoaded = () => models.length > 0;
+
 fetchModels();
 
 export const modelsByCreator = () =>

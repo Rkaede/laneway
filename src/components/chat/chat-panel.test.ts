@@ -18,6 +18,7 @@ const source = (await Bun.file(new URL('./chat-panel.tsx', import.meta.url)).tex
 const jsx = transpileModule(
   `
   const anyKeysSet = () => true;
+  const modelsLoaded = () => true;
   const requestApiKey = () => {};
   const Loader = () => '[loader]';
   const createAnimatedText = (text) => ({ animatedText: text });

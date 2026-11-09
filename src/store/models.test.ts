@@ -4,7 +4,8 @@ import type { ModelProps, ModelTags } from '~/types';
 
 const storageDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
 const fetchMock = spyOn(globalThis, 'fetch').mockResolvedValue(Response.json([]));
-const { fetchModels, models, modelsByCreator, setModels } = await import('./models');
+const { fetchModels, models, modelsByCreator, modelsLoaded, setModels } =
+  await import('./models');
 fetchMock.mockRestore();
 
 afterEach(() => {
@@ -32,6 +33,21 @@ it('loads the model catalogue', async () => {
 
   expect(fetch).toHaveBeenCalledWith('/models.json');
   expect(models).toEqual(catalogue);
+});
+
+it('reports the catalogue as loaded only once it has models', async () => {
+  const consoleError = spyOn(console, 'error').mockImplementation(() => {});
+
+  spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
+  await fetchModels();
+  expect(consoleError).toHaveBeenCalled();
+  expect(modelsLoaded()).toBe(false);
+
+  spyOn(globalThis, 'fetch').mockResolvedValue(
+    Response.json([model('openai/current', 'OpenAI')]),
+  );
+  await fetchModels();
+  expect(modelsLoaded()).toBe(true);
 });
 
 it('removes the legacy catalogue without reading or writing model storage', async () => {

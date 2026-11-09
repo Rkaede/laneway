@@ -5,6 +5,7 @@ import { Loader } from '~/components/ui';
 import { createAnimatedText } from '~/hooks/create-animated-text';
 import { useChat } from '~/hooks/use-chat';
 import { store } from '~/store';
+import { modelsLoaded } from '~/store/models';
 import { anyKeysSet } from '~/store/selectors';
 import type { ChatProps, MessageProps } from '~/types';
 
@@ -73,7 +74,11 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           </Show>
 
           {/* With no key at all, the composer already asks for one. */}
-          <Show when={!props.isExample && anyKeysSet() && !chat.isApiKeyConfigured()}>
+          <Show
+            when={
+              !props.isExample && modelsLoaded() && anyKeysSet() && !chat.isApiKeyConfigured()
+            }
+          >
             <AlertApiKey onAddKey={() => requestApiKey()} />
           </Show>
 
