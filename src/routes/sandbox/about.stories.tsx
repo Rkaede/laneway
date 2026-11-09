@@ -1,11 +1,11 @@
 import About from '~/components/connected/about';
 import { Button } from '~/components/ui/button';
-import { setStore } from '~/store';
+import { showAboutDialog } from '~/store/actions';
 
 export function Default() {
   return (
     <div>
-      <Button variant="outline" onClick={() => setStore('dialogs', 'about', 'open', true)}>
+      <Button variant="outline" onClick={showAboutDialog}>
         Open About
       </Button>
       <About />

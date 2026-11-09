@@ -3,17 +3,7 @@ import { For } from 'solid-js';
 import { IconBadge } from '~/components/ui/icon-badge';
 
 import { Cell, Cells } from './story-components';
-
-const variants = [
-  'free',
-  'reasoning',
-  'new',
-  'vision',
-  'online',
-  'preset',
-  'model',
-  'assistant',
-] as const;
+import { ROLES } from './story-fixtures';
 
 export function CustomClass() {
   return (
@@ -28,7 +18,7 @@ export function CustomClass() {
 export function Variants() {
   return (
     <Cells class="grid-cols-4">
-      <For each={variants}>
+      <For each={ROLES}>
         {(variant) => (
           <Cell>
             <IconBadge variant={variant} label={variant} />

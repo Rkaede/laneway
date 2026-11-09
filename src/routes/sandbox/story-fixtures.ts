@@ -1,3 +1,9 @@
+import { icons } from '~/components/ui/badge';
+
+// The roles that Badge, IconBadge and Tag share. Badge must have an icon for every role, so the
+// keys of its icon map are the full list.
+export const ROLES = Object.keys(icons) as Array<keyof typeof icons>;
+
 // Stories render against the real model catalogue, so they use models that are still listed.
 export const MODEL_IDS = {
   openai: 'openai/gpt-6.1-terra',

@@ -14,16 +14,12 @@ export function Basic() {
 }
 
 export function Changing() {
-  const texts = [
-    'First message that appears...',
-    'Then this one shows up!',
-    'And finally this message appears.',
-  ];
-  const [text, setText] = createSignal(texts[0]);
+  const message = 'First message that appears...';
+  const [text, setText] = createSignal(message);
   const animatedText = createAnimatedText(text, { type: 'word' });
 
   const appendText = () => {
-    setText(text() + '\n' + texts[0]);
+    setText(text() + '\n' + message);
   };
 
   return (

@@ -4,17 +4,7 @@ import { IconRocket } from '~/components/icons/ui';
 import { Tag } from '~/components/ui/tag';
 
 import { Cell, CellHeader, Cells } from './story-components';
-
-const roles = [
-  'free',
-  'reasoning',
-  'new',
-  'vision',
-  'online',
-  'preset',
-  'model',
-  'assistant',
-] as const;
+import { ROLES } from './story-fixtures';
 
 const general = [
   'default',
@@ -31,7 +21,7 @@ const general = [
 export function Roles() {
   return (
     <Cells class="grid-cols-4">
-      <For each={roles}>
+      <For each={ROLES}>
         {(variant) => (
           <Cell>
             <Tag variant={variant}>{variant}</Tag>
