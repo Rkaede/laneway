@@ -4,12 +4,26 @@ import { extendTailwindMerge } from 'tailwind-merge';
 import type { SessionProps } from './types';
 
 // Teach tailwind-merge the Loom tokens that are not part of Tailwind's stock scales, so
-// `rounded-md` overrides `rounded-card` and `h-9` overrides `h-input-md`.
+// `rounded-md` overrides `rounded-card` and `h-9` overrides `h-input-md`. Without this it also
+// reads `text-nav` as a colour and `font-menu` as a font family. Keep the lists in step with
+// the `@theme` blocks under src/styles/tokens; util.test.ts fails when a token is missing.
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      radius: ['tag', 'button', 'input', 'card', 'modal', 'badge'],
-      spacing: ['input-sm', 'input-md', 'input-lg', 'card', 'page-x', 'page-y'],
+      radius: ['tag', 'button', 'card', 'modal', 'badge', 'composer'],
+      spacing: [
+        'input-x-md',
+        'input-y-md',
+        'input-md',
+        'bubble-x',
+        'bubble-y',
+        'agent-x',
+        'nav-item-y',
+        'nav-item-h',
+      ],
+      text: ['nav', 'nav-group'],
+      'font-weight': ['menu', 'nav', 'nav-group'],
+      shadow: ['composer', 'field', 'code'],
     },
   },
 });
