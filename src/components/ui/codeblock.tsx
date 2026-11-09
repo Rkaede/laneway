@@ -1,8 +1,7 @@
-import { toBlob, toPng } from 'html-to-image';
-import { type Component, createSignal, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 
 import { useCopyToClipboard } from '~/hooks/use-copy';
-import { downloadFile, filenameDate } from '~/util';
+import { download, downloadFile, filenameDate } from '~/util';
 
 import {
   IconCheck,
@@ -51,10 +50,42 @@ export const programmingLanguages: Record<string, string> = {
   sql: '.sql',
   html: '.html',
   css: '.css',
-  // add more file extensions here, make sure the key is same as language prop in CodeBlock.tsx component
+  // The other grammars and aliases that code-highlighting.ts loads. codeblock.test.ts fails
+  // when one of them has no extension here.
+  js: '.js',
+  cjs: '.cjs',
+  mjs: '.mjs',
+  jsx: '.jsx',
+  ts: '.ts',
+  cts: '.cts',
+  mts: '.mts',
+  tsx: '.tsx',
+  json: '.json',
+  py: '.py',
+  csharp: '.cs',
+  cs: '.cs',
+  rb: '.rb',
+  kt: '.kt',
+  kts: '.kts',
+  rs: '.rs',
+  r: '.r',
+  shellscript: '.sh',
+  bash: '.sh',
+  sh: '.sh',
+  zsh: '.zsh',
+  powershell: '.ps1',
+  pwsh: '.ps1',
+  ps: '.ps1',
+  ps1: '.ps1',
+  markdown: '.md',
+  md: '.md',
+  yaml: '.yaml',
+  yml: '.yml',
+  toml: '.toml',
+  diff: '.diff',
+  docker: '.dockerfile',
+  dockerfile: '.dockerfile',
 };
-
-// const languages = Object.values(programmingLanguages).map((l) => l.split('.')[1]);
 
 const filter = (node: HTMLElement) => {
   const exclusionClasses = ['screenshot-hide'];
@@ -71,10 +102,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
     const fileExtension = programmingLanguages[props.language] || '.txt';
     const filename = filenameDate() + fileExtension;
 
-    const blob = new Blob([props.code], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    downloadFile(url, filename);
-    URL.revokeObjectURL(url);
+    download(new Blob([props.code], { type: 'text/plain' }), filename);
   }
 
   function onCopy() {
@@ -88,6 +116,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
     if (ref === undefined) {
       return;
     }
+    const { toBlob } = await import('html-to-image');
     const blob = await toBlob(ref, { cacheBust: true, filter });
     if (blob) {
       copyToClipboard(blob);
@@ -98,6 +127,7 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
     if (ref === undefined) {
       return;
     }
+    const { toPng } = await import('html-to-image');
     const dataUrl = await toPng(ref, { cacheBust: true, filter, pixelRatio: 2 });
     const filename = filenameDate();
     downloadFile(dataUrl, `${filename}.png`);
@@ -123,7 +153,6 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
             </Show>
           </Button>
           <CodeActionDropdown
-            onCopy={onCopy}
             onDownload={downloadAsFile}
             onCopyScreenshot={onCopyScreenshot}
             onDownloadScreenshot={onDownloadScreenshot}
@@ -136,19 +165,15 @@ export const CodeBlock: Component<CodeblockProps> = (props) => {
 };
 
 function CodeActionDropdown(props: {
-  sessionId?: string;
-  onCopy: () => void;
   onDownload: () => void;
   onCopyScreenshot: () => void;
   onDownloadScreenshot: () => void;
 }) {
-  const [open, setOpen] = createSignal(false);
   return (
-    <DropdownMenu open={open()} onOpenChange={(o) => setOpen(o)}>
+    <DropdownMenu>
       <DropdownMenuTrigger
         as={Button}
-        class="size-6 text-code-bar-fg transition-none hover:bg-code-bar-hover data-[open='true']:opacity-100"
-        data-open={open()}
+        class="size-6 text-code-bar-fg transition-none hover:bg-code-bar-hover"
         variant="ghost"
         size="icon"
         aria-label="Code actions"
