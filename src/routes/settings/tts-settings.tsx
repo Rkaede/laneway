@@ -9,6 +9,7 @@ import {
   SelectValue,
   Switch,
   SwitchControl,
+  SwitchLabel,
   SwitchThumb,
   Tag,
 } from '~/components/ui';
@@ -87,6 +88,7 @@ export function TTSSettings() {
             checked={anyKeysSet() && store.settings.tts.enabled}
             onChange={(value) => setStore('settings', 'tts', 'enabled', value)}
           >
+            <SwitchLabel class="sr-only">Enable TTS</SwitchLabel>
             <SwitchControl>
               <SwitchThumb />
             </SwitchControl>

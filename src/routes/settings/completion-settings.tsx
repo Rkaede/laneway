@@ -1,5 +1,5 @@
 import { MultiCombobox } from '~/components/connected/multi-combobox';
-import { Switch, SwitchControl, SwitchThumb, Tag } from '~/components/ui';
+import { Switch, SwitchControl, SwitchLabel, SwitchThumb, Tag } from '~/components/ui';
 import { setStore, store } from '~/store';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -24,6 +24,7 @@ export function Completions() {
             checked={store.settings.completions.enabled}
             onChange={(value) => setStore('settings', 'completions', 'enabled', value)}
           >
+            <SwitchLabel class="sr-only">Enable Completions</SwitchLabel>
             <SwitchControl>
               <SwitchThumb />
             </SwitchControl>

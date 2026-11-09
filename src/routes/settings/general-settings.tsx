@@ -7,6 +7,7 @@ import {
   SelectValue,
   Switch,
   SwitchControl,
+  SwitchLabel,
   SwitchThumb,
 } from '~/components/ui';
 import { getTheme, THEMES } from '~/constants';
@@ -28,7 +29,7 @@ export function GeneralSettings() {
             <SelectItem item={props.item}>{props.item.rawValue.label}</SelectItem>
           )}
         >
-          <SelectTrigger class="w-1/2">
+          <SelectTrigger aria-label="Theme" class="w-1/2">
             <SelectValue<(typeof THEMES)[number]>>
               {(state) => state.selectedOption().label}
             </SelectValue>
@@ -46,6 +47,7 @@ export function GeneralSettings() {
             checked={store.settings.generateTitles}
             onChange={(value) => setStore('settings', 'generateTitles', value)}
           >
+            <SwitchLabel class="sr-only">Generate Titles</SwitchLabel>
             <SwitchControl>
               <SwitchThumb />
             </SwitchControl>
