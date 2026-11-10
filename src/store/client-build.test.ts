@@ -222,3 +222,33 @@ it('never shows an observer a half-applied session or preset action', async () =
     { assistants: 2, presets: 2 },
   ]);
 });
+
+it('publishes the model catalogue once per load, already tagged', async () => {
+  const seen = await runInClientBuild<string[][]>(`
+    const recent = Math.floor(Date.now() / 1000);
+    const model = { title: 'Model', creator: {}, provider: [] };
+    globalThis.fetch = async () =>
+      Response.json([
+        { ...model, id: 'recent', created: recent },
+        { ...model, id: 'old', created: 0, tags: ['new', 'free'] },
+      ]);
+    const { createEffect, createRoot } = await import('solid-js');
+    const { fetchModels, models } = await import(${file('./models.ts')});
+    // Importing the module starts a load of its own; this one finishes after it.
+    await fetchModels();
+
+    const seen = [];
+    createRoot(() => {
+      createEffect(() => seen.push(models.map((model) => (model.tags ?? ['untagged']).join())));
+    });
+    await fetchModels();
+
+    console.log(JSON.stringify(seen));
+  `);
+
+  // The catalogue that was already loaded, then the reloaded one.
+  expect(seen).toEqual([
+    ['new', 'free'],
+    ['new', 'free'],
+  ]);
+});

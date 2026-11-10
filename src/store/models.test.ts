@@ -53,7 +53,7 @@ it('reports the catalogue as loaded only once it has models', async () => {
 it('removes the legacy catalogue without reading or writing model storage', async () => {
   const data = new Map([
     ['laneway-models', JSON.stringify([model('openai/legacy', 'OpenAI')])],
-    ['laneway-store', 'saved chats'],
+    ['chat-store', 'saved chats'],
   ]);
   const storage = {
     getItem: mock((key: string) => data.get(key) ?? null),
@@ -67,7 +67,7 @@ it('removes the legacy catalogue without reading or writing model storage', asyn
   await fetchModels();
 
   expect(models).toEqual(catalogue);
-  expect(data).toEqual(new Map([['laneway-store', 'saved chats']]));
+  expect(data).toEqual(new Map([['chat-store', 'saved chats']]));
   expect(storage.getItem).not.toHaveBeenCalled();
   expect(storage.setItem).not.toHaveBeenCalled();
 });
