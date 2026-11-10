@@ -10,11 +10,29 @@ const originalKey = apiKeys.openrouter;
 const originalAudio = Object.getOwnPropertyDescriptor(globalThis, 'Audio');
 const originalCaches = Object.getOwnPropertyDescriptor(globalThis, 'caches');
 
+// Like a media element, this reports an error after an empty `src` is assigned (Chromium's
+// "Empty src attribute"), but not after the attribute is removed. The browser queues that event
+// as a task. A microtask stands in for it here, so the event still arrives after the current
+// handler returns and before a mocked speech request resolves.
 class TestAudio extends EventTarget {
-  src = '';
+  #src = '';
   currentTime = 0;
   play = mock(async () => {});
   pause = mock(() => {});
+  load = mock(() => {});
+
+  get src() {
+    return this.#src;
+  }
+
+  set src(value: string) {
+    this.#src = value;
+    if (value === '') queueMicrotask(() => this.dispatchEvent(new Event('error')));
+  }
+
+  removeAttribute(name: string) {
+    if (name === 'src') this.#src = '';
+  }
 }
 
 const element = new TestAudio();
@@ -51,10 +69,11 @@ beforeEach(() => {
   cache.match.mockClear();
   cache.put.mockClear();
   openCache.mockReset().mockResolvedValue(cache);
-  element.src = '';
+  element.removeAttribute('src');
   element.currentTime = 0;
   element.play.mockReset().mockResolvedValue(undefined);
   element.pause.mockClear();
+  element.load.mockClear();
   createElement.mockClear();
   Object.defineProperty(globalThis, 'Audio', {
     configurable: true,
@@ -165,6 +184,7 @@ describe('createAudio', () => {
 
     expect(element.pause).toHaveBeenCalledTimes(1);
     expect(element.src).toBe('');
+    expect(element.load).toHaveBeenCalledTimes(1);
     expect(revokeUrl).toHaveBeenCalledWith(source);
     expect(removeListener.mock.calls).toEqual(addListener.mock.calls);
     expect(audio.status()).toBe('idle');

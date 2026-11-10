@@ -102,7 +102,10 @@ export function createAudio({ id, text }: { id?: string; text?: string | (() => 
     audio.pause();
     audio.currentTime = 0;
     URL.revokeObjectURL(audio.src);
-    audio.src = '';
+    // Assigning an empty `src` would queue an error event, which the next message to play on this
+    // shared element would receive. Removing the attribute and reloading releases it quietly.
+    audio.removeAttribute('src');
+    audio.load();
     audio = undefined;
     setTtsState({ status: 'idle', playingId: null });
   }
