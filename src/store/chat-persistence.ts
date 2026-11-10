@@ -1,13 +1,16 @@
-import { type createDefaultState, defaults } from './default-state';
+import { unwrap } from 'solid-js/store';
 
-export function serializeChatStore(state: ReturnType<typeof createDefaultState>) {
-  return JSON.stringify({ ...state, dialogs: undefined }, (key, value) =>
+import { defaults, type State } from './default-state';
+
+export function serializeChatStore(state: State) {
+  // This runs on every store write, so stringify the raw object rather than the store's proxies.
+  return JSON.stringify({ ...unwrap(state), dialogs: undefined }, (key, value) =>
     key === 'controller' ? undefined : value,
   );
 }
 
 export function deserializeChatStore(serialized: string) {
-  const state: ReturnType<typeof createDefaultState> = JSON.parse(serialized);
+  const state: State = JSON.parse(serialized);
   state.dialogs = structuredClone(defaults.dialogs);
 
   for (const chat of [...state.chats, ...state.draftChats]) {

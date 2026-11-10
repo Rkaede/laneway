@@ -11,7 +11,7 @@ import type {
 } from '~/types';
 import { clone } from '~/util';
 
-interface State {
+export interface State {
   schemaVersion: number;
   sessions: SessionProps[];
   chats: ChatProps[];
@@ -99,8 +99,8 @@ const topShelf: PresetProps = {
   ],
 };
 
-// This needs to be a factory function. If we were to use just a variable it would be mutated by
-// the store and resetStore would not work.
+// This needs to be a factory function. A store keeps the object it is given and mutates it, so a
+// shared object would no longer hold the defaults when deleteData resets the store.
 export function createDefaultState(): State {
   const story = examples.story();
   const imageAttachment = examples.imageAttachment();
