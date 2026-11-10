@@ -44,7 +44,10 @@ it('defers LLM SDK loading until a request and supports text and streaming', asy
         llm.getStream(messages, 'test-model', 'openrouter'),
       ]);
       let streamedText = '';
-      for await (const part of stream.textStream) streamedText += part;
+      for await (const part of stream.fullStream) {
+        if (part.type === 'error') throw part.error;
+        if (part.type === 'text-delta') streamedText += part.text;
+      }
       console.log(JSON.stringify({
         loadedOnStartup,
         loadedBeforeRequest,

@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { createEffect, mergeProps } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
@@ -45,14 +44,10 @@ export function useChat({ chat, readOnly }: UseChat) {
   };
 
   const streamFn = async (abortSignal: AbortSignal) => {
-    const systemPrompt = assistant()?.systemPrompt;
-    const messagesWithSystem = systemPrompt
-      ? [{ id: nanoid(), role: 'system' as const, content: systemPrompt }, ...chat.messages]
-      : chat.messages;
-
     const llm = await import('~/services/llm');
-    return llm.getStream(messagesWithSystem, provider()?.modelId, provider()?.id, {
+    return llm.getStream(chat.messages, provider()?.modelId, provider()?.id, {
       abortSignal,
+      systemPrompt: assistant()?.systemPrompt,
     });
   };
 
@@ -67,7 +62,7 @@ export function useChat({ chat, readOnly }: UseChat) {
   });
 
   // Automatically sends new user messages to the AI model, checking for vision capabilities if
-  // images are present and prepending any system prompt from the assistant
+  // images are present. The request carries any system prompt from the assistant.
   createEffect(() => {
     if (
       readOnly?.() ||
@@ -102,7 +97,6 @@ export function useChat({ chat, readOnly }: UseChat) {
     isApiKeyConfigured,
     clearError,
     assistant,
-    provider,
     model,
   });
 

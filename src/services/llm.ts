@@ -1,4 +1,4 @@
-import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 
 import { OPENROUTER_URL } from '~/constants';
 import { apiKeys } from '~/store/keys';
@@ -6,26 +6,20 @@ import type { MessageProps, ProviderId } from '~/types';
 
 import { createThrottle, formatMessages } from './util';
 
-// OpenAI's provider defaults to the Responses API, which stores conversations server-side and is
-// not supported by OpenRouter. `.chat()` keeps the Chat Completions behavior we always had.
-function chatCompletions(provider: OpenAIProvider) {
-  return (modelId: string) => provider.chat(modelId);
+// Created for each request, so a changed API key takes effect. OpenAI's provider defaults to the
+// Responses API, which stores conversations server-side and is not supported by OpenRouter.
+// `.chat()` keeps the Chat Completions behavior we always had.
+function chatModel(modelId: string) {
+  return createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL }).chat(modelId);
 }
-
-const openrouter = () =>
-  chatCompletions(createOpenAI({ apiKey: apiKeys?.openrouter, baseURL: OPENROUTER_URL }));
-
-const services = { openrouter };
-
-type Provider = ProviderId;
 
 const throttle = createThrottle();
 
 export async function getStream(
   messages: MessageProps[],
   modelId?: string,
-  provider?: Provider,
-  options?: { abortSignal?: AbortSignal },
+  provider?: ProviderId,
+  options?: { abortSignal?: AbortSignal; systemPrompt?: string },
 ) {
   if (!provider || !modelId) return;
 
@@ -36,15 +30,14 @@ export async function getStream(
     return mockStream({ abortSignal: options?.abortSignal });
   }
 
-  // We need to create a new service each time because the API key may change there is probably
-  // a slightly better way to do this but this works for now.
-  const createService = services[provider];
-  const service = createService();
   const formattedMessages = await formatMessages(messages);
   const { streamText } = await import('ai');
 
   return streamText({
-    model: service(modelId),
+    model: chatModel(modelId),
+    // The SDK rejects system messages in `messages`, so the prompt goes here. An empty prompt is
+    // left out, because the SDK would send it as an empty system message.
+    instructions: options?.systemPrompt || undefined,
     messages: formattedMessages,
     abortSignal: options?.abortSignal,
   });
@@ -57,21 +50,17 @@ export async function getText({
 }: {
   messages: MessageProps[];
   modelId?: string;
-  provider?: Provider;
+  provider?: ProviderId;
 }) {
   if (!provider || !modelId) return;
 
   throttle();
 
-  const createService = services[provider];
-  const service = createService();
   const formattedMessages = await formatMessages(messages);
   const { generateText } = await import('ai');
 
   return await generateText({
-    model: service(modelId),
+    model: chatModel(modelId),
     messages: formattedMessages,
   });
 }
-
-export default { getStream, getText };
