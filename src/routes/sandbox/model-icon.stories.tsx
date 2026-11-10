@@ -1,6 +1,6 @@
 import { For } from 'solid-js';
 
-import { ModelIcon } from '~/components/connected';
+import { ModelIcon } from '~/components/connected/model-icon';
 
 import { Cell, CellHeader, Cells } from './story-components';
 import { MODEL_IDS } from './story-fixtures';

@@ -1,4 +1,5 @@
-import { ModelCard, ModelIcon } from '~/components/connected';
+import { ModelCard } from '~/components/connected/model-card';
+import { ModelIcon } from '~/components/connected/model-icon';
 import { selectModelById } from '~/store/selectors';
 
 import { Cell, CellHeader, Cells } from './story-components';

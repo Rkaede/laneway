@@ -85,7 +85,7 @@ const { ModelIcon }: typeof import('../connected/model-icon') = await loadCompon
   },
 );
 const { Avatar }: typeof import('./avatar') = await loadComponent('./avatar.tsx', {
-  '../connected': join(directory, 'model-icon.mjs'),
+  '~/components/connected/model-icon': join(directory, 'model-icon.mjs'),
 });
 const { SidebarIcon }: typeof import('./sidebar-icon') =
   await loadComponent('./sidebar-icon.tsx');

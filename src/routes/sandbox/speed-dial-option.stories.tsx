@@ -1,6 +1,6 @@
 import { For } from 'solid-js';
 
-import { SpeedDialOption } from '~/components/connected';
+import { SpeedDialOption } from '~/components/connected/speed-dial-option';
 
 import { Cell, CellHeader, Cells } from './story-components';
 import { MODEL_IDS } from './story-fixtures';

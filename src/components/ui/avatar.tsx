@@ -2,9 +2,8 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import type { JSX, ParentComponent } from 'solid-js';
 import { Show, splitProps } from 'solid-js';
 
+import { ModelIcon } from '~/components/connected/model-icon';
 import { cn } from '~/util';
-
-import { ModelIcon } from '../connected';
 
 const avatarVariants = cva(
   'flex shrink-0 items-center justify-center rounded-full border border-border bg-surface-raised select-none',
