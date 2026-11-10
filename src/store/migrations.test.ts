@@ -17,7 +17,7 @@ describe('store migrations', () => {
       const state = createLegacyState();
       state.schemaVersion = version;
       state.sessions[0].title = 'Saved session';
-      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 3 };
+      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 4 };
       delete state.settings.messages;
       delete state.settings.completions;
       delete state.featureFlags;
@@ -49,7 +49,7 @@ describe('store migrations', () => {
         showModelTitle: true,
         [key]: false,
       });
-      expect(store.schemaVersion).toBe(3);
+      expect(store.schemaVersion).toBe(4);
     },
   );
 
@@ -69,7 +69,7 @@ describe('store migrations', () => {
           ...JSON.parse(JSON.stringify(state.settings)),
           tts: { ...createDefaultState().settings.tts, enabled: false },
         },
-        schemaVersion: 3,
+        schemaVersion: 4,
       };
       state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
       const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
@@ -132,7 +132,7 @@ describe('store migrations', () => {
       enabled: false,
     });
     expect(store.settings).not.toHaveProperty('openRouterUsage');
-    expect(store.schemaVersion).toBe(3);
+    expect(store.schemaVersion).toBe(4);
   });
 
   it('adds the streaming display setting to older stores and keeps a saved one', () => {
@@ -143,8 +143,8 @@ describe('store migrations', () => {
 
     migrateStore(store, setStore);
 
-    expect(store.settings.streaming).toEqual({ display: 'live' });
-    expect(store.schemaVersion).toBe(3);
+    expect(store.settings.streaming).toEqual({ display: 'paragraphs', cursor: 'square' });
+    expect(store.schemaVersion).toBe(4);
 
     const saved = JSON.parse(JSON.stringify(createDefaultState()));
     saved.schemaVersion = 2;
@@ -154,9 +154,31 @@ describe('store migrations', () => {
     migrateStore(kept, setKept);
 
     expect(kept.settings.streaming.display).toBe('paragraphs');
+    expect(kept.settings.streaming.cursor).toBe('square');
   });
 
-  it.each([3, 4])('does not rewrite schema version %s', (schemaVersion) => {
+  it('adds the streaming cursor setting to stores saved before it existed', () => {
+    const state = JSON.parse(JSON.stringify(createDefaultState()));
+    state.schemaVersion = 3;
+    state.settings.streaming = { display: 'sentences' };
+    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+
+    migrateStore(store, setStore);
+
+    expect(store.settings.streaming).toEqual({ display: 'sentences', cursor: 'square' });
+    expect(store.schemaVersion).toBe(4);
+
+    const saved = JSON.parse(JSON.stringify(createDefaultState()));
+    saved.schemaVersion = 3;
+    saved.settings.streaming = { display: 'live', cursor: 'circle' };
+    const [kept, setKept] = createStore<ReturnType<typeof createDefaultState>>(saved);
+
+    migrateStore(kept, setKept);
+
+    expect(kept.settings.streaming.cursor).toBe('circle');
+  });
+
+  it.each([4, 5])('does not rewrite schema version %s', (schemaVersion) => {
     const state = createDefaultState();
     state.schemaVersion = schemaVersion;
     const set = mock(() => {});
@@ -168,6 +190,6 @@ describe('store migrations', () => {
   });
 
   it('initializes new and reset stores at the current schema version', () => {
-    expect(createDefaultState().schemaVersion).toBe(3);
+    expect(createDefaultState().schemaVersion).toBe(4);
   });
 });

@@ -186,7 +186,7 @@ describe('backups', () => {
 
     await restoreBackup(backup, current, setCurrent);
 
-    expect(current.schemaVersion).toBe(3);
+    expect(current.schemaVersion).toBe(4);
     expect(current.settings.theme).toBe('system');
     expect(current.settings.messages).toEqual(createDefaultState().settings.messages);
     expect(current.sessions).toEqual(source.sessions);
@@ -313,7 +313,7 @@ describe('backups', () => {
     '[]',
     JSON.stringify({ format: 'other', version: 1 }),
     JSON.stringify({ format: 'laneway-backup', version: 2 }),
-    JSON.stringify({ ...createDefaultState(), schemaVersion: 4 }),
+    JSON.stringify({ ...createDefaultState(), schemaVersion: 5 }),
     JSON.stringify({ ...createDefaultState(), chats: [null] }),
     JSON.stringify({ ...createDefaultState(), settings: { theme: 'dark' } }),
     JSON.stringify({
@@ -341,8 +341,24 @@ describe('backups', () => {
     delete old.settings.streaming;
 
     expect(parseBackup(JSON.stringify(old)).state.settings.streaming).toEqual({
-      display: 'live',
+      display: 'paragraphs',
+      cursor: 'square',
     });
+  });
+
+  it('fills in the streaming cursor setting for backups from before it existed', () => {
+    const old = JSON.parse(JSON.stringify(createDefaultState()));
+    old.schemaVersion = 3;
+    delete old.settings.streaming.cursor;
+
+    expect(parseBackup(JSON.stringify(old)).state.settings.streaming.cursor).toBe('square');
+  });
+
+  it('rejects an unknown streaming cursor', () => {
+    const state = createDefaultState();
+    (state.settings.streaming as { cursor: string }).cursor = 'hologram';
+
+    expect(() => parseBackup(JSON.stringify(state))).toThrow('Invalid Laneway backup');
   });
 
   it('rejects an unknown streaming display mode', () => {

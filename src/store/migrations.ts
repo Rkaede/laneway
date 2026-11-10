@@ -72,4 +72,12 @@ export function migrateStore(store: State, setStore: SetStoreFunction<State>) {
     }
     setStore('schemaVersion', 3);
   }
+
+  if ((store.schemaVersion ?? 0) < 4) {
+    // Stores saved with a streaming display setting but before the cursor setting existed.
+    if (store.settings.streaming.cursor === undefined) {
+      setStore('settings', 'streaming', 'cursor', defaults.settings.streaming.cursor);
+    }
+    setStore('schemaVersion', 4);
+  }
 }

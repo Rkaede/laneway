@@ -32,8 +32,10 @@ const directory = await mkdtemp(join(tmpdir(), 'laneway-markdown-'));
 afterAll(() => rm(directory, { recursive: true, force: true }));
 const filename = join(directory, 'markdown.mjs');
 await Bun.write(filename, code);
-const { default: Markdown }: { default: Component<{ text: string }> } = await import(filename);
-const render = (text: string) => renderToString(() => Markdown({ text }));
+type MarkdownProps = { text: string; wordSpans?: boolean; cursor?: 'square' | 'circle' };
+const { default: Markdown }: { default: Component<MarkdownProps> } = await import(filename);
+const render = (text: string, options: Omit<MarkdownProps, 'text'> = {}) =>
+  renderToString(() => Markdown({ text, ...options }));
 
 describe('Markdown', () => {
   it('preserves arrows and generics in inline code without double escaping', () => {
@@ -138,5 +140,40 @@ describe('Markdown', () => {
     expect(html).toContain('<span>alt text</span>');
     expect(html).not.toContain('href=');
     expect(html).not.toContain('<img');
+  });
+
+  it('adds no spans or cursor to a finished answer', () => {
+    const html = render('Two words');
+
+    expect(html).not.toContain('data-word');
+    expect(html).not.toContain('stream-cursor');
+  });
+
+  it('puts each word of a streaming answer in a span', () => {
+    const html = render('Two **bold** words', { wordSpans: true });
+
+    expect(html.match(/<span[^>]*data-word[^>]*>/g)).toHaveLength(3);
+    expect(html).toContain('>bold</span></strong>');
+  });
+
+  it('puts the cursor after the last text of a streaming answer', () => {
+    const html = render('First.\n\nSecond', { cursor: 'square' });
+
+    expect(html).toMatch(/Second<span[^>]*class="stream-cursor[^>]*><\/span><\/p>/);
+    expect(html).toContain('data-shape="square"');
+    expect(html.match(/class="stream-cursor/g)).toHaveLength(1);
+  });
+
+  it('puts the cursor on a line below a code block', () => {
+    const html = render('Run:\n\n```ts\nconst a = 1;\n```', { cursor: 'circle' });
+
+    expect(html).toMatch(/<\/pre><div[^>]*class="stream-cursor-line/);
+  });
+
+  it('keeps the cursor out of the word spans', () => {
+    const html = render('Two words', { wordSpans: true, cursor: 'square' });
+
+    expect(html.match(/<span[^>]*data-word[^>]*>/g)).toHaveLength(2);
+    expect(html).toMatch(/words<\/span><span[^>]*class="stream-cursor/);
   });
 });

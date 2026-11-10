@@ -15,11 +15,12 @@ export function getTheme(id: string) {
   return THEMES.find((theme) => theme.id === id) ?? THEMES[0];
 }
 
-// How an incoming answer is shown. Live shows text as it arrives, paragraphs holds text back until
-// a paragraph is finished, and complete shows nothing until the whole answer is in. The ids are
-// saved in users' settings, and unknown ids fall back to live.
+// How an incoming answer is shown. The first three show it a word, a sentence or a paragraph at a
+// time, each once it is finished, and complete shows nothing until the whole answer is in. The
+// ids are saved in users' settings, and unknown ids fall back to the default.
 export const STREAM_DISPLAY_MODES = [
-  { id: 'live', label: 'Live', description: 'Show text as it arrives' },
+  { id: 'live', label: 'Words', description: 'Show each word as it arrives' },
+  { id: 'sentences', label: 'Sentences', description: 'Show each sentence once it is done' },
   { id: 'paragraphs', label: 'Paragraphs', description: 'Show each paragraph once it is done' },
   {
     id: 'complete',
@@ -30,6 +31,31 @@ export const STREAM_DISPLAY_MODES = [
 
 export type StreamDisplayMode = (typeof STREAM_DISPLAY_MODES)[number]['id'];
 
+export const DEFAULT_STREAM_DISPLAY: StreamDisplayMode = 'paragraphs';
+
 export function getStreamDisplayMode(id: unknown) {
-  return STREAM_DISPLAY_MODES.find((mode) => mode.id === id) ?? STREAM_DISPLAY_MODES[0];
+  return (
+    STREAM_DISPLAY_MODES.find((mode) => mode.id === id) ??
+    STREAM_DISPLAY_MODES.find((mode) => mode.id === DEFAULT_STREAM_DISPLAY)!
+  );
+}
+
+// What marks the spot where an answer is about to appear. Dots are the loader shown before the
+// first text. The other two are a cursor that stays at the end of the text while it streams. The
+// ids are saved in users' settings, and unknown ids fall back to the default.
+export const STREAM_CURSORS = [
+  { id: 'dots', label: 'Dots', description: 'Three dots, until the text starts' },
+  { id: 'square', label: 'Square', description: 'A blinking block, as in a terminal' },
+  { id: 'circle', label: 'Circle', description: 'A pulsing dot' },
+] as const;
+
+export type StreamCursorId = (typeof STREAM_CURSORS)[number]['id'];
+
+export const DEFAULT_STREAM_CURSOR: StreamCursorId = 'square';
+
+export function getStreamCursor(id: unknown) {
+  return (
+    STREAM_CURSORS.find((cursor) => cursor.id === id) ??
+    STREAM_CURSORS.find((cursor) => cursor.id === DEFAULT_STREAM_CURSOR)!
+  );
 }

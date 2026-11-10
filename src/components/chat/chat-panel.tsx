@@ -9,12 +9,15 @@ import {
 } from 'solid-js';
 
 import { requestApiKey } from '~/components/connected/api-key-request';
-import { Loader } from '~/components/ui';
-import { getStreamDisplayMode } from '~/constants';
-import { createAnimatedText } from '~/hooks/create-animated-text';
+import { Loader, StreamCursor } from '~/components/ui';
+import type { StreamCursorShape } from '~/components/ui/markdown-cursor';
+import { getStreamCursor, getStreamDisplayMode } from '~/constants';
+import { createPacedText } from '~/hooks/create-paced-text';
 import { createStreamFollow, prefersReducedMotion } from '~/hooks/create-stream-follow';
+import { createStreamReveal } from '~/hooks/create-stream-reveal';
 import { useChat } from '~/hooks/use-chat';
-import { visibleStreamText } from '~/services/stream-display';
+import { STREAM_PACES, type StreamUnit, unitEnds } from '~/services/stream-display';
+import { streamAnimation } from '~/services/stream-trials';
 import { store } from '~/store';
 import { modelsLoaded } from '~/store/models';
 import { anyKeysSet } from '~/store/selectors';
@@ -44,12 +47,36 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
   const follow = createStreamFollow(lane);
   const mode = () => getStreamDisplayMode(store.settings.streaming?.display).id;
 
-  // The transport keeps streaming into the store. Only what the lane shows is held back.
-  const incoming = createMemo(() => {
-    const content = props.chat.latest?.content;
-    return visibleStreamText(typeof content === 'string' ? content : '', mode());
+  // The answer is shown a word, a sentence or a paragraph at a time, unless it is held back whole.
+  const unit = (): StreamUnit | undefined => {
+    const current = mode();
+    return current === 'complete' ? undefined : current;
+  };
+  const pacing = createMemo(() => {
+    const current = unit();
+    // Reduced motion gets text as it arrives, without words appearing one by one.
+    if (!current || (current === 'live' && prefersReducedMotion())) return undefined;
+    return { ...STREAM_PACES[current], ends: (text: string) => unitEnds(text, current) };
   });
+  // The transport keeps streaming into the store. Only what the lane shows is held back.
+  const incoming = createPacedText(() => {
+    const content = props.chat.latest?.content;
+    return unit() && typeof content === 'string' ? content : '';
+  }, pacing);
   const hasIncoming = () => !!props.chat.latest?.content;
+  const cursor = (): StreamCursorShape | undefined => {
+    const { id } = getStreamCursor(store.settings.streaming?.cursor);
+    return id === 'dots' ? undefined : id;
+  };
+  const reveal = createStreamReveal(lane, {
+    pieces: () => {
+      const current = unit();
+      if (!current || !streamAnimation(current).keyframes) return undefined;
+      return current === 'paragraphs' ? 'blocks' : 'words';
+    },
+    animation: () => streamAnimation(unit() ?? 'live'),
+    status: () => props.chat.status,
+  });
 
   // An answer that was held back until it finished is read from its start, not from its end.
   let streamed = false;
@@ -117,24 +144,46 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
                 {...message}
                 model={chat.model()}
                 tts={!props.isExample && store.settings.tts.enabled}
+                wordSpans={
+                  reveal.wordSpans() &&
+                  message.role === 'assistant' &&
+                  message.id === props.chat.messages.at(-1)?.id
+                }
               />
             )}
           </For>
 
           <Show when={incoming()}>
             {(text) => (
-              <IncomingMessage
-                id={props.chat.latest?.id}
-                text={text()}
-                animate={mode() === 'live'}
-                model={chat.model()}
-              />
+              // The wrapper adds no box. It tells the block reveal which message is streaming.
+              <div class="contents" data-incoming-message>
+                <IncomingMessage
+                  id={props.chat.latest?.id}
+                  text={text()}
+                  wordSpans={reveal.wordSpans()}
+                  cursor={cursor()}
+                  model={chat.model()}
+                />
+              </div>
             )}
           </Show>
 
           <Show when={props.chat.status === 'loading' && !incoming()}>
-            <div class="flex flex-col items-center gap-1">
-              <Loader />
+            <div
+              class="flex flex-col gap-1"
+              classList={{
+                'items-center': !cursor(),
+                // A cursor stands where the first line of the answer will start.
+                'items-start px-agent-x py-bubble-y': !!cursor(),
+              }}
+            >
+              <Show when={cursor()} fallback={<Loader />}>
+                {(shape) => (
+                  <div class="px-1 text-base leading-relaxed">
+                    <StreamCursor shape={shape()} />
+                  </div>
+                )}
+              </Show>
               <Show when={mode() === 'complete' && hasIncoming()}>
                 <p class="text-xs text-muted">Writing the answer. It will appear when done.</p>
               </Show>
@@ -175,17 +224,17 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
 function IncomingMessage(props: {
   id?: string;
   text: string;
-  animate: boolean;
+  wordSpans: boolean;
+  cursor?: StreamCursorShape;
   model?: ModelProps;
 }) {
-  const animated = createAnimatedText(() => props.text, { type: 'word' });
-  // Paragraphs are shown whole, and reduced motion gets the text without the word fade.
-  const text = () =>
-    props.animate && !prefersReducedMotion() ? animated.animatedText() : props.text;
   return (
     <Message
-      content={text()}
+      content={props.text}
       role="assistant"
+      status="loading"
+      wordSpans={props.wordSpans}
+      cursor={props.cursor}
       id={props.id ?? 'incoming'}
       model={props.model}
     />

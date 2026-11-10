@@ -1,0 +1,56 @@
+/*
+ * A cursor in the brand colour that marks where the next text of an answer will appear. It sits
+ * on the line of text it follows and is sized by that text.
+ */
+.stream-cursor {
+  display: inline-block;
+  margin-left: 0.15em;
+  background-color: var(--brand);
+}
+
+/* A block cursor that switches on and off, as in a terminal. */
+.stream-cursor[data-shape='square'] {
+  width: 0.55em;
+  height: 1.15em;
+  vertical-align: text-bottom;
+  animation: stream-cursor-blink 1.1s steps(1, end) infinite;
+}
+
+.stream-cursor[data-shape='circle'] {
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 9999px;
+  animation: stream-cursor-pulse 1.1s ease-in-out infinite;
+}
+
+/* A cursor on a line of its own, below a block such as a code block. */
+.stream-cursor-line {
+  margin-top: 0.75rem;
+  line-height: 1;
+
+  & .stream-cursor {
+    margin-left: 0;
+  }
+}
+
+@keyframes stream-cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes stream-cursor-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+}

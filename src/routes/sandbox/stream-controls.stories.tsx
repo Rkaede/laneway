@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 import { ChatPanel } from '~/components/chat/chat-panel';
@@ -12,10 +12,20 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import {
+  getStreamCursor,
   getStreamDisplayMode,
+  STREAM_CURSORS,
   STREAM_DISPLAY_MODES,
+  type StreamCursorId,
   type StreamDisplayMode,
 } from '~/constants';
+import type { StreamUnit } from '~/services/stream-display';
+import {
+  defaultStreamTrials,
+  setStreamTrials,
+  STREAM_ANIMATIONS,
+  streamAnimation,
+} from '~/services/stream-trials';
 import { setStore, store } from '~/store';
 import type { ChatProps } from '~/types';
 
@@ -41,19 +51,32 @@ const PARAGRAPHS = [
   '- Simple interest: 1,000 grows by 50 every year.\n- Compound interest: 1,000 grows by 50, then 52.50, then 55.13, and so on.',
   'Time does most of the work. At 5% a year, money doubles in roughly fourteen years, and doubles again in the next fourteen.',
   'Fees count too. A 1% annual fee on a 5% return takes away a fifth of your growth, and that loss compounds as well.',
+  // A list with blank lines between its items, which arrives one item at a time.
+  '1. **Start early.** The first years of saving do the most work.\n\n2. **Keep fees low.** A small fee takes a large share over decades.\n\n3. **Leave it alone.** Money you take out stops compounding.',
 ];
 
 const LENGTHS = [
   { id: 'short', label: 'Short', paragraphs: 3 },
-  { id: 'medium', label: 'Medium', paragraphs: 7 },
-  { id: 'long', label: 'Long', paragraphs: 21 },
+  { id: 'medium', label: 'Medium', paragraphs: 8 },
+  { id: 'long', label: 'Long', paragraphs: 24 },
 ] as const;
 
 const SPEEDS = [
   { id: 'slow', label: 'Slow', msPerWord: 160 },
   { id: 'normal', label: 'Normal', msPerWord: 50 },
   { id: 'fast', label: 'Fast', msPerWord: 12 },
+  // Quick enough to finish several paragraphs inside one reveal interval.
+  { id: 'very-fast', label: 'Very fast', msPerWord: 4 },
 ] as const;
+
+// Some providers send a word at a time and others send a clause or a sentence in one piece.
+const CHUNKS = [
+  { id: 'words', label: 'Single words', words: 1 },
+  { id: 'bursts', label: 'Bursts of 12 words', words: 12 },
+] as const;
+
+/** How long the made-up model takes to send its first text, in milliseconds. */
+const FIRST_TEXT_DELAY = 1200;
 
 type Option = { id: string; label: string };
 
@@ -76,7 +99,7 @@ function Choice<T extends Option>(props: {
           <SelectItem item={item.item}>{item.item.rawValue.label}</SelectItem>
         )}
       >
-        <SelectTrigger class="w-40">
+        <SelectTrigger class="w-44">
           <SelectValue<T>>{(state) => state.selectedOption().label}</SelectValue>
         </SelectTrigger>
         <SelectContent />
@@ -88,6 +111,9 @@ function Choice<T extends Option>(props: {
 /**
  * A chat lane that streams a made-up answer, so the streaming display modes and the follow
  * behaviour can be tried without a model. Scroll up while it streams to see "Jump to latest".
+ *
+ * Each display mode keeps its own animation. The bursts show how a lane catches up when text
+ * arrives faster than it is shown.
  */
 export function Playground() {
   const [chat, setChat] = createStore<ChatProps>({
@@ -98,18 +124,28 @@ export function Playground() {
   });
   const [length, setLength] = createSignal<(typeof LENGTHS)[number]>(LENGTHS[1]);
   const [speed, setSpeed] = createSignal<(typeof SPEEDS)[number]>(SPEEDS[1]);
-  let timer: ReturnType<typeof setInterval> | undefined;
+  const [chunks, setChunks] = createSignal<(typeof CHUNKS)[number]>(CHUNKS[0]);
+  let timer: ReturnType<typeof setTimeout> | undefined;
   let runs = 0;
 
-  // The display mode is a real app setting, so put it back when the story is closed.
-  const original = store.settings.streaming.display;
+  // The display mode and the cursor are real app settings and the trial choices are shared by
+  // every lane, so put them back when the story is closed.
+  const original = { ...store.settings.streaming };
   onCleanup(() => {
     stop();
-    setStore('settings', 'streaming', 'display', original);
+    setStore('settings', 'streaming', original);
+    setStreamTrials(defaultStreamTrials());
   });
 
+  const mode = () => getStreamDisplayMode(store.settings.streaming.display);
+  // The mode whose animation can be chosen. An answer shown when finished has none.
+  const unit = (): StreamUnit | undefined => {
+    const { id } = mode();
+    return id === 'complete' ? undefined : id;
+  };
+
   function stop() {
-    clearInterval(timer);
+    clearTimeout(timer);
     timer = undefined;
   }
 
@@ -142,6 +178,8 @@ export function Playground() {
     ).join('\n\n');
     // Split on spaces and keep the whitespace, so joining the pieces gives the text back.
     const pieces = text.split(/(?<= )/);
+    const { words } = chunks();
+    const { msPerWord } = speed();
     let sent = 0;
     setChat({
       messages: [
@@ -151,15 +189,18 @@ export function Playground() {
       status: 'loading',
       latest: undefined,
     });
-    timer = setInterval(() => {
-      sent += 1;
+
+    function send() {
+      sent += words;
       setChat('latest', {
         id: `answer-${runs}`,
         role: 'assistant',
         content: pieces.slice(0, sent).join(''),
       });
       if (sent >= pieces.length) finish(false);
-    }, speed().msPerWord);
+      else timer = setTimeout(send, msPerWord * words);
+    }
+    timer = setTimeout(send, FIRST_TEXT_DELAY);
   }
 
   function reset() {
@@ -173,13 +214,32 @@ export function Playground() {
         <Choice
           label="Streaming display"
           options={STREAM_DISPLAY_MODES}
-          value={getStreamDisplayMode(store.settings.streaming.display)}
-          onChange={(mode) =>
-            setStore('settings', 'streaming', 'display', mode.id as StreamDisplayMode)
+          value={mode()}
+          onChange={(next) =>
+            setStore('settings', 'streaming', 'display', next.id as StreamDisplayMode)
+          }
+        />
+        <Show when={unit()} keyed>
+          {(unit) => (
+            <Choice
+              label={`Animation for ${mode().label.toLowerCase()}`}
+              options={STREAM_ANIMATIONS}
+              value={streamAnimation(unit)}
+              onChange={(animation) => setStreamTrials('animation', unit, animation.id)}
+            />
+          )}
+        </Show>
+        <Choice
+          label="Streaming cursor"
+          options={STREAM_CURSORS}
+          value={getStreamCursor(store.settings.streaming.cursor)}
+          onChange={(next) =>
+            setStore('settings', 'streaming', 'cursor', next.id as StreamCursorId)
           }
         />
         <Choice label="Answer length" options={LENGTHS} value={length()} onChange={setLength} />
         <Choice label="Speed" options={SPEEDS} value={speed()} onChange={setSpeed} />
+        <Choice label="Chunks" options={CHUNKS} value={chunks()} onChange={setChunks} />
       </div>
       <div class="flex gap-2">
         <Button onClick={start} disabled={chat.status === 'loading'}>

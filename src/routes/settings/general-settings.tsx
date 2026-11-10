@@ -10,7 +10,14 @@ import {
   SwitchLabel,
   SwitchThumb,
 } from '~/components/ui';
-import { getStreamDisplayMode, getTheme, STREAM_DISPLAY_MODES, THEMES } from '~/constants';
+import {
+  getStreamCursor,
+  getStreamDisplayMode,
+  getTheme,
+  STREAM_CURSORS,
+  STREAM_DISPLAY_MODES,
+  THEMES,
+} from '~/constants';
 import { setStore, store } from '~/store';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -56,6 +63,31 @@ export function GeneralSettings() {
         >
           <SelectTrigger class="w-1/2">
             <SelectValue<(typeof STREAM_DISPLAY_MODES)[number]>>
+              {(state) => state.selectedOption().label}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
+      </Setting>
+      <Setting
+        title="Streaming Cursor"
+        description="What marks the spot where an answer is about to appear."
+      >
+        <Select
+          options={[...STREAM_CURSORS]}
+          optionValue="id"
+          optionTextValue="label"
+          value={getStreamCursor(store.settings.streaming.cursor)}
+          onChange={(value) => value && setStore('settings', 'streaming', 'cursor', value.id)}
+          itemComponent={(props) => (
+            <SelectItem item={props.item}>
+              {props.item.rawValue.label}
+              <span class="ml-2 text-xs text-muted">{props.item.rawValue.description}</span>
+            </SelectItem>
+          )}
+        >
+          <SelectTrigger aria-label="Streaming Cursor" class="w-1/2">
+            <SelectValue<(typeof STREAM_CURSORS)[number]>>
               {(state) => state.selectedOption().label}
             </SelectValue>
           </SelectTrigger>

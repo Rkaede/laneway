@@ -1,17 +1,36 @@
 import remarkGfm from 'remark-gfm';
-import { type Component, Show } from 'solid-js';
+import { type Component, createMemo, Show } from 'solid-js';
 import { SolidMarkdown } from 'solid-markdown';
 
 import { CodeBlock } from '~/components/ui';
 import { cn } from '~/util';
 
+import { rehypeStreamCursor, type StreamCursorShape } from './markdown-cursor';
 import { sanitizeMarkdownLink } from './markdown-links';
+import { rehypeWordSpans } from './markdown-words';
 
-const Markdown: Component<{ text: string }> = (props) => {
+type MarkdownProps = {
+  text: string;
+  /** Puts each word in its own span, so a streaming answer can animate them one by one. */
+  wordSpans?: boolean;
+  /** Shows a cursor after the last text, for an answer that is still streaming. */
+  cursor?: StreamCursorShape;
+};
+
+const Markdown: Component<MarkdownProps> = (props) => {
+  const rehypePlugins = createMemo(() => [
+    ...(props.wordSpans ? [rehypeWordSpans] : []),
+    // The cursor is added last, so that it is not taken for a word.
+    ...(props.cursor
+      ? [[rehypeStreamCursor, props.cursor] as [typeof rehypeStreamCursor, StreamCursorShape]]
+      : []),
+  ]);
+
   return (
     <SolidMarkdown
       renderingStrategy="reconcile"
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={rehypePlugins()}
       transformLinkUri={sanitizeMarkdownLink}
       linkTarget={(href) => (/^(https?:|\/\/)/i.test(href) ? '_blank' : undefined)}
       components={{
@@ -49,7 +68,8 @@ const Markdown: Component<{ text: string }> = (props) => {
                 />
               }
             >
-              <span class="inline-block max-w-full overflow-x-auto align-bottom">
+              {/* Inline code counts as one word when a streaming answer animates its words. */}
+              <span data-word class="inline-block max-w-full overflow-x-auto align-bottom">
                 <span class="mx-[0.2em] inline-block rounded-tag border bg-surface-sunken px-1 align-baseline font-mono text-sm">
                   {
                     /* @ts-ignore: this is a dependency bug */

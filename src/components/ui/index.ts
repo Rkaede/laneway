@@ -21,6 +21,7 @@ export * from './separator';
 export * from './shortcut';
 export * from './sidebar';
 export * from './sidebar-icon';
+export * from './stream-cursor';
 export * from './switch';
 export * from './tag';
 export * from './text';

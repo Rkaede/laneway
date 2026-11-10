@@ -1,5 +1,11 @@
 // Default state factory and constants
-import type { StreamDisplayMode, Theme } from '~/constants';
+import {
+  DEFAULT_STREAM_CURSOR,
+  DEFAULT_STREAM_DISPLAY,
+  type StreamCursorId,
+  type StreamDisplayMode,
+  type Theme,
+} from '~/constants';
 import * as examples from '~/store/examples';
 import type {
   AssistantProps,
@@ -59,6 +65,7 @@ export interface State {
     };
     streaming: {
       display: StreamDisplayMode;
+      cursor: StreamCursorId;
     };
   };
 }
@@ -109,7 +116,7 @@ export function createDefaultState(): State {
   const imageAttachment = examples.imageAttachment();
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     sessions: [story.session, imageAttachment.session],
     chats: [...story.chats, ...imageAttachment.chats],
     draftSession: {
@@ -211,7 +218,8 @@ export function createDefaultState(): State {
         showModelTitle: false,
       },
       streaming: {
-        display: 'live',
+        display: DEFAULT_STREAM_DISPLAY,
+        cursor: DEFAULT_STREAM_CURSOR,
       },
     },
     presets: [...clone([defaultPreset, flagshipModels, topShelf])],

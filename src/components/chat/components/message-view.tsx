@@ -6,6 +6,7 @@ import { Avatar, Tag } from '~/components/ui';
 import { Lightbox } from '~/components/ui/lightbox/lightbox';
 import { LocalImage } from '~/components/ui/local-image';
 import Markdown from '~/components/ui/markdown';
+import type { StreamCursorShape } from '~/components/ui/markdown-cursor';
 import { AudioButton, type AudioButtonProps } from '~/components/ui/message/audio-button';
 import { CopyButton } from '~/components/ui/message/copy-button';
 import { StatsPopover } from '~/components/ui/stats-popover';
@@ -27,6 +28,10 @@ export type MessageViewProps = MessageProps & {
   /** Leave this out to hide the audio button. */
   audioStatus?: AudioButtonProps['status'];
   onAudioClick?: () => void;
+  /** Puts each word of the text in its own span, so a streaming answer can animate them. */
+  wordSpans?: boolean;
+  /** Shows a cursor after the last text, for an answer that is still streaming. */
+  cursor?: StreamCursorShape;
 };
 
 /** The plain text of a message, without its images. */
@@ -135,7 +140,7 @@ export const MessageView: Component<MessageViewProps> = (props) => {
               return `Unknown part type: ${JSON.stringify(part)}`;
             })
         ) : (
-          <Markdown text={props.content} />
+          <Markdown text={props.content} wordSpans={props.wordSpans} cursor={props.cursor} />
         )}
       </div>
       <Show when={props.cancelled}>
@@ -144,7 +149,8 @@ export const MessageView: Component<MessageViewProps> = (props) => {
           Full response cancelled by user
         </Tag>
       </Show>
-      <Show when={props.role === 'assistant'}>
+      {/* An answer that is still arriving has nothing complete to copy, play or measure. */}
+      <Show when={props.role === 'assistant' && props.status !== 'loading'}>
         <div class="mt-2 flex items-center gap-[1px]">
           <Show when={props.audioStatus}>
             {(status) => (

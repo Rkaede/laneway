@@ -5,9 +5,12 @@ import { store } from '~/store/index';
 import { anyKeysSet } from '~/store/selectors';
 import type { MessageProps } from '~/types';
 
-import { messageText, MessageView } from './message-view';
+import { messageText, MessageView, type MessageViewProps } from './message-view';
 
-export const Message: Component<MessageProps & { tts?: boolean }> = (props) => {
+type MessageComponentProps = MessageProps &
+  Pick<MessageViewProps, 'wordSpans' | 'cursor'> & { tts?: boolean };
+
+export const Message: Component<MessageComponentProps> = (props) => {
   const [local, rest] = splitProps(props, ['tts']);
 
   const audio = createAudio({

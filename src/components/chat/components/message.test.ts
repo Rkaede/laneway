@@ -20,8 +20,9 @@ await Bun.write(
   `export default (props) => props.text;
 export const ModelIcon = () => null;
 export const LocalImage = (props) => '[image alt=' + props.alt + ']';
+export const CopyButton = () => '[copy]';
 export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag = ModelIcon,
-  Lightbox = ModelIcon, AudioButton = ModelIcon, CopyButton = ModelIcon,
+  Lightbox = ModelIcon, AudioButton = ModelIcon,
   StatsPopover = ModelIcon, Tooltip = ModelIcon, TooltipContent = ModelIcon, TooltipTrigger = ModelIcon;
 `,
 );
@@ -91,6 +92,23 @@ describe('MessageView', () => {
 
     expect(html).toContain('[image alt=holiday.png]');
     expect(html).toContain('[image alt=receipt.jpg]');
+  });
+
+  it('shows the toolbar on a finished answer and hides it while the answer streams', () => {
+    const message = { id: 'answer', role: 'assistant', content: 'Hello' } as const;
+
+    expect(renderToString(() => MessageView(message))).toContain('[copy]');
+    expect(renderToString(() => MessageView({ ...message, status: 'loading' }))).not.toContain(
+      '[copy]',
+    );
+  });
+
+  it('shows no toolbar on a message from the user', () => {
+    const html = renderToString(() =>
+      MessageView({ id: 'question', role: 'user', content: 'Hello' }),
+    );
+
+    expect(html).not.toContain('[copy]');
   });
 
   it('shows the model title only when asked to', () => {
