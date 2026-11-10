@@ -12,25 +12,27 @@ export function addPreset(preset: PresetProps, assistants: AssistantProps[]) {
   newPreset.id = nanoid();
   newPreset.templateId = preset.id;
 
-  for (const chat of newPreset.chats) {
-    if (!chat.assistantId) continue;
+  batch(() => {
+    for (const chat of newPreset.chats) {
+      if (!chat.assistantId) continue;
 
-    const assistantInList =
-      store.assistants.find((a) => a.id === chat.assistantId) ??
-      store.assistants.find((a) => a.templateId === chat.assistantId);
+      const assistantInList =
+        store.assistants.find((a) => a.id === chat.assistantId) ??
+        store.assistants.find((a) => a.templateId === chat.assistantId);
 
-    if (assistantInList) {
-      chat.assistantId = assistantInList.id;
-      continue;
+      if (assistantInList) {
+        chat.assistantId = assistantInList.id;
+        continue;
+      }
+
+      const assistant = assistants.find((a) => a.id === chat.assistantId);
+      if (assistant) {
+        chat.assistantId = addAssistant(assistant);
+      }
     }
 
-    const assistant = assistants.find((a) => a.id === chat.assistantId);
-    if (assistant) {
-      chat.assistantId = addAssistant(assistant);
-    }
-  }
-
-  setStore('presets', (p) => [...p, newPreset]);
+    setStore('presets', (p) => [...p, newPreset]);
+  });
   return newPreset.id;
 }
 
@@ -51,30 +53,4 @@ export function deletePreset(id: string) {
       items.filter((item) => !(item.type === 'preset' && item.referenceId === id)),
     );
   });
-}
-
-export function setPresetName(presetId: string, name: string) {
-  setStore('presets', (p) => p.id === presetId, 'presetTitle', name);
-}
-
-export function setPresetInput(presetId: string, input: string) {
-  setStore('presets', (p) => p.id === presetId, 'input', input);
-}
-
-export function addAssistantToPreset(presetId: string, assistantId: string) {
-  setStore(
-    'presets',
-    (p) => p.id === presetId,
-    'chats',
-    (chats) => [...chats, { assistantId, status: 'idle' as const }],
-  );
-}
-
-export function deleteAssistantFromPreset(presetId: string, assistantId: string) {
-  setStore(
-    'presets',
-    (p) => p.id === presetId,
-    'chats',
-    (chats) => chats.filter((c) => c.assistantId !== assistantId),
-  );
 }

@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
-import { reconcile } from 'solid-js/store';
+import { batch } from 'solid-js';
+import { produce, reconcile } from 'solid-js/store';
 
 import { IconNewSession, IconSquarePen, IconTrash } from '~/components/icons/ui';
 import { showSuccess } from '~/components/ui/notify';
@@ -34,7 +35,6 @@ function createSessionFromDraft() {
     id: nanoid(),
     created: Date.now(),
     sessionId,
-    status: chat.status as 'idle' | 'error' | 'loading' | 'canceled',
   }));
 
   const session: SessionProps = {
@@ -44,10 +44,15 @@ function createSessionFromDraft() {
     chats: chats.map((c) => c.id),
   };
 
-  setStore('sessions', (otherSessions) => [session, ...otherSessions]);
-  for (const chat of chats) {
-    setStore('chats', store.chats.length, chat);
-  }
+  batch(() => {
+    setStore('sessions', (otherSessions) => [session, ...otherSessions]);
+    setStore(
+      'chats',
+      produce((allChats) => {
+        allChats.push(...chats);
+      }),
+    );
+  });
   return session.id;
 }
 
@@ -79,33 +84,37 @@ export function newDraftSession({
 
   if (type === 'preset') {
     const draft = createSessionFromPreset(_record as PresetProps);
-    setStore('draftSession', reconcile({ input: '', ...draft.session }));
-    setStore('draftChats', draft.chats);
+    batch(() => {
+      setStore('draftSession', reconcile({ input: '', ...draft.session }));
+      setStore('draftChats', draft.chats);
+    });
     return;
   }
 
-  setStore(
-    'draftSession',
-    reconcile({
-      id: nanoid(),
-      title: sessionType === 'note' ? 'New Note' : 'New Chat',
-      type: sessionType,
-      chats: [chatId],
-      created: Date.now(),
-      input: '',
-    }),
-  );
+  batch(() => {
+    setStore(
+      'draftSession',
+      reconcile({
+        id: nanoid(),
+        title: sessionType === 'note' ? 'New Note' : 'New Chat',
+        type: sessionType,
+        chats: [chatId],
+        created: Date.now(),
+        input: '',
+      }),
+    );
 
-  setStore('draftChats', [
-    {
-      id: chatId,
-      status: 'idle',
-      created: Date.now(),
-      messages: [],
-      modelId: type === 'model' ? referenceId : undefined,
-      assistantId: type === 'assistant' ? referenceId : undefined,
-    },
-  ]);
+    setStore('draftChats', [
+      {
+        id: chatId,
+        status: 'idle',
+        created: Date.now(),
+        messages: [],
+        modelId: type === 'model' ? referenceId : undefined,
+        assistantId: type === 'assistant' ? referenceId : undefined,
+      },
+    ]);
+  });
 }
 
 export function addMessageToSessionChats(
@@ -118,32 +127,31 @@ export function addMessageToSessionChats(
   if (session?.created === -1) return sessionId;
 
   if (session) {
-    for (const chatId of session.chats) {
-      const chat = store.chats.find((c) => c.id === chatId);
-      const model = getChatModel(chat, store.assistants, models);
+    batch(() => {
+      for (const chatId of session.chats) {
+        const chat = store.chats.find((c) => c.id === chatId);
+        const model = getChatModel(chat, store.assistants, models);
 
-      const hasImageContent =
-        Array.isArray(message.content) && message.content.some((part) => part.type === 'image');
-      const supportsVision = model?.vision === true;
+        const hasImageContent =
+          Array.isArray(message.content) &&
+          message.content.some((part) => part.type === 'image');
+        const supportsVision = model?.vision === true;
 
-      if (!hasImageContent || supportsVision) {
-        setStore(
-          'chats',
-          (c) => c.id === chatId,
-          (c): Partial<ChatProps> => ({
-            messages: sessionType === 'note' ? [message] : [...c.messages, message],
-            status: c.status === 'loading' ? 'loading' : 'idle',
-            error: undefined,
-          }),
-        );
+        if (!hasImageContent || supportsVision) {
+          setStore(
+            'chats',
+            (c) => c.id === chatId,
+            (c): Partial<ChatProps> => ({
+              messages: sessionType === 'note' ? [message] : [...c.messages, message],
+              status: c.status === 'loading' ? 'loading' : 'idle',
+              error: undefined,
+            }),
+          );
+        }
       }
-    }
+    });
   }
   return sessionId;
-}
-
-export function chatError(chatId: string, error: { name: string; message: string }) {
-  setStore('chats', (c) => c.id === chatId, 'error', error);
 }
 
 export function clearChatError(chatId: string) {
@@ -151,10 +159,6 @@ export function clearChatError(chatId: string) {
     error: undefined,
     status: 'idle',
   });
-}
-
-export function setAssistant(id: string, chatId: string) {
-  setStore('chats', (c) => c.id === chatId, 'assistantId', id);
 }
 
 export function setSessionInput(input: string, sessionId?: string) {
@@ -202,14 +206,16 @@ export function deleteSession(sessionId: string) {
   }
   deleteImagesForSession(sessionId);
 
-  setStore(
-    'chats',
-    store.chats.filter((c) => !session.chats.includes(c.id)),
-  );
-  setStore(
-    'sessions',
-    store.sessions.filter((s) => s.id !== sessionId),
-  );
+  batch(() => {
+    setStore(
+      'chats',
+      store.chats.filter((c) => !session.chats.includes(c.id)),
+    );
+    setStore(
+      'sessions',
+      store.sessions.filter((s) => s.id !== sessionId),
+    );
+  });
   showSuccess(session.type === 'note' ? 'Note deleted.' : 'Chat deleted.');
   return true;
 }

@@ -21,6 +21,17 @@ async function runInClientBuild<T>(script: string): Promise<T> {
 
 const file = (path: string) => JSON.stringify(new URL(path, import.meta.url).href);
 
+// The icons module only resolves under Vite, so stub it as src/test/setup.ts does for unit tests.
+const stubIcons = `
+  const { iconsMock } = await import(${file('../test/icons-mock.ts')});
+  Bun.plugin({
+    name: 'icons',
+    setup(build) {
+      build.module('~/components/icons/ui', () => ({ exports: iconsMock(), loader: 'object' }));
+    },
+  });
+`;
+
 it('serialises the raw state to the same bytes as serialising through the store', async () => {
   const result = await runInClientBuild<Record<string, boolean>>(`
     const { $PROXY } = await import('solid-js');
@@ -92,4 +103,122 @@ it('serialises the raw state to the same bytes as serialising through the store'
     plainObjectMatches: true,
     omitsRuntimeState: true,
   });
+});
+
+type Observed = {
+  step: string;
+  /** Per session, the message count of each of its chats; null when the chat does not exist. */
+  sessions: (number | null)[][];
+  /** Whether each chat of the draft session exists. */
+  draft: boolean[];
+  library: { assistants: number; presets: number };
+};
+
+it('never shows an observer a half-applied session or preset action', async () => {
+  const seen = await runInClientBuild<Observed[]>(`
+    ${stubIcons}
+    globalThis.fetch = async () => Response.json([]);
+    const { createEffect, createRoot } = await import('solid-js');
+    const { setStore, store } = await import(${file('./index.tsx')});
+    const { setModels } = await import(${file('./models.ts')});
+    const { addPreset } = await import(${file('./actions/presets.ts')});
+    const { addMessageToSessionChats, deleteSession, newDraftSession } = await import(
+      ${file('./actions/session-actions.ts')}
+    );
+    globalThis.window = { confirm: () => true };
+
+    const model = { title: 'Model', creator: {}, created: 0, provider: [] };
+    setModels([{ ...model, id: 'one' }, { ...model, id: 'two' }]);
+    const twoChats = [
+      { modelId: 'one', status: 'idle' },
+      { modelId: 'two', status: 'idle' },
+    ];
+    setStore({
+      sessions: [],
+      chats: [],
+      assistants: [],
+      presets: [{ id: 'preset', type: 'chat', chats: twoChats }],
+    });
+
+    const seen = [];
+    let step = 'start';
+    createRoot(() => {
+      createEffect(() => {
+        const messages = (id) => store.chats.find((chat) => chat.id === id)?.messages.length;
+        seen.push({
+          step,
+          sessions: store.sessions.map((session) => session.chats.map(messages)),
+          draft: store.draftSession.chats.map((id) =>
+            store.draftChats.some((chat) => chat.id === id),
+          ),
+          library: { assistants: store.assistants.length, presets: store.presets.length },
+        });
+      });
+    });
+    const during = (name, action) => {
+      step = name;
+      return action();
+    };
+
+    during('draft from a preset', () => newDraftSession({ type: 'preset', referenceId: 'preset' }));
+    const sessionId = during('create', () =>
+      addMessageToSessionChats({ id: 'first', role: 'user', content: 'Hello' }),
+    );
+    during('message', () =>
+      addMessageToSessionChats({ id: 'second', role: 'user', content: 'Again' }, sessionId),
+    );
+    during('draft from a model', () => newDraftSession({ type: 'model', referenceId: 'one' }));
+    during('delete', () => deleteSession(sessionId));
+    during('add preset', () =>
+      addPreset(
+        {
+          id: 'template',
+          type: 'chat',
+          chats: [
+            { assistantId: 'writer', status: 'idle' },
+            { assistantId: 'editor', status: 'idle' },
+          ],
+        },
+        [
+          { id: 'writer', title: 'Writer', modelId: 'one' },
+          { id: 'editor', title: 'Editor', modelId: 'two' },
+        ],
+      ),
+    );
+
+    console.log(JSON.stringify(seen));
+  `);
+
+  const during = (step: string) => seen.filter((observed) => observed.step === step);
+  const sessions = (step: string) => during(step).map((observed) => observed.sessions);
+
+  // Every action was observed, so the checks below cannot pass by seeing nothing.
+  expect([...new Set(seen.map((observed) => observed.step))]).toEqual([
+    'start',
+    'draft from a preset',
+    'create',
+    'message',
+    'draft from a model',
+    'delete',
+    'add preset',
+  ]);
+
+  // A session never refers to a chat that does not exist yet, or no longer exists.
+  expect(seen.flatMap((observed) => observed.sessions.flat())).not.toContain(null);
+  expect(sessions('create').at(-1)).toEqual([[1, 1]]);
+  expect(sessions('delete')).toEqual([[]]);
+
+  // A message reaches all of a session's chats together.
+  expect(sessions('message')).toEqual([[[2, 2]]]);
+
+  // A new draft never refers to chats of the draft it replaced.
+  expect(during('draft from a preset').map((observed) => observed.draft)).toEqual([
+    [true, true],
+  ]);
+  expect(during('draft from a model').map((observed) => observed.draft)).toEqual([[true]]);
+
+  // A preset arrives together with the assistants it imports.
+  expect(during('add preset').map((observed) => observed.library)).toEqual([
+    { assistants: 2, presets: 2 },
+  ]);
 });

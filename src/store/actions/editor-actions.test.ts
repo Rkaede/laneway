@@ -5,7 +5,7 @@ import type { AssistantProps, PresetProps } from '~/types';
 Object.defineProperty(globalThis, 'self', { value: globalThis, configurable: true });
 const { setStore, store } = await import('..');
 const { addAssistant } = await import('./assistants');
-const { addPreset, setPresetName } = await import('./presets');
+const { addPreset } = await import('./presets');
 
 const originalAssistants = [...store.assistants];
 const originalPresets = [...store.presets];
@@ -63,11 +63,3 @@ it.each([preset, { ...preset, presetTitle: undefined }])(
     });
   },
 );
-
-it.each(['', ' Shared Preset '])('sets the preset name as supplied (%j)', (name) => {
-  setStore('presets', (presets) => [...presets, { ...preset, id: 'other-preset' }]);
-
-  setPresetName('other-preset', name);
-
-  expect(store.presets[1].presetTitle).toBe(name);
-});
