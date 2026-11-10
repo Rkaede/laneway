@@ -74,8 +74,10 @@ afterEach(() => {
 });
 
 describe('data deletion', () => {
-  it('keeps data and caches when confirmation is canceled', () => {
+  it('keeps data, caches, and requests when confirmation is canceled', () => {
     const clearImages = spyOn(imageCache, 'clearAll').mockResolvedValue(undefined);
+    const controller = new AbortController();
+    setStore('chats', 0, { status: 'loading', controller });
     const before = JSON.stringify(store);
 
     expect(deleteData()).toBe(false);
@@ -83,6 +85,7 @@ describe('data deletion', () => {
     expect(confirm).toHaveBeenCalledTimes(1);
     expect(confirm).toHaveBeenCalledWith(expect.stringContaining('cannot be undone'));
     expect(JSON.stringify(store)).toBe(before);
+    expect(controller.signal.aborted).toBe(false);
     expect(clearImages).not.toHaveBeenCalled();
     expect(deleteCache).not.toHaveBeenCalled();
     expect(apiKeys.openrouter).toBe('saved-key');
@@ -100,6 +103,29 @@ describe('data deletion', () => {
     expect(deleteCache).toHaveBeenCalledTimes(1);
     expect(deleteCache).toHaveBeenCalledWith('laneway-tts-cache');
     expect(apiKeys.openrouter).toBe('saved-key');
+  });
+
+  it('aborts every request, including the draft, before resetting', () => {
+    spyOn(imageCache, 'clearAll').mockResolvedValue(undefined);
+    confirm.mockReturnValue(true);
+    const controllers = [new AbortController(), new AbortController(), new AbortController()];
+    setStore('chats', 0, { status: 'loading', controller: controllers[0] });
+    setStore('chats', 1, { status: 'loading', controller: controllers[1] });
+    setStore('draftChats', 0, { status: 'loading', controller: controllers[2] });
+    for (const controller of controllers) {
+      controller.signal.addEventListener('abort', () => {
+        expect(store.chats.some((chat) => chat.id === 'delete-chat')).toBe(true);
+      });
+    }
+
+    expect(deleteData()).toBe(true);
+
+    expect(controllers.map((controller) => controller.signal.aborted)).toEqual([
+      true,
+      true,
+      true,
+    ]);
+    expect(store.chats.some((chat) => chat.id === 'delete-chat')).toBe(false);
   });
 
   it('still deletes data when Cache Storage is unavailable', () => {

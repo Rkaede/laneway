@@ -23,6 +23,7 @@ export const deleteData = () => {
   ) {
     return false;
   }
+  for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
   setStore(createDefaultState());
   imageCache.clearAll();
   if (typeof caches !== 'undefined') caches.delete('laneway-tts-cache');
