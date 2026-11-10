@@ -6,7 +6,7 @@ import { models } from '~/store/models';
 import { getChatModel } from '~/store/util';
 import type { ImagePart, MessageProps } from '~/types';
 
-export interface MessageContext {
+interface MessageContext {
   chatIds: string[];
   draft: boolean;
 }

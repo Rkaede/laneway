@@ -29,10 +29,9 @@ export type MessageProps = {
 
 export type ProviderId = 'openrouter';
 
-export type Provider = {
+type Provider = {
   id: ProviderId;
   modelId: string;
-  primary?: boolean;
 };
 
 /** A text-to-speech model on OpenRouter, written to public/speech-models.json at build time. */
@@ -44,12 +43,11 @@ export type SpeechModel = {
   price: number;
 };
 
-export type Creator = {
+type Creator = {
   id: string;
   name: string;
   website: string;
   icon: string;
-  type?: 'frontier';
 };
 
 export type ModelProps = {
@@ -67,35 +65,13 @@ export type ModelProps = {
   legacy?: boolean; // the model has a newer version
   vision?: boolean;
   reasoning?: boolean;
-  maxFrequency?: number;
-  maxTokens?: number;
-  maxPenalty?: number;
-  maxTemperature?: number;
-  contextWindow?: number;
   pricing?: {
     prompt: number;
     completion: number;
     image: number;
     request: number;
   };
-  defaultSettings?: {
-    temperature?: number;
-    topP?: number;
-    frequencyPenalty?: number;
-    presencePenalty?: number;
-  };
 };
-
-export enum Modality {
-  TextImageText = 'text+image->text',
-  TextText = 'text->text',
-}
-
-export interface Architecture {
-  modality: Modality;
-  tokenizer: string;
-  instruct_type: null | string;
-}
 
 export type ModelTags = 'new' | 'vision' | 'free' | 'online' | 'reasoning';
 
@@ -105,7 +81,6 @@ export type AssistantProps = {
   subtitle?: string;
   description?: string;
   modelId: string;
-  providerId?: string;
   templateId?: string;
   systemPrompt?: string;
   messages?: MessageProps[];
@@ -145,11 +120,6 @@ export type SessionProps = {
   input?: string;
 };
 
-export type UserProps = {
-  id: string;
-  name: string;
-};
-
 export type PresetProps = Omit<SessionProps, 'created' | 'chats' | 'title'> & {
   chats: Omit<ChatProps, 'created' | 'messages' | 'id'>[] & {
     messages?: MessageProps[];
@@ -162,7 +132,7 @@ export type ActionContext = {
   event?: KeyboardEvent;
 };
 
-export interface Action {
+interface Action {
   id: string;
   name: string;
   keywords: string[];
@@ -180,14 +150,13 @@ export type SessionTemplate = {
   type: 'model' | 'assistant' | 'preset';
   sessionType?: SessionType;
   id: string;
-  // todo: check if title and modelId are needed
   title?: string;
   referenceId?: string;
 };
 
 export type SVGAttributes = Partial<JSX.SvgSVGAttributes<SVGSVGElement>>;
 
-export type SpeedDialType = 'model' | 'assistant' | 'preset';
+type SpeedDialType = 'model' | 'assistant' | 'preset';
 
 export type SpeedDialItem = {
   id: string;

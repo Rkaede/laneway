@@ -15,7 +15,7 @@ afterEach(() => {
 });
 
 describe('getProvider', () => {
-  const openrouter = { id: 'openrouter', modelId: 'openai/model', primary: false } as const;
+  const openrouter = { id: 'openrouter', modelId: 'openai/model' } as const;
 
   beforeEach(() => {
     setModels([

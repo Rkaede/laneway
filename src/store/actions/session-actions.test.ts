@@ -211,7 +211,7 @@ describe('autonameChat', () => {
   const getText = mock<typeof llm.getText>();
 
   beforeEach(() => {
-    setModels(0, 'provider', [{ id: 'openrouter', modelId: 'title-model', primary: false }]);
+    setModels(0, 'provider', [{ id: 'openrouter', modelId: 'title-model' }]);
     setStore('settings', 'systemModel', 'vision');
     setApiKeys({ openrouter: 'test-key' });
     getText.mockReset();

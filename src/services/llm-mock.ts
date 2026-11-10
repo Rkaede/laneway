@@ -1,4 +1,4 @@
-export const stillAlive = `This was a triumph
+const stillAlive = `This was a triumph
 I'm making a note here: huge success
 It's hard to overstate my satisfaction
 Aperture Science
