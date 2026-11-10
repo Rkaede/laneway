@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, spyOn } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import * as solid from 'solid-js';
 
 import type { MessageProps } from '~/types';
 
@@ -14,6 +15,7 @@ fetchMock.mockRestore();
 const chatId = 'recovery-chat';
 const sessionId = 'recovery-session';
 const prompt: MessageProps = { id: 'prompt', role: 'user', content: 'Hello' };
+type Stream = Awaited<ReturnType<Parameters<typeof append>[0]['streamFn']>>;
 
 function createStream(text: string) {
   return {
@@ -30,6 +32,8 @@ beforeEach(() => {
   ]);
   setStore('chats', [{ id: chatId, status: 'loading', messages: [prompt] }]);
 });
+
+afterEach(() => mock.restore());
 
 describe('chat cancellation', () => {
   it.each(['Partial response', undefined])(
@@ -72,6 +76,16 @@ describe('chat cancellation', () => {
       expect(store.chats[0]).toEqual({ id: chatId, status, messages: [prompt] });
     },
   );
+
+  it('looks the chat up without creating a memo', async () => {
+    // Stop is clicked outside any reactive owner, so a memo made here would never be disposed.
+    const createMemo = spyOn(solid, 'createMemo');
+
+    await cancel({ chatId });
+
+    expect(store.chats[0].status).toBe('canceled');
+    expect(createMemo).not.toHaveBeenCalled();
+  });
 });
 
 describe('chat recovery', () => {
@@ -104,6 +118,24 @@ describe('chat recovery', () => {
     expect(store.chats[0].error?.message).toBe(
       'No provider is available for this model. Check your API keys in Settings.',
     );
+    expect(store.chats[0].controller).toBeUndefined();
+    expect(store.chats[0].latest).toBeUndefined();
+    expect(store.chats[0].messages).toEqual([prompt]);
+  });
+
+  it('ends loading with the error carried by an error stream part', async () => {
+    // The SDK reports API failures as a part of `fullStream` instead of rejecting.
+    const fullStream = (async function* () {
+      yield { type: 'error' as const, error: new Error('No auth credentials found') };
+    })();
+
+    await append({
+      chatId,
+      streamFn: async () => ({ ...createStream(''), fullStream }) as unknown as Stream,
+    });
+
+    expect(store.chats[0].status).toBe('error');
+    expect(store.chats[0].error?.message).toBe('No auth credentials found');
     expect(store.chats[0].controller).toBeUndefined();
     expect(store.chats[0].latest).toBeUndefined();
     expect(store.chats[0].messages).toEqual([prompt]);

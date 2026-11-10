@@ -4,13 +4,12 @@
 
 import { nanoid } from 'nanoid';
 
-import * as router from '~/services/llm';
-import { setStore } from '~/store';
+import type { getStream } from '~/services/llm';
+import { setStore, store } from '~/store';
 import { addMessage } from '~/store/actions';
-import { selectChatById } from '~/store/selectors';
 
 export async function cancel({ chatId }: { chatId: string }) {
-  const chat = selectChatById(chatId)();
+  const chat = store.chats.find((c) => c.id === chatId);
   if (!chat || chat.status !== 'loading') return;
 
   chat.controller?.abort();
@@ -39,7 +38,7 @@ export async function append({
   streamFn,
 }: {
   chatId: string;
-  streamFn: (abortSignal: AbortSignal) => ReturnType<typeof router.getStream>;
+  streamFn: (abortSignal: AbortSignal) => ReturnType<typeof getStream>;
 }) {
   const controller = new AbortController();
   try {
@@ -104,7 +103,6 @@ export async function append({
         message: errorMessage,
       },
     });
-    // }
   }
 }
 
