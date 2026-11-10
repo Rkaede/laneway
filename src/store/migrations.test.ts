@@ -1,7 +1,7 @@
 import { describe, expect, it, mock } from 'bun:test';
 import { createStore } from 'solid-js/store';
 
-import { createDefaultState } from './default-state';
+import { createDefaultState, defaults } from './default-state';
 import { migrateStore } from './migrations';
 
 function createLegacyState() {
@@ -79,6 +79,30 @@ describe('store migrations', () => {
       expect(store).toEqual(expected);
     },
   );
+
+  it('keeps the shared defaults out of the migrated store', () => {
+    const state = createLegacyState();
+    delete state.settings.messages;
+    delete state.settings.completions;
+    delete state.featureFlags;
+    delete state.speedDial;
+    delete state.settings.noteModel;
+    delete state.settings.tts;
+    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+    const before = structuredClone(defaults);
+
+    migrateStore(store, setStore);
+    setStore('settings', 'messages', 'showAvatars', true);
+    setStore('settings', 'completions', 'model', 'saved-model');
+    setStore('featureFlags', 'completions', true);
+    setStore('speedDial', 0, 'title', 'Renamed');
+    setStore('settings', 'noteModel', 'referenceId', 'saved-assistant');
+    setStore('settings', 'tts', 'voice', 'saved-voice');
+
+    expect(defaults).toEqual(before);
+    expect(store.settings.messages.showAvatars).toBe(true);
+    expect(store.speedDial[0].title).toBe('Renamed');
+  });
 
   it('does not rerun completed migrations', () => {
     const state = createLegacyState();
