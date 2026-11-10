@@ -10,9 +10,11 @@ interface UseAnimatedTextOptions {
 
 export function createAnimatedText(text: () => string, options: UseAnimatedTextOptions = {}) {
   const [animatedText, setAnimatedText] = createSignal('');
-  const [previousText, setPreviousText] = createSignal('');
-  const [lastAnimatedIndex, setLastAnimatedIndex] = createSignal(0);
   const [isAnimating, setIsAnimating] = createSignal(false);
+  // Plain variables, so the effect below depends on the text alone. As signals, every frame's
+  // write to the index re-ran the effect and restarted the animation.
+  let previousText = '';
+  let lastAnimatedIndex = 0;
 
   const defaultOptions = {
     duration: 0.5,
@@ -33,7 +35,7 @@ export function createAnimatedText(text: () => string, options: UseAnimatedTextO
 
   createEffect(() => {
     const currentText = text();
-    const prevText = previousText();
+    const prevText = previousText;
 
     // If texts are identical, no animation needed
     if (currentText === prevText) return;
@@ -54,7 +56,7 @@ export function createAnimatedText(text: () => string, options: UseAnimatedTextO
     }
 
     // Determine the starting point for the animation
-    const startIndex = Math.max(commonPrefixLength, lastAnimatedIndex());
+    const startIndex = Math.max(commonPrefixLength, lastAnimatedIndex);
 
     // Keep the existing animated text
     if (startIndex > 0) {
@@ -75,12 +77,12 @@ export function createAnimatedText(text: () => string, options: UseAnimatedTextO
         onUpdate: (latest) => {
           const currentIndex = Math.floor(latest);
           setAnimatedText(currentParts.slice(0, currentIndex).join(''));
-          setLastAnimatedIndex(currentIndex);
+          lastAnimatedIndex = currentIndex;
         },
         onComplete: () => {
           setAnimatedText(currentText);
-          setPreviousText(currentText);
-          setLastAnimatedIndex(currentParts.length);
+          previousText = currentText;
+          lastAnimatedIndex = currentParts.length;
           setIsAnimating(false);
         },
       });
@@ -91,8 +93,8 @@ export function createAnimatedText(text: () => string, options: UseAnimatedTextO
     } else {
       // If no new parts to animate, just update the state
       setAnimatedText(currentText);
-      setPreviousText(currentText);
-      setLastAnimatedIndex(currentParts.length);
+      previousText = currentText;
+      lastAnimatedIndex = currentParts.length;
       setIsAnimating(false);
     }
   });
