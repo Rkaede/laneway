@@ -6,6 +6,7 @@ import type { ImagePart, MessageProps } from '~/types';
 import * as util from '~/util';
 
 import { createBackup, exportBackup, parseBackup, restoreBackup } from './backup';
+import { deserializeChatStore, serializeChatStore } from './chat-persistence';
 import { createDefaultState } from './default-state';
 
 let images: Map<string, Blob>;
@@ -51,6 +52,16 @@ function stateWithImages() {
 
 function imagePart(message: MessageProps) {
   return (message.content as ImagePart[]).find((part) => part.type === 'image')!;
+}
+
+// The chat controller writes the streamed reply without an id.
+const streamedReply = { role: 'assistant', content: 'Partial answer' } as MessageProps;
+
+function draftChatBackup(chat: object) {
+  return JSON.stringify({
+    ...createDefaultState(),
+    draftChats: [{ id: 'draft', status: 'idle', messages: [], ...chat }],
+  });
 }
 
 describe('backups', () => {
@@ -125,7 +136,7 @@ describe('backups', () => {
     const savedController = new AbortController();
     source.chats[0].controller = savedController;
     source.chats[0].status = 'loading';
-    source.chats[0].latest = { id: 'partial', role: 'assistant', content: 'Partial answer' };
+    source.chats[0].latest = { ...streamedReply };
     const { file } = await createBackup(source);
     expect(await file.text()).not.toContain('controller');
     expect(savedController.signal.aborted).toBe(false);
@@ -143,6 +154,21 @@ describe('backups', () => {
     expect(current.chats[0].status).toBe('canceled');
     expect(current.chats[0].controller).toBeUndefined();
     expect(current.chats[0].latest?.content).toBe('Partial answer');
+  });
+
+  it('imports a backup exported after a reload interrupted a reply', async () => {
+    const interrupted = stateWithImages();
+    interrupted.chats[0].status = 'loading';
+    interrupted.chats[0].latest = { ...streamedReply };
+    const source = deserializeChatStore(serializeChatStore(interrupted));
+    expect(source.chats[0].latest).toEqual(streamedReply);
+    const { file } = await createBackup(source);
+    const [current, setCurrent] = createStore(createDefaultState());
+
+    await restoreBackup(parseBackup(await file.text()), current, setCurrent);
+
+    expect(current.chats[0].status).toBe('canceled');
+    expect(current.chats[0].latest).toEqual(streamedReply);
   });
 
   it('imports old JSON exports and runs migrations without inventing missing image bytes', async () => {
@@ -300,6 +326,10 @@ describe('backups', () => {
         },
       ],
     }),
+    draftChatBackup({ messages: [{ role: 'user', content: 'Saved without an id' }] }),
+    draftChatBackup({ latest: { id: 1, role: 'assistant', content: 'Partial answer' } }),
+    draftChatBackup({ latest: { role: 'narrator', content: 'Partial answer' } }),
+    draftChatBackup({ latest: { role: 'assistant', content: [{ type: 'image', image: {} }] } }),
   ])('rejects invalid or incompatible input before writing anything (%#)', (input) => {
     expect(() => parseBackup(input)).toThrow();
     expect(imageCache.add).not.toHaveBeenCalled();

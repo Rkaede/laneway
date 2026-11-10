@@ -6,10 +6,9 @@ import type { ImagePart, MessageProps } from '~/types';
 import { download, filenameDate } from '~/util';
 
 import { deserializeChatStore, serializeChatStore } from './chat-persistence';
-import { createDefaultState } from './default-state';
+import { createDefaultState, type State } from './default-state';
 import { migrateStore } from './migrations';
 
-type State = ReturnType<typeof createDefaultState>;
 type Backup = { state: State; images: Map<string, Blob>; legacy: boolean };
 
 function valid(condition: unknown): asserts condition {
@@ -34,8 +33,11 @@ function matchesShape(value: unknown, shape: unknown): boolean {
   return typeof value === typeof shape;
 }
 
-function validateMessage(message: unknown) {
-  valid(isObject(message) && matchesShape(message, { id: '', role: '' }));
+// A streamed reply is held in `latest` without an id until it completes, so only saved messages
+// must have one.
+function validateMessage(message: unknown, { requireId = true } = {}) {
+  valid(isObject(message) && matchesShape(message, { role: '' }));
+  valid(typeof message.id === 'string' || (!requireId && message.id === undefined));
   valid(['user', 'assistant', 'system', 'tool'].includes(String(message.role)));
   if (typeof message.content === 'string') return;
   valid(Array.isArray(message.content));
@@ -156,9 +158,9 @@ export function parseBackup(serialized: string): Backup {
   for (const owner of messageOwners(state)) {
     if (owner.messages !== undefined) {
       valid(Array.isArray(owner.messages));
-      owner.messages.forEach(validateMessage);
+      for (const message of owner.messages) validateMessage(message);
     }
-    if (owner.latest !== undefined) validateMessage(owner.latest);
+    if (owner.latest !== undefined) validateMessage(owner.latest, { requireId: false });
   }
   const [migrated, setMigrated] = createStore(state);
   migrateStore(migrated, setMigrated);
