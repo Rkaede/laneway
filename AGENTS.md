@@ -7,11 +7,15 @@ own API keys, and all data stays in the browser.
 
 - Use Bun for everything. There is no pnpm or npm lockfile.
 - Lint with oxlint (`bun run lint`) and format with oxfmt (`bun run format`). ESLint and Prettier
-  are gone, but keep the `eslint-plugin-*` devDependencies: oxlint loads them as JS plugins.
+  are no longer run, but keep `eslint` and the `eslint-plugin-*` devDependencies: oxlint loads the
+  plugins as JS plugins, and they need `eslint` to load.
 - `bun run validate` checks formatting, typechecks, lints and runs the unit tests without changing
   any files. Use `bun run format` and `bun run lint:fix` to apply fixes.
 - Unit tests are `*.test.ts` files, run with `bun test`. Playwright tests are `*.e2e.ts` files, run
   with `bun run test:e2e`; that needs `bunx playwright install chromium` and a free port 5173.
+- `bun test` resolves `solid-js` to its server build, where effects and memos never re-run and
+  `batch` does nothing. A test that needs real reactivity runs its body in a child process with
+  `--conditions=browser`, as `src/store/client-build.test.ts` and `src/tinykeys.test.ts` do.
 - Commit messages follow `type: description` (conventional commits). The commit-msg hook in
   `scripts/verify-commit.js` rejects anything else.
 
@@ -26,9 +30,11 @@ The design system lives in `src/styles/`, with `src/styles/loom.css` as its entr
   should not need dark overrides.
 - Hand-written CSS reads tokens as `var(--surface)`, never `var(--color-surface)`. The `--color-*`
   names resolve once at `:root` and would pin the value to the default theme.
-- When you add a radius or spacing token outside Tailwind's stock scale, register it in the
-  `extendTailwindMerge` config in `src/util.ts`, or `cn()` will not let stock classes override it.
-  `src/util.test.ts` covers this.
+- When you add a radius, spacing, font-size, font-weight or shadow token outside Tailwind's stock
+  scale, register it in the `extendTailwindMerge` config in `src/util.ts`. Otherwise `cn()` will
+  not let stock classes override it, or will drop it as a conflict: it reads an unregistered
+  `text-nav` as a colour. `src/util.test.ts` fails when a token under `src/styles/tokens/` is not
+  registered.
 - Button variants map to the `.btn-*` classes in `src/styles/button.css`. Buttons space their
   children with a gap, so icons inside a button do not need `mr-2`.
 
@@ -54,6 +60,8 @@ The app uses AI SDK 7 (`ai`, `@ai-sdk/openai`).
   checks it stays out of the startup bundle.
 - Read `fullStream`, not `textStream`. `textStream` hides API failures behind a generic
   `NoOutputGeneratedError`.
+- Send an assistant's system prompt through the `systemPrompt` option of `getStream`, which passes
+  it to the SDK as `instructions`. AI SDK 7 rejects a system message inside `messages`.
 - Usage fields are `inputTokens` and `outputTokens`. The mock stream in
   `src/services/llm-mock.ts` must match the shape of the real one.
 
