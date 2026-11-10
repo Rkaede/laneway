@@ -56,8 +56,11 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
     isSubmitting = true;
 
     try {
-      const _input = session().input;
-      if (_input === '' || _input === undefined) return;
+      // Read the session once. The route can change while attachments are cached, and the message
+      // belongs to the session it was submitted from.
+      const submittedId = sessionId?.();
+      const { input: _input, type } = session();
+      if (!_input?.trim()) return;
 
       const message = await createMessage(_input, sessionStore.attachments, {
         chatIds: sessionStore.chatIds,
@@ -66,13 +69,13 @@ export function createSession(sessionId?: Accessor<string | undefined>) {
 
       if (!message) return;
 
-      if (session().type !== 'note') {
-        setSessionInput('', sessionId?.());
+      if (type !== 'note') {
+        setSessionInput('', submittedId);
       }
 
-      const id = addMessageToSessionChats(message, sessionId?.(), session().type);
+      const id = addMessageToSessionChats(message, submittedId, type);
 
-      if (!sessionId?.()) {
+      if (!submittedId) {
         navigate(`/session/${id}`);
         if (store.settings.generateTitles) {
           autonameChat(id, _input);

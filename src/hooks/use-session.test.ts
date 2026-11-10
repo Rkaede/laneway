@@ -88,6 +88,51 @@ describe('session submission', () => {
     ]);
   });
 
+  it.each(['chat', 'note'] as const)(
+    'does not send whitespace-only input from a %s session',
+    async (type) => {
+      setStore('sessions', 0, { type, input: ' \n\t ' });
+      const session = createSession(() => 'session');
+
+      await session.handleSubmit();
+
+      expect(store.chats[0].messages).toEqual([]);
+      expect(session.input).toBe(' \n\t ');
+    },
+  );
+
+  it('sends to the session it was submitted from when the route changes while an image is cached', async () => {
+    setModels(0, 'vision', true);
+    setStore('sessions', 1, {
+      id: 'other',
+      title: 'Other',
+      type: 'chat',
+      created: 0,
+      chats: ['other-chat'],
+      input: 'Other draft',
+    });
+    setStore('chats', 1, {
+      id: 'other-chat',
+      modelId: 'no-vision',
+      status: 'idle',
+      messages: [],
+    });
+    const cached = Promise.withResolvers<void>();
+    spyOn(imageCache, 'add').mockReturnValue(cached.promise);
+    let route = 'session';
+    const session = createSession(() => route);
+    session.handleFileSelect(new File(['image'], 'photo.png', { type: 'image/png' }));
+
+    const pending = session.handleSubmit();
+    route = 'other';
+    cached.resolve();
+    await pending;
+
+    expect(store.chats.map((chat) => chat.messages.length)).toEqual([1, 0]);
+    expect(store.sessions.map((s) => s.input)).toEqual(['', 'Other draft']);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
   it.each([undefined, 'session'])(
     'ignores duplicate submissions while an image is being cached (session: %s)',
     async (sessionId) => {
