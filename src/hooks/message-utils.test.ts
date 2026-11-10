@@ -1,9 +1,18 @@
 /* oxlint-disable typescript/no-explicit-any */
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import { afterAll, afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 
-// Prevent fetch errors when importing modules that fetch data at load time
-(globalThis as any).fetch = async () => Response.json([]);
-(globalThis as any).self = {};
+// Prevent fetch errors when importing modules that fetch data at load time. These are plain
+// assignments, not spies, so the `mock.restore()` after each test leaves them in place.
+const originalFetch = globalThis.fetch;
+const originalSelf = Object.getOwnPropertyDescriptor(globalThis, 'self');
+globalThis.fetch = (async () => Response.json([])) as unknown as typeof fetch;
+Object.defineProperty(globalThis, 'self', { value: {}, configurable: true });
+
+afterAll(() => {
+  globalThis.fetch = originalFetch;
+  if (originalSelf) Object.defineProperty(globalThis, 'self', originalSelf);
+  else Reflect.deleteProperty(globalThis, 'self');
+});
 
 const { createMessage } = await import('./message-utils');
 const { imageCache } = await import('../services/image-cache');
