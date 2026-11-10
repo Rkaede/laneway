@@ -39,7 +39,7 @@ export function GeneralSettings() {
       </Setting>
       <Setting
         title="Streaming Display"
-        description="How an answer appears while it is written. Each lane also has a toggle to follow new output."
+        description="How an answer appears while it is written."
       >
         <Select
           options={[...STREAM_DISPLAY_MODES]}

@@ -33,7 +33,6 @@ const jsx = transpileModule(
   const createStreamFollow = () => ({
     following: () => true,
     away: () => false,
-    toggle: () => {},
     jump: () => {},
     revealFromStart: () => {},
   });

@@ -105,11 +105,6 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         type={props.chat.assistantId ? 'assistant' : 'model'}
         isFirst={props.isFirst}
         isLast={props.isLast}
-        follow={
-          props.chat.messages.length > 0 || props.chat.status === 'loading'
-            ? { following: follow.following(), onToggle: follow.toggle }
-            : undefined
-        }
       />
       <div class="sr-only" role="status">
         {announcement()}

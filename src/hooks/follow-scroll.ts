@@ -9,11 +9,9 @@ export type ScrollMetrics = { scrollTop: number; scrollHeight: number; clientHei
 export type FollowState = {
   /** The lane keeps its newest output in view. */
   following: boolean;
-  /** The reader switched following off themselves, so reaching the bottom will not resume it. */
-  locked: boolean;
 };
 
-export const FOLLOWING: FollowState = { following: true, locked: false };
+export const FOLLOWING: FollowState = { following: true };
 
 export function distanceFromBottom(m: ScrollMetrics, reverse: boolean) {
   return reverse
@@ -48,15 +46,10 @@ export function followAfterScroll(
   threshold = BOTTOM_THRESHOLD,
 ): FollowState {
   if (next.distance <= threshold) {
-    return state.locked || state.following ? state : FOLLOWING;
+    return state.following ? state : FOLLOWING;
   }
   if (state.following && next.distance > previous.distance && next.height === previous.height) {
-    return { following: false, locked: false };
+    return { following: false };
   }
   return state;
-}
-
-/** The follow toggle. Turning it off is deliberate, so it stays off until turned on again. */
-export function toggleFollow(state: FollowState): FollowState {
-  return state.following ? { following: false, locked: true } : FOLLOWING;
 }

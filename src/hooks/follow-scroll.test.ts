@@ -7,7 +7,6 @@ import {
   followAfterScroll,
   FOLLOWING,
   scrollTopForOffset,
-  toggleFollow,
   topOffset,
 } from './follow-scroll';
 
@@ -48,7 +47,6 @@ describe('followAfterScroll', () => {
   it('pauses when the reader scrolls away from the bottom', () => {
     expect(followAfterScroll(FOLLOWING, at(0), at(BOTTOM_THRESHOLD + 1))).toEqual({
       following: false,
-      locked: false,
     });
   });
 
@@ -65,29 +63,12 @@ describe('followAfterScroll', () => {
   });
 
   it('resumes when the reader scrolls back to the bottom', () => {
-    const paused = { following: false, locked: false };
+    const paused = { following: false };
     expect(followAfterScroll(paused, at(300), at(10))).toEqual(FOLLOWING);
   });
 
   it('stays paused while the reader is still above the bottom', () => {
-    const paused = { following: false, locked: false };
+    const paused = { following: false };
     expect(followAfterScroll(paused, at(300), at(200))).toBe(paused);
-  });
-
-  it('does not resume after the reader turned following off', () => {
-    const locked = { following: false, locked: true };
-    expect(followAfterScroll(locked, at(300), at(0))).toBe(locked);
-  });
-});
-
-describe('toggleFollow', () => {
-  it('turns following off for good until it is turned back on', () => {
-    const off = toggleFollow(FOLLOWING);
-    expect(off).toEqual({ following: false, locked: true });
-    expect(toggleFollow(off)).toEqual(FOLLOWING);
-  });
-
-  it('turns following on when it was paused by scrolling', () => {
-    expect(toggleFollow({ following: false, locked: false })).toEqual(FOLLOWING);
   });
 });

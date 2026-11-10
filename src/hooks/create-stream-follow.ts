@@ -8,7 +8,6 @@ import {
   FOLLOWING,
   type FollowState,
   scrollTopForOffset,
-  toggleFollow,
   topOffset,
 } from './follow-scroll';
 
@@ -106,11 +105,6 @@ export function createStreamFollow(lane: () => HTMLElement | undefined) {
     following: () => state().following,
     /** The reader is not at the latest output. */
     away,
-    toggle() {
-      const next = toggleFollow(state());
-      setState(next);
-      if (next.following) scrollToBottom('auto');
-    },
     /** Resume following and scroll to the newest output, without animation if motion is reduced. */
     jump() {
       setState(FOLLOWING);
@@ -119,7 +113,7 @@ export function createStreamFollow(lane: () => HTMLElement | undefined) {
     /** Stop following and bring the top of an element into view, to read an answer from its start. */
     revealFromStart(element: Element | null | undefined) {
       if (!scroller || !element) return;
-      setState({ following: false, locked: false });
+      setState({ following: false });
       element.scrollIntoView({ block: 'start', behavior: 'auto' });
       capture();
     },

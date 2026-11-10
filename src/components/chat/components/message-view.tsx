@@ -74,7 +74,7 @@ export const MessageView: Component<MessageViewProps> = (props) => {
   };
 
   return (
-    <MessageContainer role={props.role} showAvatars={props.showAvatars}>
+    <MessageContainer id={props.id} role={props.role} showAvatars={props.showAvatars}>
       <Show when={lightboxOpen()}>
         <Lightbox
           images={lightboxImages()}
@@ -170,11 +170,13 @@ export const MessageView: Component<MessageViewProps> = (props) => {
 };
 
 const MessageContainer: ParentComponent<
-  Pick<MessageProps, 'role'> & { showAvatars?: boolean }
+  Pick<MessageProps, 'id' | 'role'> & { showAvatars?: boolean }
 > = (props) => {
   return (
     <div
-      class="max-w-full rounded-xl py-bubble-y"
+      data-message-id={props.id}
+      // Leaves room for the sticky lane header when a message is scrolled into view.
+      class="max-w-full scroll-mt-14 rounded-xl py-bubble-y"
       classList={{
         'gap-2 flex items-start': props.showAvatars,
         'self-start bg-agent px-agent-x text-agent-fg': props.role === 'assistant',
