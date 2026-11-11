@@ -81,3 +81,12 @@ test('finds a chat despite a typo or a partial word', async ({ page }) => {
   await input.fill('aqua');
   await expect(page.getByRole('option', { name: /Aquarium notes/ })).toBeVisible();
 });
+
+test('opens search from the sidebar', async ({ page }) => {
+  await page.getByRole('button', { name: /^Search/ }).click();
+  const input = page.getByPlaceholder(/Search chats, notes/);
+  await expect(input).toBeFocused();
+
+  await input.fill('zebrafish');
+  await expect(page.getByRole('option', { name: /Aquarium notes/ })).toBeVisible();
+});

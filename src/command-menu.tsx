@@ -23,6 +23,7 @@ import {
   CommandShortcut,
 } from '~/components/ui/command';
 
+import { commandMenuOpen, setCommandMenuOpen } from './command-menu-state';
 import { shouldIgnoreShortcut } from './command-shortcuts';
 import { ModelIcon } from './components/connected/model-icon';
 import { IconChat, IconLayoutGrid, IconSquarePen } from './components/icons/ui';
@@ -94,7 +95,8 @@ function SessionResult(props: {
 }
 
 export function CommandMenu() {
-  const [open, setOpen] = createSignal(false);
+  const open = commandMenuOpen;
+  const setOpen = setCommandMenuOpen;
   const [query, setQuery] = createSignal('');
   const navigate = useNavigate();
   const params = useParams();

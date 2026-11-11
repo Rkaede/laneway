@@ -9,6 +9,7 @@ import {
   Show,
 } from 'solid-js';
 
+import { setCommandMenuOpen } from '~/command-menu-state';
 import { requestApiKey } from '~/components/connected/api-key-request';
 import {
   IconBox,
@@ -16,6 +17,7 @@ import {
   IconLayoutGrid,
   IconNewSession,
   IconScanFace,
+  IconSearch,
   IconSettings,
   IconSquarePen,
   MoreHorizontalIcon,
@@ -32,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  Shortcut,
   SidebarGroup,
   SidebarIcon,
   SidebarItem,
@@ -119,6 +122,17 @@ export const AppSidebar: Component<{ open?: boolean }> = (props) => {
             </SidebarItem>
             <SidebarItem onClick={handleNewNote} icon={<IconSquarePen class="mr-2 size-4" />}>
               New Note
+            </SidebarItem>
+            <SidebarItem
+              onClick={() => setCommandMenuOpen(true)}
+              icon={<IconSearch class="mr-2 size-4" />}
+              dropdown={
+                <Shortcut class="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
+                  $mod+K
+                </Shortcut>
+              }
+            >
+              Search
             </SidebarItem>
             <Show when={!anyKeysSet()}>
               <SidebarItem
