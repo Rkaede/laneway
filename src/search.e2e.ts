@@ -70,3 +70,14 @@ test('finds a chat by title and by date', async ({ page }) => {
   await input.fill('aquarium yesterday');
   await expect(page.getByRole('option', { name: /Aquarium notes/ })).toHaveCount(0);
 });
+
+test('finds a chat despite a typo or a partial word', async ({ page }) => {
+  await page.keyboard.press('ControlOrMeta+k');
+  const input = page.getByPlaceholder(/Search chats, notes/);
+
+  await input.fill('zebarfish');
+  await expect(page.getByRole('option', { name: /Aquarium notes/ })).toContainText('zebrafish');
+
+  await input.fill('aqua');
+  await expect(page.getByRole('option', { name: /Aquarium notes/ })).toBeVisible();
+});

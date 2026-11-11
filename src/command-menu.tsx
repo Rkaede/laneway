@@ -6,10 +6,12 @@ import {
   createSignal,
   For,
   Match,
+  on,
   onCleanup,
   Show,
   Switch,
 } from 'solid-js';
+import { unwrap } from 'solid-js/store';
 
 import {
   CommandDialog,
@@ -30,9 +32,9 @@ import { models } from './store/models';
 import {
   recentSessions,
   type SearchHit,
-  searchSessions,
   type SearchSnippet,
   sessionHref,
+  SessionIndex,
 } from './store/search';
 import { tinykeys } from './tinykeys';
 import type { SessionTemplate, SessionType } from './types';
@@ -188,13 +190,40 @@ export function CommandMenu() {
     },
   ];
 
-  const results = createMemo(() =>
-    searchSessions(
-      query(),
-      { sessions: store.sessions, chats: store.chats, assistants: store.assistants },
-      models,
+  // Sync the index when the menu opens rather than whenever the store changes, which would
+  // re-index on every token while a reply streams. Only changed sessions are re-indexed.
+  const sessionIndex = new SessionIndex();
+  const [synced, markSynced] = createSignal(undefined, { equals: false });
+  function syncIndex() {
+    const { sessions, chats, assistants } = unwrap(store);
+    sessionIndex.sync({ sessions, chats, assistants }, unwrap(models));
+    markSynced();
+  }
+  createEffect(on(open, (isOpen) => isOpen && syncIndex()));
+
+  // Building the index from scratch takes around 100ms for a full store, so do it while the app
+  // is idle rather than when the menu first opens. Wait for the models, because they change what
+  // every session indexes.
+  createEffect(
+    on(
+      () => models.length > 0,
+      (loaded) => {
+        if (!loaded) return;
+        if (typeof requestIdleCallback === 'function') {
+          const id = requestIdleCallback(syncIndex, { timeout: 5000 });
+          onCleanup(() => cancelIdleCallback(id));
+        } else {
+          const id = setTimeout(syncIndex, 2000);
+          onCleanup(() => clearTimeout(id));
+        }
+      },
     ),
   );
+
+  const results = createMemo(() => {
+    synced();
+    return sessionIndex.search(query());
+  });
   const recent = () => recentSessions(store.sessions);
   const searching = () => query().trim() !== '';
 

@@ -12,9 +12,9 @@ import {
   dateKeywords,
   messageText,
   recentSessions,
-  searchSessions,
   type SearchState,
   sessionHref,
+  SessionIndex,
   tokenize,
 } from './search';
 
@@ -83,8 +83,13 @@ function fixture(): SearchState {
   };
 }
 
-const search = (query: string, state = fixture()) =>
-  searchSessions(query, state, models, { now: NOW });
+function indexOf(state: SearchState) {
+  const index = new SessionIndex();
+  index.sync(state, models);
+  return index;
+}
+
+const search = (query: string, state = fixture()) => indexOf(state).search(query, { now: NOW });
 
 describe('tokenize', () => {
   it('lowercases and splits on whitespace', () => {
@@ -131,14 +136,9 @@ describe('recentSessions', () => {
 
 describe('dateKeywords', () => {
   it('includes the ISO date, month names and the year', () => {
-    const words = dateKeywords(new Date(2026, 2, 9, 8).getTime(), NOW);
-    for (const word of ['2026-03-09', 'march', 'mar', '2026']) expect(words).toContain(word);
-  });
-
-  it('labels today and yesterday', () => {
-    expect(dateKeywords(NOW, NOW)).toContain('today');
-    expect(dateKeywords(NOW - DAY, NOW)).toContain('yesterday');
-    expect(dateKeywords(NOW - 2 * DAY, NOW)).not.toMatch(/today|yesterday/);
+    const words = dateKeywords(new Date(2026, 2, 9, 8).getTime()).split(' ');
+    for (const word of ['2026-03-09', 'march', 'mar', '2026', '9'])
+      expect(words).toContain(word);
   });
 });
 
@@ -196,6 +196,20 @@ describe('searchSessions', () => {
     expect(search('today').map((h) => h.sessionId)).toEqual(['s-note']);
     expect(search('2026-10-24').map((h) => h.sessionId)).toEqual(['s-recipe']);
     expect(search('2026-10-24')[0].matchedOn).toBe('date');
+    expect(search('october').map((h) => h.sessionId)).toEqual(['s-recipe']);
+  });
+
+  it('matches dates by whole keyword only', () => {
+    expect(search('2026-10')).toEqual([]);
+    expect(search('octo')).toEqual([]);
+  });
+
+  it('works out today and yesterday when searching, not when indexing', () => {
+    const index = indexOf(fixture());
+    expect(index.search('today', { now: NOW + DAY }).map((h) => h.sessionId)).toEqual([]);
+    expect(index.search('yesterday', { now: NOW + DAY }).map((h) => h.sessionId)).toEqual([
+      's-note',
+    ]);
   });
 
   it('requires every word to match, in any field', () => {
@@ -211,6 +225,38 @@ describe('searchSessions', () => {
     state.sessions.push(session('s-extra', 'Unrelated', NOW, ['c-extra']));
 
     expect(search('parser', state).map((h) => h.sessionId)).toEqual(['s-code', 's-extra']);
+  });
+
+  it('matches the start of a word', () => {
+    expect(search('lev')[0]).toMatchObject({ sessionId: 's-recipe', messageId: 'm2' });
+    expect(search('sour').map((h) => h.sessionId)).toEqual(['s-recipe']);
+    expect(search('lev')[0].snippet?.match).toBe('levain');
+  });
+
+  it('tolerates a typo in longer words', () => {
+    expect(search('sourdogh').map((h) => h.sessionId)).toEqual(['s-recipe']);
+    expect(search('tokenzier')[0]).toMatchObject({ sessionId: 's-code', messageId: 'm3' });
+    expect(search('levan')[0].snippet?.match).toBe('levain');
+  });
+
+  it('does not treat short words as typos', () => {
+    expect(search('fed')).toEqual([]);
+  });
+
+  it('ignores punctuation in the query', () => {
+    expect(search('levain, / feed!').map((h) => h.sessionId)).toEqual(['s-recipe']);
+    expect(search(' / ')).toEqual([]);
+  });
+
+  it('highlights whole words rather than the inside of another word', () => {
+    const state = fixture();
+    state.chats[0] = chat('c-recipe', [
+      message('m9', 'user', 'Another day, another loaf of the bread'),
+    ]);
+    expect(search('the', state)[0].snippet).toMatchObject({
+      before: 'Another day, another loaf of ',
+      match: 'the',
+    });
   });
 
   it('searches the text of a note', () => {
@@ -234,7 +280,7 @@ describe('searchSessions', () => {
   });
 
   it('limits the number of results', () => {
-    const results = searchSessions('a', fixture(), models, { now: NOW, limit: 1 });
+    const results = indexOf(fixture()).search('a', { now: NOW, limit: 1 });
     expect(results).toHaveLength(1);
   });
 
@@ -256,29 +302,77 @@ describe('searchSessions', () => {
   });
 });
 
-describe('consistency with the store', () => {
+describe('syncing with the store', () => {
+  const find = (index: SessionIndex, query: string) =>
+    index.search(query, { now: NOW }).map((h) => h.sessionId);
+
   it('drops a session from results once it is deleted', () => {
     const state = fixture();
-    expect(search('levain', state)).toHaveLength(1);
+    const index = indexOf(state);
+    expect(find(index, 'levain')).toEqual(['s-recipe']);
 
     state.sessions = state.sessions.filter((s) => s.id !== 's-recipe');
     state.chats = state.chats.filter((c) => c.id !== 'c-recipe');
+    index.sync(state, models);
 
-    expect(search('levain', state)).toEqual([]);
+    expect(find(index, 'levain')).toEqual([]);
   });
 
   it('finds sessions that appear in the store later, such as a restored backup', () => {
-    const empty: SearchState = { sessions: [], chats: [], assistants: [] };
-    expect(search('levain', empty)).toEqual([]);
+    const index = indexOf({ sessions: [], chats: [], assistants: [] });
+    expect(find(index, 'levain')).toEqual([]);
 
-    expect(search('levain', fixture())[0].sessionId).toBe('s-recipe');
+    index.sync(fixture(), models);
+    expect(find(index, 'levain')).toEqual(['s-recipe']);
   });
 
   it('follows a rename', () => {
     const state = fixture();
+    const index = indexOf(state);
     state.sessions[1] = { ...state.sessions[1], title: 'Lexer rewrite' };
+    index.sync(state, models);
 
-    expect(search('parser', state).map((h) => h.matchedOn)).toEqual(['message']);
-    expect(search('lexer', state)[0].matchedOn).toBe('title');
+    expect(index.search('parser', { now: NOW }).map((h) => h.matchedOn)).toEqual(['message']);
+    expect(index.search('lexer', { now: NOW })[0].matchedOn).toBe('title');
+  });
+
+  it('picks up new messages and edits', () => {
+    const state = fixture();
+    const index = indexOf(state);
+
+    state.chats[1].messages.push(
+      message('m8', 'assistant', 'Use a recursive descent grammar.'),
+    );
+    index.sync(state, models);
+    expect(index.search('grammar', { now: NOW })[0]).toMatchObject({ messageId: 'm8' });
+
+    state.chats[1].messages[2] = message('m8', 'assistant', 'Use a Pratt parser.');
+    index.sync(state, models);
+    expect(find(index, 'grammar')).toEqual([]);
+    expect(find(index, 'pratt')).toEqual(['s-code']);
+  });
+
+  it('picks up models once they load', () => {
+    const state = fixture();
+    const index = new SessionIndex();
+    index.sync(state, []);
+    expect(find(index, 'anthropic')).toEqual([]);
+
+    index.sync(state, models);
+    expect(find(index, 'anthropic')).toEqual(['s-code']);
+  });
+
+  it('can be synced repeatedly without changes', () => {
+    const state = fixture();
+    const index = indexOf(state);
+    index.sync(state, models);
+    index.sync(state, models);
+    expect(find(index, 'sourdough')).toEqual(['s-recipe']);
+  });
+
+  it('indexes a session once when the store lists it twice', () => {
+    const state = fixture();
+    state.sessions.push(state.sessions[0]);
+    expect(search('sourdough', state)).toHaveLength(1);
   });
 });

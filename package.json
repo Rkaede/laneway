@@ -36,6 +36,7 @@
     "dequal": "^2.0.3",
     "html-to-image": "^1.11.13",
     "lucide-solid": "^1.62.0",
+    "minisearch": "^7.2.0",
     "motion": "^14.7.1",
     "nanoid": "^6.0.2",
     "remark-gfm": "^4.0.1",
