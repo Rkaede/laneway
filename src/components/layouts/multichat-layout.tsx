@@ -101,6 +101,8 @@ export const MultiChatLayout: ParentComponent<MultiChatLayoutProps> = (props) =>
 
                   return (
                     <ChatPanel
+                      sessionId={s().id}
+                      branch={s().branch}
                       chat={chat}
                       attachments={attachments()}
                       isExample={s().created === -1}

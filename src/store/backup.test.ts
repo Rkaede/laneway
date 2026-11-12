@@ -391,4 +391,29 @@ describe('backups', () => {
     expect(() => parseBackup(JSON.stringify(data))).toThrow('Invalid Laneway backup');
     expect(imageCache.add).not.toHaveBeenCalled();
   });
+
+  it('keeps the branch ancestry of forked sessions, even when the parent is missing', async () => {
+    const source = stateWithImages();
+    const branch = {
+      parentId: 'deleted-parent',
+      parentTitle: 'Gone',
+      messageId: 'm1',
+      forkedMessageId: 'm1-copy',
+    };
+    source.sessions[0].branch = branch;
+    const backup = parseBackup(await (await createBackup(source)).file.text());
+    const [current, setCurrent] = createStore(createDefaultState());
+
+    await restoreBackup(backup, current, setCurrent);
+
+    expect(current.sessions[0].branch).toEqual(branch);
+  });
+
+  it('rejects a malformed branch', async () => {
+    const source = stateWithImages();
+    const data = JSON.parse(await (await createBackup(source)).file.text());
+    data.state.sessions[0].branch = { parentId: 'parent' };
+
+    expect(() => parseBackup(JSON.stringify(data))).toThrow('Invalid Laneway backup');
+  });
 });

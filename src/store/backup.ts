@@ -156,6 +156,18 @@ export function parseBackup(serialized: string): Backup {
   for (const chat of [...state.chats, ...state.draftChats]) {
     valid(['idle', 'loading', 'error', 'canceled'].includes(chat.status));
   }
+  // A parent may be missing from the backup (deleted before export), so only the shape is checked.
+  for (const session of [...state.sessions, state.draftSession]) {
+    valid(
+      session.branch === undefined ||
+        matchesShape(session.branch, {
+          parentId: '',
+          parentTitle: '',
+          messageId: '',
+          forkedMessageId: '',
+        }),
+    );
+  }
   for (const owner of messageOwners(state)) {
     if (owner.messages !== undefined) {
       valid(Array.isArray(owner.messages));

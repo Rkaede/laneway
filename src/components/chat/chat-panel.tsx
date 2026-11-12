@@ -21,18 +21,24 @@ import { streamAnimation } from '~/services/stream-trials';
 import { store } from '~/store';
 import { modelsLoaded } from '~/store/models';
 import { anyKeysSet } from '~/store/selectors';
-import type { ChatProps, ModelProps } from '~/types';
+import type { ChatProps, ModelProps, SessionBranch } from '~/types';
 
 import {
   AlertApiKey,
   AlertError,
   AlertNoVision,
+  BranchNotice,
   Chatbar,
+  ForkDialog,
   JumpToLatest,
   Message,
 } from './components';
 
 type ChatPanelProps = {
+  /** The saved session the chat belongs to. Leave this out for a draft, which cannot be forked. */
+  sessionId?: string;
+  /** Where the session was forked from. A notice follows the message it was forked at. */
+  branch?: SessionBranch;
   chat: ChatProps;
   attachments?: File[];
   variant?: 'chat' | 'note';
@@ -43,6 +49,10 @@ type ChatPanelProps = {
 
 export const ChatPanel: Component<ChatPanelProps> = (props) => {
   const chat = useChat({ chat: props.chat, readOnly: () => props.isExample });
+  const [forkMessageId, setForkMessageId] = createSignal<string>();
+  // A note keeps only its latest exchange, so there is nothing to branch from.
+  const canFork = () => !!props.sessionId && props.variant !== 'note';
+
   const [lane, setLane] = createSignal<HTMLDivElement>();
   const follow = createStreamFollow(lane);
   const mode = () => getStreamDisplayMode(store.settings.streaming?.display).id;
@@ -140,16 +150,26 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
         <div class="flex min-h-full flex-1 flex-col gap-8 pt-8 pb-8">
           <For each={props.chat.messages}>
             {(message) => (
-              <Message
-                {...message}
-                model={chat.model()}
-                tts={!props.isExample && store.settings.tts.enabled}
-                wordSpans={
-                  reveal.wordSpans() &&
-                  message.role === 'assistant' &&
-                  message.id === props.chat.messages.at(-1)?.id
-                }
-              />
+              <>
+                <Message
+                  {...message}
+                  model={chat.model()}
+                  tts={!props.isExample && store.settings.tts.enabled}
+                  wordSpans={
+                    reveal.wordSpans() &&
+                    message.role === 'assistant' &&
+                    message.id === props.chat.messages.at(-1)?.id
+                  }
+                  onFork={
+                    canFork() && message.role === 'assistant'
+                      ? () => setForkMessageId(message.id)
+                      : undefined
+                  }
+                />
+                <Show when={props.branch?.forkedMessageId === message.id && props.branch}>
+                  {(branch) => <ForkPoint branch={branch()} />}
+                </Show>
+              </>
             )}
           </For>
 
@@ -208,6 +228,17 @@ export const ChatPanel: Component<ChatPanelProps> = (props) => {
           <Show when={props.chat.error}>
             {(error) => <AlertError error={error()} onRetry={() => chat.clearError()} />}
           </Show>
+
+          <Show when={props.sessionId && forkMessageId()}>
+            {(messageId) => (
+              <ForkDialog
+                sessionId={props.sessionId as string}
+                chatId={props.chat.id}
+                messageId={messageId()}
+                onClose={() => setForkMessageId(undefined)}
+              />
+            )}
+          </Show>
         </div>
       </div>
       <Show when={follow.away()}>
@@ -240,3 +271,14 @@ function IncomingMessage(props: {
     />
   );
 }
+
+/** Marks where a forked chat leaves its parent. Messages above it were copied from the parent. */
+const ForkPoint: Component<{ branch: SessionBranch }> = (props) => {
+  const parent = () => store.sessions.find((s) => s.id === props.branch.parentId);
+  return (
+    <BranchNotice
+      parentTitle={parent()?.title ?? props.branch.parentTitle}
+      href={parent() ? `/session/${props.branch.parentId}` : undefined}
+    />
+  );
+};

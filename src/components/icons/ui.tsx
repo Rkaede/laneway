@@ -38,6 +38,7 @@ export { default as IconScanFace } from 'lucide-solid/icons/scan-face';
 export { default as IconSearch } from 'lucide-solid/icons/search';
 export { default as IconSendHorizontal } from 'lucide-solid/icons/send-horizontal';
 export { default as IconSettings } from 'lucide-solid/icons/settings';
+export { default as IconSplit } from 'lucide-solid/icons/split';
 export { default as IconSquare } from 'lucide-solid/icons/square';
 export { default as IconSquarePen } from 'lucide-solid/icons/square-pen';
 export { default as IconSun } from 'lucide-solid/icons/sun';

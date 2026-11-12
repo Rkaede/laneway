@@ -7,6 +7,7 @@ import * as AppErrorStories from './app-error.stories';
 import * as AudioButtonStories from './audio-button.stories';
 import * as AvatarStories from './avatar.stories';
 import * as BadgeStories from './badge.stories';
+import * as BranchNoticeStories from './branch-notice.stories';
 import * as ButtonStories from './button.stories';
 import * as CardStories from './card.stories';
 import * as ChatAlertsStories from './chat-alerts.stories';
@@ -69,6 +70,7 @@ export const storyMap: Record<string, StoryGroup> = {
   'audio-button': { title: 'AudioButton', stories: AudioButtonStories },
   avatar: { title: 'Avatar', stories: AvatarStories },
   badge: { title: 'Badge', stories: BadgeStories },
+  'branch-notice': { title: 'BranchNotice', stories: BranchNoticeStories },
   button: { title: 'Button', stories: ButtonStories },
   card: { title: 'Card', stories: CardStories },
   'chat-alerts': { title: 'Chat Alerts', stories: ChatAlertsStories },

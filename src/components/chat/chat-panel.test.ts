@@ -54,6 +54,8 @@ const jsx = transpileModule(
   const AlertApiKey = () => null;
   const AlertError = () => null;
   const AlertNoVision = () => null;
+  const ForkDialog = () => null;
+  const BranchNotice = () => null;
   const Message = (props) =>
     props.content +
     '[model:' + (props.model?.id ?? 'none') + '][status:' + props.status + ']' +

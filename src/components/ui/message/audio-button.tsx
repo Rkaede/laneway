@@ -31,7 +31,7 @@ export function AudioButton(props: AudioButtonProps) {
       classList={{
         'disabled:opacity-100': props.status === 'loading',
         'motion-reduce:w-auto motion-reduce:px-2': props.status === 'loading',
-        'bg-surface-hover': props.status === 'playing',
+        'bg-surface-hover text-main': props.status === 'playing',
       }}
       title={ariaLabels[props.status]}
       aria-label={ariaLabels[props.status]}

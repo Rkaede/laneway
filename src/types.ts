@@ -105,6 +105,16 @@ export type ChatProps = {
 
 export type SessionType = 'chat' | 'note';
 
+/** Where a forked session came from. The title is a snapshot, kept after the parent is deleted. */
+export type SessionBranch = {
+  parentId: string;
+  parentTitle: string;
+  /** The message in the parent that the fork was made from. */
+  messageId: string;
+  /** The copy of that message in the fork. New messages in the fork follow it. */
+  forkedMessageId: string;
+};
+
 export type SessionProps = {
   id: string;
   // the title of the session shown in the sidebar
@@ -118,6 +128,7 @@ export type SessionProps = {
   created: number;
   chats: string[];
   input?: string;
+  branch?: SessionBranch;
 };
 
 export type PresetProps = Omit<SessionProps, 'created' | 'chats' | 'title'> & {

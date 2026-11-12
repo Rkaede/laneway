@@ -32,6 +32,21 @@ export function Basic() {
   );
 }
 
+export function WithFork() {
+  return (
+    <div class="flex max-w-md flex-col gap-4">
+      <MessageView id="fork-user" role="user" content={exampleUser} />
+      <MessageView
+        id="fork-assistant"
+        role="assistant"
+        content={exampleAssistant}
+        usage={stats}
+        onFork={() => {}}
+      />
+    </div>
+  );
+}
+
 export function AudioStates() {
   return (
     <Cells class="max-w-md">

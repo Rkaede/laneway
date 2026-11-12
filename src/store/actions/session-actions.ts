@@ -18,6 +18,7 @@ import type {
 } from '~/types';
 
 import { setStore, store } from '..';
+import { chatImageIds, createFork, type ForkTarget } from '../branches';
 import { apiKeys } from '../keys';
 import { models } from '../models';
 import { createSessionFromPreset, getChatModel } from '../util';
@@ -173,21 +174,41 @@ function deleteImagesForSession(sessionId: string) {
   const session = store.sessions.find((s) => s.id === sessionId);
   if (!session) return;
 
-  session.chats.forEach((chatId) => deleteImagesForChat(chatId));
+  // Forks share images with the chats they were copied from, so keep any image still in use.
+  const inUse = chatImageIds([
+    ...store.chats.filter((c) => !session.chats.includes(c.id)),
+    ...store.draftChats,
+  ]);
+  const doomed = store.chats.filter((c) => session.chats.includes(c.id));
+  for (const storageId of chatImageIds(doomed)) {
+    if (!inUse.has(storageId)) imageCache.remove(storageId);
+  }
 }
 
-function deleteImagesForChat(chatId: string) {
+/** Copy one chat, up to a message, into a new session and return the new session's id. */
+export function forkSession({
+  sessionId,
+  chatId,
+  messageId,
+  title,
+  target,
+}: {
+  sessionId: string;
+  chatId: string;
+  messageId: string;
+  title?: string;
+  target?: ForkTarget;
+}) {
+  const session = store.sessions.find((s) => s.id === sessionId);
   const chat = store.chats.find((c) => c.id === chatId);
-  if (!chat) return;
+  if (!session || !chat || session.type === 'note') return undefined;
 
-  chat.messages.forEach((message) => {
-    if (typeof message.content === 'string') return;
-    message.content.forEach((content) => {
-      if (content.type === 'image' && content.image.storageId) {
-        imageCache.remove(content.image.storageId);
-      }
-    });
-  });
+  const fork = createFork({ session, chat, messageId, title, target });
+  if (!fork) return undefined;
+
+  setStore('chats', store.chats.length, fork.chat);
+  setStore('sessions', (otherSessions) => [fork.session, ...otherSessions]);
+  return fork.session.id;
 }
 
 export function deleteSession(sessionId: string) {

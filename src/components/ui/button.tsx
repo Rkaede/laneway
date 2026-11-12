@@ -20,7 +20,7 @@ const buttonVariants = cva('btn', {
       link: 'btn-link',
       combobox: 'btn-field w-full min-w-0 justify-between text-left font-normal',
       close: 'size-10 rounded-full p-0 text-on-media hover:bg-media-wash',
-      toolbar: 'text-main hover:bg-surface-hover',
+      toolbar: 'text-muted hover:bg-surface-hover hover:text-main',
     },
     size: {
       default: 'btn-md',

@@ -22,7 +22,7 @@ export const ModelIcon = () => null;
 export const LocalImage = (props) => '[image alt=' + props.alt + ']';
 export const CopyButton = () => '[copy]';
 export const IconBan = ModelIcon, IconUser = ModelIcon, Avatar = ModelIcon, Tag = ModelIcon,
-  Lightbox = ModelIcon, AudioButton = ModelIcon,
+  Lightbox = ModelIcon, AudioButton = ModelIcon, ForkButton = ModelIcon,
   StatsPopover = ModelIcon, Tooltip = ModelIcon, TooltipContent = ModelIcon, TooltipTrigger = ModelIcon;
 `,
 );

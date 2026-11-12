@@ -9,6 +9,7 @@ import Markdown from '~/components/ui/markdown';
 import type { StreamCursorShape } from '~/components/ui/markdown-cursor';
 import { AudioButton, type AudioButtonProps } from '~/components/ui/message/audio-button';
 import { CopyButton } from '~/components/ui/message/copy-button';
+import { ForkButton } from '~/components/ui/message/fork-button';
 import { StatsPopover } from '~/components/ui/stats-popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip';
 import type { ImagePart, MessageProps, TextPart } from '~/types';
@@ -32,6 +33,8 @@ export type MessageViewProps = MessageProps & {
   wordSpans?: boolean;
   /** Shows a cursor after the last text, for an answer that is still streaming. */
   cursor?: StreamCursorShape;
+  /** Leave this out to hide the fork button, which only responses show. */
+  onFork?: () => void;
 };
 
 /** The plain text of a message, without its images. */
@@ -151,7 +154,18 @@ export const MessageView: Component<MessageViewProps> = (props) => {
       </Show>
       {/* An answer that is still arriving has nothing complete to copy, play or measure. */}
       <Show when={props.role === 'assistant' && props.status !== 'loading'}>
-        <div class="mt-2 flex items-center gap-[1px]">
+        <div
+          class={cn(
+            'mt-2 flex items-center gap-[1px] transition-opacity',
+            // Shown while the pointer is over the message, or while a button in it is in use.
+            // Audio that is loading or playing keeps it shown, so it can be stopped.
+            props.audioStatus !== 'loading' &&
+              props.audioStatus !== 'playing' &&
+              'opacity-0 group-focus-within/message:opacity-100 group-hover/message:opacity-100 has-[[data-expanded]]:opacity-100',
+            // Without hover, as on touch screens, there is no way to reveal it, so it stays shown.
+            '[@media(hover:none)]:opacity-100',
+          )}
+        >
           <Show when={props.audioStatus}>
             {(status) => (
               <Show
@@ -169,6 +183,7 @@ export const MessageView: Component<MessageViewProps> = (props) => {
           </Show>
           <CopyButton text={messageText(props.content)} />
           <StatsPopover stats={props.usage} />
+          <Show when={props.onFork}>{(onFork) => <ForkButton onClick={onFork()} />}</Show>
         </div>
       </Show>
     </MessageContainer>
@@ -182,7 +197,14 @@ const MessageContainer: ParentComponent<
     <div
       data-message-id={props.id}
       // Leaves room for the sticky lane header when a message is scrolled into view.
-      class="max-w-full scroll-mt-14 rounded-xl py-bubble-y"
+      class={cn(
+        'group/message relative isolate max-w-full scroll-mt-14 rounded-xl py-bubble-y',
+        // An invisible area reaching into the gaps around the message keeps the toolbar shown
+        // while the pointer heads for it. It sits under the content, so it never takes a click
+        // or a text selection from the message. It stays inside the lane's padding sideways,
+        // or it would make the chat scroll horizontally.
+        "before:absolute before:-inset-x-1.5 before:-inset-y-4 before:-z-10 before:content-['']",
+      )}
       classList={{
         'gap-2 flex items-start': props.showAvatars,
         'self-start bg-agent px-agent-x text-agent-fg': props.role === 'assistant',

@@ -8,7 +8,7 @@ import type { MessageProps } from '~/types';
 import { messageText, MessageView, type MessageViewProps } from './message-view';
 
 type MessageComponentProps = MessageProps &
-  Pick<MessageViewProps, 'wordSpans' | 'cursor'> & { tts?: boolean };
+  Pick<MessageViewProps, 'wordSpans' | 'cursor' | 'onFork'> & { tts?: boolean };
 
 export const Message: Component<MessageComponentProps> = (props) => {
   const [local, rest] = splitProps(props, ['tts']);
