@@ -1,13 +1,21 @@
 import { useParams } from '@solidjs/router';
 import { For, Show } from 'solid-js';
 
-import { storyMap } from './stories';
+import { findStoryGroup, type StoryGroup } from './stories';
+
+const orderedStories = (group: StoryGroup) => {
+  const order = group.order ?? [];
+  const rank = (name: string) => {
+    const index = order.indexOf(name);
+    return index === -1 ? order.length : index;
+  };
+  // Array.prototype.sort is stable, so unlisted stories keep their alphabetical order.
+  return Object.entries(group.stories).sort(([a], [b]) => rank(a) - rank(b));
+};
 
 export default function StoryPage() {
   const params = useParams<{ story: string }>();
-  // An own-property check, so ids such as "constructor" do not resolve to Object.prototype.
-  const currentStory = () =>
-    Object.hasOwn(storyMap, params.story) ? storyMap[params.story] : undefined;
+  const currentStory = () => findStoryGroup(params.story);
 
   return (
     <Show
@@ -24,7 +32,7 @@ export default function StoryPage() {
         <div class="h-full overflow-auto px-10 py-6">
           <h1 class="mb-6 text-3xl font-medium">{story.title}</h1>
           <div class="flex flex-col gap-6">
-            <For each={Object.entries(story.stories)}>
+            <For each={orderedStories(story)}>
               {([name, Component]) => (
                 <div>
                   <h3 class="mb-4 text-lg font-semibold">{name}</h3>

@@ -60,6 +60,8 @@ const CommandInput: Component<VoidProps<CommandPrimitive.CommandInputProps>> = (
         <path d="M21 21l-6 -6" />
       </svg>
       <CommandPrimitive.CommandInput
+        // Keep 1Password's button out of the search field.
+        data-1p-ignore=""
         class={cn(
           'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-placeholder disabled:opacity-50',
           local.class,

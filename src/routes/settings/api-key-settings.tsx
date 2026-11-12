@@ -36,7 +36,7 @@ export function APIKeySetting() {
       >
         <Input
           aria-label="OpenRouter API key"
-          data-1p-ignore // disable 1Password extension
+          passwordManager
           autocomplete="off"
           type="password"
           value={apiKeys?.openrouter ?? ''}

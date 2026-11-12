@@ -30,6 +30,8 @@ type MultiComboboxProps = {
   includeAssistants?: boolean;
   includePresets?: boolean;
   showType?: boolean;
+  disabled?: boolean;
+  invalid?: boolean;
 };
 
 export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
@@ -58,14 +60,24 @@ export const MultiCombobox: Component<MultiComboboxProps> = (props) => {
 
   return (
     <Popover open={open()} onOpenChange={setOpen}>
-      <Button as={PopoverTrigger} variant="combobox" class={cn(props.class)}>
+      <Button
+        as={PopoverTrigger}
+        variant="combobox"
+        class={cn(props.class)}
+        disabled={props.disabled}
+        aria-invalid={props.invalid ? 'true' : undefined}
+      >
         <Show
           when={selectedItem()?.type === 'preset'}
           fallback={<ModelIcon modelId={modelId()} class="size-4" />}
         >
           <IconLayoutGrid class="size-4" />
         </Show>
-        <span class="min-w-0 flex-1 truncate">
+        {/* Marked the way Kobalte marks the Select's value, so `.field` mutes the placeholder. */}
+        <span
+          class="min-w-0 flex-1 truncate"
+          data-placeholder-shown={selectedItem() ? undefined : ''}
+        >
           {selectedItem() ? (
             <span class="flex items-baseline gap-1">
               <span class="truncate">{selectedItem()?.title}</span>

@@ -87,10 +87,10 @@ export const ForkDialog: Component<ForkDialogProps> = (props) => {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Fork</Button>
-          <Button type="button" variant="secondary" onClick={props.onClose}>
+          <Button type="button" variant="outline" onClick={props.onClose}>
             Cancel
           </Button>
+          <Button type="submit">Fork</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

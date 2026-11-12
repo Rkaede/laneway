@@ -39,11 +39,6 @@
     box-shadow: var(--button-outline-shadow);
   }
 
-  /* Form-control chrome: matches Input/Select border strength (WCAG 1.4.11). */
-  .btn-field {
-    @apply border border-border-emphasis bg-surface-input hover:bg-surface-hover hover:text-main;
-  }
-
   .btn-secondary {
     @apply text-main;
     background-color: var(--button-secondary-bg);

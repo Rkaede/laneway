@@ -319,11 +319,11 @@ const RenameDialog: Component<{ sessionId: string }> = (props) => {
           </div>
         </div>
         <DialogFooter>
+          <Button type="button" variant="outline" onClick={closeDialog}>
+            Cancel
+          </Button>
           <Button type="submit" disabled={!title().trim() || !session()}>
             Rename
-          </Button>
-          <Button type="button" onClick={closeDialog}>
-            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>

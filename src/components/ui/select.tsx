@@ -17,10 +17,7 @@ export const SelectTrigger = <T extends ValidComponent = 'button'>(
 
   return (
     <SelectPrimitive.Trigger
-      class={cn(
-        'flex h-input-md w-full items-center justify-between rounded-md border border-border-emphasis bg-surface-input px-input-x-md py-input-y-md text-sm shadow-field transition-shadow placeholder:text-placeholder focus:outline-hidden focus-visible:border-field-focus focus-visible:ring-(length:--field-focus-ring-w) focus-visible:ring-border-focus/50 disabled:opacity-50',
-        local.class,
-      )}
+      class={cn('field input-md flex w-full items-center justify-between', local.class)}
       {...rest}
     >
       {local.children}

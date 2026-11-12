@@ -1,10 +1,36 @@
 @layer components {
-  .input {
-    @apply w-full min-w-0 rounded-md border border-border-emphasis bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
+  /*
+   * Field chrome, shared by every control that looks like a field: Input, TextArea, the Select
+   * trigger and field-style buttons such as the model picker. The composer and ordinary buttons
+   * have their own look and do not use it. This file loads after button.css, so `.field` wins
+   * over `.btn` where the two set the same property.
+   */
+  .field {
+    @apply rounded-md border border-border-emphasis bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
 
-    &::placeholder {
+    &::placeholder,
+    & [data-placeholder-shown] {
       @apply text-placeholder;
     }
+
+    &:focus-visible {
+      @apply border-field-focus ring-(length:--field-focus-ring-w) ring-border-focus/50;
+    }
+
+    &:disabled,
+    &[data-disabled] {
+      @apply pointer-events-none opacity-50;
+    }
+
+    &[aria-invalid='true'],
+    &[data-invalid] {
+      @apply border-danger ring-danger/20;
+    }
+  }
+
+  /* Text entry: an <input> or <textarea> that also carries `.field`. */
+  .input {
+    @apply w-full min-w-0;
 
     &::selection {
       @apply bg-brand text-brand-fg;
@@ -12,18 +38,6 @@
 
     &::file-selector-button {
       @apply inline-flex h-7 border-0 bg-transparent text-sm font-medium text-main;
-    }
-
-    &:focus-visible {
-      @apply border-field-focus ring-(length:--field-focus-ring-w) ring-border-focus/50;
-    }
-
-    &:disabled {
-      @apply pointer-events-none opacity-50;
-    }
-
-    &[aria-invalid='true'] {
-      @apply border-danger ring-danger/20;
     }
 
     &[type='number'] {

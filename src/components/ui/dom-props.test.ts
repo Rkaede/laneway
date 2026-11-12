@@ -165,25 +165,42 @@ describe('component DOM props', () => {
 });
 
 describe('field borders', () => {
-  // A border colour utility on the element would beat the focus and invalid rules of `.input`,
+  // A border colour utility on the element would beat the focus and invalid rules of `.field`,
   // which sit in the earlier components layer.
-  it('leaves the input border colour to the .input class', () => {
+  it('leaves the input border colour to the .field class', () => {
     expect(
       classOf(
         renderToString(() => Input({})),
         'input',
       ),
-    ).toEqual(['input', 'input-md']);
+    ).toEqual(['field', 'input', 'input-md']);
   });
 
-  it('leaves the textarea border colour to the .input class', () => {
+  it('leaves the textarea border colour to the .field class', () => {
     const classes = classOf(
       renderToString(() => TextArea({})),
       'textarea',
     );
 
-    expect(classes).toContain('input');
+    expect(classes).toContain('field');
     expect(classes.filter((name) => name.startsWith('border-'))).toEqual([]);
+  });
+});
+
+describe('password managers', () => {
+  it('keeps 1Password out of an input by default', () => {
+    expect(renderToString(() => Input({}))).toContain('data-1p-ignore');
+  });
+
+  it('lets 1Password fill an input that asks for it', () => {
+    const html = renderToString(() => Input({ passwordManager: true }));
+
+    expect(html).not.toContain('data-1p-ignore');
+    expect(html).not.toMatch(/passwordmanager/i);
+  });
+
+  it('keeps 1Password out of a textarea', () => {
+    expect(renderToString(() => TextArea({}))).toContain('data-1p-ignore');
   });
 });
 

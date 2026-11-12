@@ -9,11 +9,17 @@ import { useApplyTheme } from '~/hooks/use-theme';
 import { setStore, store } from '~/store';
 import { cn } from '~/util';
 
-import { storyMap } from './stories';
+import { exampleMap, type StoryGroup, storyMap } from './stories';
 
-const stories = Object.entries(storyMap)
-  .map(([path, { title }]) => ({ title, path }))
-  .sort((a, b) => a.title.localeCompare(b.title));
+const toLinks = (map: Record<string, StoryGroup>) =>
+  Object.entries(map)
+    .map(([path, { title }]) => ({ title, path }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+
+const sections = [
+  { title: 'Examples', links: toLinks(exampleMap) },
+  { title: 'Components', links: toLinks(storyMap) },
+];
 
 const SandboxLayout: ParentComponent = (props) => {
   const location = useLocation();
@@ -38,22 +44,29 @@ const SandboxLayout: ParentComponent = (props) => {
       <div class="w-[240px] shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-fg">
         <div class="flex h-full flex-col overflow-hidden">
           <div class="border-b px-4 py-3">
-            <h2 class="text-lg font-semibold">UI Sandbox</h2>
+            <h2 class="text-lg font-semibold">Sandbox</h2>
           </div>
           <div class="flex-1 overflow-auto">
-            <nav class="flex flex-col gap-1 p-2">
-              <For each={stories}>
-                {(story) => (
-                  <A
-                    href={`/sandbox/${story.path}`}
-                    class={cn(
-                      'rounded-md px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent',
-                      location.pathname === `/sandbox/${story.path}` &&
-                        'bg-sidebar-accent font-medium',
-                    )}
-                  >
-                    {story.title}
-                  </A>
+            <nav class="flex flex-col gap-4 p-2">
+              <For each={sections}>
+                {(section) => (
+                  <div class="flex flex-col gap-1">
+                    <h3 class="px-3 pt-1 text-xs font-medium text-muted">{section.title}</h3>
+                    <For each={section.links}>
+                      {(story) => (
+                        <A
+                          href={`/sandbox/${story.path}`}
+                          class={cn(
+                            'rounded-md px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent',
+                            location.pathname === `/sandbox/${story.path}` &&
+                              'bg-sidebar-accent font-medium',
+                          )}
+                        >
+                          {story.title}
+                        </A>
+                      )}
+                    </For>
+                  </div>
                 )}
               </For>
             </nav>

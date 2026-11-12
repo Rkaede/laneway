@@ -44,7 +44,7 @@ export function ApiKeyFormView(props: {
       <div class="flex gap-2">
         <Input
           id={inputId}
-          data-1p-ignore // disable 1Password extension
+          passwordManager
           autocomplete="off"
           type="password"
           placeholder="sk-or-…"

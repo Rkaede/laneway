@@ -22,6 +22,7 @@ import * as CopyButtonStories from './copy-button.stories';
 import * as DeleteButtonStories from './delete-button.stories';
 import * as DialogStories from './dialog.stories';
 import * as DropdownStories from './dropdown.stories';
+import * as FormControlsExamples from './form-controls.stories';
 import * as FormsStories from './forms.stories';
 import * as HoverCardStories from './hover-card.stories';
 import * as IconBadgeStories from './icon-badge.stories';
@@ -59,9 +60,15 @@ import * as ThumbnailStories from './thumbnail.stories';
 import * as TooltipStories from './tooltip.stories';
 import * as UseAnimatedText from './use-animated-text.stories';
 
-type StoryGroup = { title: string; stories: Record<string, () => JSX.Element> };
+export type StoryGroup = {
+  title: string;
+  stories: Record<string, () => JSX.Element>;
+  // Story names in display order. Module exports are listed alphabetically, and any story left
+  // out of this list follows the ones in it.
+  order?: string[];
+};
 
-// Keyed by the URL segment under /sandbox.
+// Keyed by the URL segment under /sandbox. Examples share that namespace, so keys must not clash.
 export const storyMap: Record<string, StoryGroup> = {
   about: { title: 'About', stories: AboutStories },
   alert: { title: 'Alert', stories: AlertStories },
@@ -124,4 +131,28 @@ export const storyMap: Record<string, StoryGroup> = {
   thumbnail: { title: 'Thumbnail', stories: ThumbnailStories },
   tooltip: { title: 'Tooltip', stories: TooltipStories },
   'use-animated-text': { title: 'useAnimatedText', stories: UseAnimatedText },
+};
+
+// Pages that combine several components, such as every form control side by side.
+export const exampleMap: Record<string, StoryGroup> = {
+  'form-controls': {
+    title: 'Form Controls',
+    stories: FormControlsExamples,
+    order: [
+      'SideBySide',
+      'Pairs',
+      'Stacked',
+      'States',
+      'Composer',
+      'InContext',
+      'Measurements',
+    ],
+  },
+};
+
+export const findStoryGroup = (id: string): StoryGroup | undefined => {
+  // An own-property check, so ids such as "constructor" do not resolve to Object.prototype.
+  if (Object.hasOwn(exampleMap, id)) return exampleMap[id];
+  if (Object.hasOwn(storyMap, id)) return storyMap[id];
+  return undefined;
 };

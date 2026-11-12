@@ -65,10 +65,10 @@ if (root) {
           {/* Sandbox routes with SandboxLayout */}
           {import.meta.env.DEV && (
             <Route path="/sandbox" component={SandboxLayout}>
-              <Route path="/:story" component={StoryPage} info={{ title: 'UI Sandbox' }} />
+              <Route path="/:story" component={StoryPage} info={{ title: 'Sandbox' }} />
               <Route
                 path="/"
-                info={{ title: 'UI Sandbox' }}
+                info={{ title: 'Sandbox' }}
                 component={() => (
                   <div class="flex h-full items-center justify-center text-muted">
                     Select a story from the sidebar

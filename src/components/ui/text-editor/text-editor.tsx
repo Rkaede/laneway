@@ -31,6 +31,8 @@ type TextEditorProps = {
   mode?: 'note' | 'chat';
   placeholder?: string;
   disabled?: boolean;
+  /** Focus the editor when it mounts. Defaults to true. */
+  autofocus?: boolean;
 };
 
 export function TextEditor(props: TextEditorProps) {
@@ -118,6 +120,10 @@ export function TextEditor(props: TextEditorProps) {
 
   // focus the editor when the component is mounted
   const timer = setInterval(() => {
+    if (props.autofocus === false) {
+      clearInterval(timer);
+      return;
+    }
     const view = editorView();
     view?.focus();
     view?.dispatch({

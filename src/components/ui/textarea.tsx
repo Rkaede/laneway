@@ -19,7 +19,9 @@ export const TextArea = <T extends ValidComponent = 'textarea'>(
 
   return (
     <TextFieldPrimitive
-      class={cn('input min-h-[60px] px-3 py-2 text-sm', local.class)}
+      class={cn('field input min-h-[60px] px-3 py-2 text-sm', local.class)}
+      // Keep 1Password's button out of the field.
+      data-1p-ignore=""
       {...rest}
     />
   );

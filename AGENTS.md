@@ -37,6 +37,12 @@ The design system lives in `src/styles/`, with `src/styles/loom.css` as its entr
   registered.
 - Button variants map to the `.btn-*` classes in `src/styles/button.css`. Buttons space their
   children with a gap, so icons inside a button do not need `mr-2`.
+- In a `DialogFooter`, put the outline Cancel button first and the main action last, so the action
+  sits on the right. The footer gives its buttons a minimum width.
+- Anything that looks like a field (Input, TextArea, the Select trigger, the `combobox` button
+  variant) gets its chrome from the `.field` class in `src/styles/input.css`. The composer and
+  ordinary buttons keep their own look. `src/form-controls.e2e.ts` checks that every field still
+  matches the Input on the `/sandbox/form-controls` page.
 
 ## Themes
 

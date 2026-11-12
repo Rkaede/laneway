@@ -29,6 +29,8 @@ interface PromptProps {
   onCancel?: () => void;
   onInput: (value: string) => void;
   onSubmit: (value: string) => void;
+  /** Focus the editor when it mounts. Defaults to true. */
+  autofocus?: boolean;
 }
 
 export const ChatInput: Component<PromptProps> = (props) => {
@@ -163,6 +165,7 @@ export const ChatInput: Component<PromptProps> = (props) => {
             <TextEditor
               initialValue={props.input}
               placeholder="Ask anything..."
+              autofocus={props.autofocus}
               onInput={(value) => props.onInput(value)}
               onSubmit={handleSubmit}
               onPaste={handlePasteFile}

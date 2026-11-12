@@ -96,11 +96,17 @@ const DialogHeader: Component<ComponentProps<'div'>> = (props) => {
   );
 };
 
+// Put Cancel first and the main action last: the action sits on the right, and on narrow screens
+// the reversed column puts it on top. The minimum width keeps short labels such as "Fork" from
+// making a narrow button.
 const DialogFooter: Component<ComponentProps<'div'>> = (props) => {
   const [, rest] = splitProps(props, ['class']);
   return (
     <div
-      class={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', props.class)}
+      class={cn(
+        'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end [&>*]:min-w-20',
+        props.class,
+      )}
       {...rest}
     />
   );
