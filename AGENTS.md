@@ -43,6 +43,9 @@ The design system lives in `src/styles/`, with `src/styles/loom.css` as its entr
   variant) gets its chrome from the `.field` class in `src/styles/input.css`. The composer and
   ordinary buttons keep their own look. `src/form-controls.e2e.ts` checks that every field still
   matches the Input on the `/sandbox/form-controls` page.
+- Fields show the button focus ring only after keyboard navigation. Text fields match
+  `:focus-visible` on click too, so `src/focus-source.ts` marks `<html>` with `data-focus-source`
+  and `.field` reads it.
 
 ## Themes
 

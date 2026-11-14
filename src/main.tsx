@@ -10,12 +10,14 @@ import { AppLayout } from './app-layout';
 import { AppError } from './components/connected/app-error';
 import { WelcomeContent } from './components/connected/welcome';
 import { getDocumentTitle } from './document-title';
+import { trackFocusSource } from './focus-source';
 import { registerPreloadErrorHandler } from './preload-error';
 import { NotFound } from './routes/not-found';
 import { Session } from './routes/session';
 import { selectRouteSession } from './store/selectors';
 
 registerPreloadErrorHandler(window, import.meta.url);
+trackFocusSource(document);
 
 const SandboxLayout = import.meta.env.DEV
   ? lazy(() => import('./routes/sandbox/sandbox-layout'))

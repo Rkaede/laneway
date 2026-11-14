@@ -420,10 +420,20 @@ export function Measurements() {
     );
   };
 
+  // Wait a frame so fonts and theme classes have applied, then let colour transitions finish, or
+  // the table would read values part-way through a theme change.
+  const measureWhenSettled = () =>
+    requestAnimationFrame(async () => {
+      const transitions = document
+        .getAnimations()
+        .filter((animation) => animation instanceof CSSTransition);
+      await Promise.allSettled(transitions.map((transition) => transition.finished));
+      measure();
+    });
+
   onMount(() => {
-    // Wait a frame so fonts and theme classes have applied.
-    requestAnimationFrame(measure);
-    const observer = new MutationObserver(() => requestAnimationFrame(measure));
+    measureWhenSettled();
+    const observer = new MutationObserver(measureWhenSettled);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],

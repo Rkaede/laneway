@@ -6,7 +6,7 @@
    * over `.btn` where the two set the same property.
    */
   .field {
-    @apply rounded-md border border-border-emphasis bg-surface-input shadow-field transition-[color,box-shadow] outline-none;
+    @apply rounded-md border border-border-emphasis bg-surface-input shadow-field transition-[color,background-color,border-color,box-shadow] outline-none;
 
     &::placeholder,
     & [data-placeholder-shown] {
@@ -14,7 +14,7 @@
     }
 
     &:focus-visible {
-      @apply border-field-focus ring-(length:--field-focus-ring-w) ring-border-focus/50;
+      @apply border-field-focus;
     }
 
     &:disabled,
@@ -25,6 +25,19 @@
     &[aria-invalid='true'],
     &[data-invalid] {
       @apply border-danger ring-danger/20;
+    }
+  }
+
+  /*
+   * The same focus ring as buttons, but only when focus came from the keyboard. Text fields match
+   * :focus-visible on click too, so src/focus-source.ts records how focus arrived.
+   */
+  :root[data-focus-source='keyboard'] .field:focus-visible {
+    @apply ring-[3px] ring-border-focus/50;
+
+    &[aria-invalid='true'],
+    &[data-invalid] {
+      @apply ring-danger/20;
     }
   }
 

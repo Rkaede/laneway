@@ -1,6 +1,6 @@
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-button text-sm font-medium whitespace-nowrap transition-all;
+    @apply inline-flex items-center justify-center gap-2 rounded-button text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow];
     @apply shrink-0 outline-none;
 
     &:disabled {
