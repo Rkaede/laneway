@@ -118,17 +118,6 @@ describe('deleting a parent or a fork', () => {
     expect(chat?.messages).toHaveLength(2);
   });
 
-  it('removes the shared image once the last copy is deleted', () => {
-    const remove = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
-    const id = forkSession({ sessionId: 'parent', chatId: 'left', messageId: 'a1' });
-
-    deleteSession('parent');
-    deleteSession(id!);
-
-    expect(remove).toHaveBeenCalledTimes(1);
-    expect(remove).toHaveBeenCalledWith('shared-image');
-  });
-
   it('keeps the parent and its images when a fork is deleted', () => {
     const remove = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
     const id = forkSession({ sessionId: 'parent', chatId: 'left', messageId: 'a1' });

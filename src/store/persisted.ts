@@ -2,8 +2,13 @@ import { makePersisted, type PersistenceOptions } from '@solid-primitives/storag
 import { getOwner, onCleanup } from 'solid-js';
 import type { SetStoreFunction, Store } from 'solid-js/store';
 
+/** A value to save, or a function that produces it when the save happens. */
+type PendingValue = string | (() => string);
+
+const resolve = (value: PendingValue) => (typeof value === 'function' ? value() : value);
+
 export function createDebouncedStorage() {
-  const pending = new Map<string, string>();
+  const pending = new Map<string, PendingValue>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let started: number | undefined;
   let warned = false;
@@ -24,7 +29,7 @@ export function createDebouncedStorage() {
     started = undefined;
     for (const [key, value] of pending) {
       access(() => {
-        storage?.setItem(key, value);
+        storage?.setItem(key, resolve(value));
         pending.delete(key);
       });
     }
@@ -47,9 +52,12 @@ export function createDebouncedStorage() {
 
   return {
     getItem(key: string) {
-      return pending.get(key) ?? access(() => storage?.getItem(key)) ?? null;
+      const value = pending.get(key);
+      return value === undefined
+        ? (access(() => storage?.getItem(key)) ?? null)
+        : resolve(value);
     },
-    setItem(key: string, value: string) {
+    setItem(key: string, value: PendingValue) {
       pending.set(key, value);
       started ??= performance.now();
       clearTimeout(timer);
@@ -70,16 +78,44 @@ export function createDebouncedStorage() {
   };
 }
 
+const DEFERRED = '\u0000deferred';
+
 // @solid-primitives/storage 4.4 no longer infers the store type from its argument.
 export function makePersistedStore<T extends object>(
   store: [Store<T>, SetStoreFunction<T>],
   options: { name: string } & Pick<
     PersistenceOptions<T, undefined>,
     'serialize' | 'deserialize'
-  >,
+  > & {
+      /**
+       * Serialise when the debounced save runs rather than on every change. For a large store that
+       * changes on every streamed token.
+       */
+      deferSerialize?: boolean;
+      /** Called after every change to the store. */
+      onChange?: () => void;
+    },
 ) {
-  return makePersisted<T, [Store<T>, SetStoreFunction<T>]>(store, {
-    ...options,
-    storage: createDebouncedStorage(),
+  const { deferSerialize, onChange, ...persistence } = options;
+  const storage = createDebouncedStorage();
+  const serialize = persistence.serialize ?? ((state: T) => JSON.stringify(state));
+  let state: T | undefined;
+  const persisted = makePersisted<T, [Store<T>, SetStoreFunction<T>]>(store, {
+    ...persistence,
+    serialize(value) {
+      onChange?.();
+      if (!deferSerialize) return serialize(value);
+      state = value;
+      return DEFERRED;
+    },
+    storage: {
+      ...storage,
+      setItem: (key: string, value: string) =>
+        storage.setItem(key, value === DEFERRED ? () => serialize(state!) : value),
+    },
+  });
+  return Object.assign(persisted, {
+    /** Saves the store again, for when its serialised form changes without a store change. */
+    save: () => storage.setItem(options.name, () => serialize(persisted[0])),
   });
 }

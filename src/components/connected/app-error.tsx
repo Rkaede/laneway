@@ -1,7 +1,8 @@
 import type { Component } from 'solid-js';
 
-import { deleteData, store } from '~/store';
+import { deleteData } from '~/store';
 import { exportBackup } from '~/store/backup';
+import { completeState } from '~/store/database';
 
 import { AppErrorView } from './app-error-view';
 
@@ -14,7 +15,7 @@ export const AppError: Component = () => {
 
   const handleExportData = async () => {
     try {
-      const omittedImages = await exportBackup(store);
+      const omittedImages = await exportBackup(await completeState());
       if (omittedImages) {
         window.alert(
           `Data exported. ${omittedImages} unavailable image${omittedImages === 1 ? '' : 's'} left out.`,

@@ -29,6 +29,7 @@ import { ModelIcon } from './components/connected/model-icon';
 import { IconChat, IconLayoutGrid, IconSquarePen } from './components/icons/ui';
 import { store } from './store';
 import { actions } from './store/actions';
+import { chatsWithMessages } from './store/database';
 import { models } from './store/models';
 import {
   recentSessions,
@@ -196,10 +197,21 @@ export function CommandMenu() {
   // re-index on every token while a reply streams. Only changed sessions are re-indexed.
   const sessionIndex = new SessionIndex();
   const [synced, markSynced] = createSignal(undefined, { equals: false });
+  // Until search reads the database directly, it reads the messages of chats that are not loaded.
+  let syncing: Promise<void> | undefined;
   function syncIndex() {
-    const { sessions, chats, assistants } = unwrap(store);
-    sessionIndex.sync({ sessions, chats, assistants }, unwrap(models));
-    markSynced();
+    syncing ??= (async () => {
+      try {
+        const { sessions, chats, assistants } = unwrap(store);
+        const withMessages = await chatsWithMessages(chats);
+        sessionIndex.sync({ sessions, chats: withMessages, assistants }, unwrap(models));
+        markSynced();
+      } catch (error) {
+        console.error('Unable to index chats for search.', error);
+      } finally {
+        syncing = undefined;
+      }
+    })();
   }
   createEffect(on(open, (isOpen) => isOpen && syncIndex()));
 

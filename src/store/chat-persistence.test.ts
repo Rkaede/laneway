@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'bun:test';
 
+import type { ChatProps, SessionProps } from '~/types';
+
 import { assistants } from '../../scripts/data/assistants';
-import { deserializeChatStore, serializeChatStore } from './chat-persistence';
+import {
+  deserializeChatStore,
+  deserializeSnapshot,
+  serializeChatStore,
+  serializeSnapshot,
+} from './chat-persistence';
 import { createDefaultState, defaults } from './default-state';
 
 describe('chat persistence', () => {
@@ -188,4 +195,68 @@ describe('chat persistence', () => {
       expect(deserializeChatStore(serializeChatStore(state))).toEqual(state);
     },
   );
+});
+
+describe('snapshot', () => {
+  function snapshotState(sessionCount: number) {
+    const state = createDefaultState();
+    state.sessions = Array.from({ length: sessionCount }, (_, index): SessionProps => ({
+      id: `s${index}`,
+      title: `Session ${index}`,
+      type: 'chat',
+      created: index,
+      chats: [`c${index}`],
+    }));
+    state.chats = state.sessions.map((session): ChatProps => ({
+      id: session.chats[0],
+      status: 'idle',
+      messages: [{ id: `m-${session.id}`, role: 'user', content: 'hello' }],
+    }));
+    return state;
+  }
+
+  const savedChats = (serialized: string) =>
+    deserializeSnapshot(serialized).state.chats.map((chat) => ({
+      id: chat.id,
+      messages: chat.messages.length,
+      unloaded: chat.unloaded ?? false,
+    }));
+
+  it('drops the messages the database holds, except in the newest sessions', () => {
+    const state = snapshotState(5);
+    const serialized = serializeSnapshot(state, {
+      isPersisted: (chat) => chat.id !== 'c0',
+      pendingDeletes: [],
+    });
+    expect(savedChats(serialized)).toEqual([
+      // Not saved to the database yet, so the snapshot keeps it.
+      { id: 'c0', messages: 1, unloaded: false },
+      { id: 'c1', messages: 0, unloaded: true },
+      { id: 'c2', messages: 1, unloaded: false },
+      { id: 'c3', messages: 1, unloaded: false },
+      { id: 'c4', messages: 1, unloaded: false },
+    ]);
+    // The store keeps every message in memory.
+    expect(state.chats.every((chat) => chat.messages.length === 1)).toBe(true);
+  });
+
+  it('keeps a chat that is not loaded marked as not loaded', () => {
+    const state = snapshotState(1);
+    state.chats[0] = { ...state.chats[0], messages: [], unloaded: true };
+    const serialized = serializeSnapshot(state, {
+      isPersisted: () => false,
+      pendingDeletes: [],
+    });
+    expect(savedChats(serialized)).toEqual([{ id: 'c0', messages: 0, unloaded: true }]);
+  });
+
+  it('carries deletes the database has not made yet, outside the state', () => {
+    const serialized = serializeSnapshot(snapshotState(1), {
+      isPersisted: () => true,
+      pendingDeletes: ['gone'],
+    });
+    const { state, pendingDeletes } = deserializeSnapshot(serialized);
+    expect(pendingDeletes).toEqual(['gone']);
+    expect(state).not.toHaveProperty('pendingDeletes');
+  });
 });

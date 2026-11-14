@@ -1,10 +1,12 @@
 import { Navigate, useParams, useSearchParams } from '@solidjs/router';
-import { createEffect, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 
 import { SessionProvider } from '~/components/connected/session-provider';
 import { MultiChatLayout } from '~/components/layouts/multichat-layout';
 import { NoteLayout } from '~/components/layouts/note-layout';
+import { Loader } from '~/components/ui/loader';
 import { useScrollToMessage } from '~/hooks/use-scroll-to-message';
+import { useSessionMessages } from '~/hooks/use-session-messages';
 import { store } from '~/store';
 import { newDraftSession } from '~/store/actions';
 import { anyKeysSet, selectRouteSession } from '~/store/selectors';
@@ -34,7 +36,8 @@ export function Session() {
   });
 
   const activeSession = selectRouteSession(() => params.id);
-  useScrollToMessage(() => Boolean(params.id && activeSession()));
+  const messages = useSessionMessages(activeSession);
+  useScrollToMessage(() => Boolean(params.id && activeSession() && messages.ready()));
 
   // New visitors without a key see the welcome page once. After that the root route is always a
   // chat, and sending without a key asks for one.
@@ -46,14 +49,46 @@ export function Session() {
         {(session) => (
           <SessionProvider session={session}>
             <Show
-              when={session.type === 'note'}
-              fallback={<MultiChatLayout sessionId={params.id} />}
+              when={messages.ready()}
+              fallback={<SessionLoading error={messages.error()} />}
             >
-              <NoteLayout sessionId={params.id} />
+              <Show
+                when={session.type === 'note'}
+                fallback={<MultiChatLayout sessionId={params.id} />}
+              >
+                <NoteLayout sessionId={params.id} />
+              </Show>
             </Show>
           </SessionProvider>
         )}
       </Show>
     </Show>
+  );
+}
+
+/** Shown while a session's messages load from the database, which usually takes a few ms. */
+function SessionLoading(props: { error?: Error }) {
+  // Wait before showing the loader, so a quick load does not flash it.
+  const [visible, setVisible] = createSignal(false);
+  const timer = setTimeout(() => setVisible(true), 300);
+  onCleanup(() => clearTimeout(timer));
+
+  return (
+    <div
+      class="flex h-full flex-col items-center justify-center gap-2 px-6 text-center"
+      aria-busy={!props.error}
+    >
+      <Show
+        when={props.error}
+        fallback={
+          <Show when={visible()}>
+            <Loader />
+          </Show>
+        }
+      >
+        <h1 class="text-xl font-medium">Unable to load this chat</h1>
+        <p class="text-muted">Its messages could not be read from this browser's storage.</p>
+      </Show>
+    </div>
   );
 }

@@ -1,17 +1,52 @@
-import { createStore } from 'solid-js/store';
+import { createStore, unwrap } from 'solid-js/store';
 
+import { getDatabase } from '~/db/client';
+import { createDatabaseSync } from '~/db/sync';
 import { imageCache } from '~/services/image-cache';
 
-import { deserializeChatStore, serializeChatStore } from './chat-persistence';
+import { deserializeSnapshot, serializeSnapshot } from './chat-persistence';
 import { createDefaultState } from './default-state';
 import { migrateStore } from './migrations';
 import { makePersistedStore } from './persisted';
 
-export const [store, setStore] = makePersistedStore(createStore(createDefaultState()), {
-  name: 'chat-store',
-  serialize: serializeChatStore,
-  deserialize: deserializeChatStore,
+/** Sessions deleted before the last sync could save that, read from the snapshot at startup. */
+let startupDeletes: string[] = [];
+
+export const databaseSync = createDatabaseSync({
+  getDatabase,
+  getState: () => unwrap(store),
 });
+
+const persisted = makePersistedStore(createStore(createDefaultState()), {
+  name: 'chat-store',
+  // The snapshot is large and the store changes on every streamed token.
+  deferSerialize: true,
+  onChange: () => databaseSync.schedule(),
+  serialize: (state) =>
+    serializeSnapshot(state, {
+      isPersisted: databaseSync.isPersisted,
+      pendingDeletes: [
+        ...new Set([...startupDeletes, ...databaseSync.pendingDeletes(unwrap(state))]),
+      ],
+    }),
+  deserialize: (serialized) => {
+    const snapshot = deserializeSnapshot(serialized);
+    startupDeletes = snapshot.pendingDeletes;
+    return snapshot.state;
+  },
+});
+
+export const [store, setStore] = persisted;
+
+/** Writes the snapshot again, after a sync changes which messages it needs to keep. */
+export const saveSnapshot = persisted.save;
+
+/** Takes the deletes read at startup, which the first sync carries out. */
+export function takeStartupDeletes() {
+  const deletes = startupDeletes;
+  startupDeletes = [];
+  return deletes;
+}
 
 migrateStore(store, setStore);
 

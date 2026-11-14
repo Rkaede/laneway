@@ -92,7 +92,7 @@ it('precaches models and keeps a network-first fallback for galleries, not provi
   }
 });
 
-it('precaches the self-hosted fonts along with the app code', async () => {
+it('precaches the self-hosted fonts and the database engine along with the app code', async () => {
   const createPWA = spyOn(pwa, 'VitePWA');
 
   try {
@@ -100,7 +100,9 @@ it('precaches the self-hosted fonts along with the app code', async () => {
     const options = createPWA.mock.calls[0]?.[0];
 
     // Setting globPatterns replaces Workbox's default, so js, css and html must stay listed.
-    expect(options?.workbox?.globPatterns).toEqual(['**/*.{js,css,html,woff2}']);
+    expect(options?.workbox?.globPatterns).toEqual(['**/*.{js,css,html,woff2,wasm,data,gz}']);
+    // Workbox skips files over 2 MB by default, and pglite.wasm is 9 MB.
+    expect(options?.workbox?.maximumFileSizeToCacheInBytes).toBeGreaterThan(9 * 1024 * 1024);
   } finally {
     createPWA.mockRestore();
   }

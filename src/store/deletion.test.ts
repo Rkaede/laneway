@@ -163,7 +163,7 @@ describe('session deletion', () => {
   );
 
   it.each([undefined, { sessionId: 'delete-session' }])(
-    'deletes only the confirmed active session and its images before navigating (%j)',
+    'deletes only the confirmed active session before navigating, leaving images to the sync (%j)',
     (options) => {
       const removeImage = spyOn(imageCache, 'remove').mockResolvedValue(undefined);
       confirm.mockReturnValue(true);
@@ -172,8 +172,8 @@ describe('session deletion', () => {
 
       expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
       expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
-      expect(removeImage).toHaveBeenCalledTimes(1);
-      expect(removeImage).toHaveBeenCalledWith('/delete-image');
+      // A chat that is not loaded may share the image, so the database sync decides.
+      expect(removeImage).not.toHaveBeenCalled();
       expect(navigate).toHaveBeenCalledTimes(1);
       expect(navigate).toHaveBeenCalledWith('/');
     },
@@ -189,7 +189,7 @@ describe('session deletion', () => {
 
       expect(store.sessions.map((session) => session.id)).toEqual(['keep-session']);
       expect(store.chats.map((chat) => chat.id)).toEqual(['keep-chat']);
-      expect(removeImage).toHaveBeenCalledWith('/delete-image');
+      expect(removeImage).not.toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
     },
   );

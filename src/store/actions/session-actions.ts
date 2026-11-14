@@ -4,7 +4,6 @@ import { produce, reconcile } from 'solid-js/store';
 
 import { IconNewSession, IconSquarePen, IconTrash } from '~/components/icons/ui';
 import { showSuccess } from '~/components/ui/notify';
-import { imageCache } from '~/services/image-cache';
 import { getProvider } from '~/services/util';
 import { completion, summarizeTitle } from '~/store/prompts';
 import type {
@@ -18,7 +17,7 @@ import type {
 } from '~/types';
 
 import { setStore, store } from '..';
-import { chatImageIds, createFork, type ForkTarget } from '../branches';
+import { createFork, type ForkTarget } from '../branches';
 import { apiKeys } from '../keys';
 import { models } from '../models';
 import { createSessionFromPreset, getChatModel } from '../util';
@@ -170,21 +169,6 @@ export function setSessionInput(input: string, sessionId?: string) {
   setStore('sessions', (s) => s.id === sessionId, 'input', input);
 }
 
-function deleteImagesForSession(sessionId: string) {
-  const session = store.sessions.find((s) => s.id === sessionId);
-  if (!session) return;
-
-  // Forks share images with the chats they were copied from, so keep any image still in use.
-  const inUse = chatImageIds([
-    ...store.chats.filter((c) => !session.chats.includes(c.id)),
-    ...store.draftChats,
-  ]);
-  const doomed = store.chats.filter((c) => session.chats.includes(c.id));
-  for (const storageId of chatImageIds(doomed)) {
-    if (!inUse.has(storageId)) imageCache.remove(storageId);
-  }
-}
-
 /** Copy one chat, up to a message, into a new session and return the new session's id. */
 export function forkSession({
   sessionId,
@@ -225,7 +209,7 @@ export function deleteSession(sessionId: string) {
   for (const chatId of session.chats) {
     store.chats.find((c) => c.id === chatId)?.controller?.abort();
   }
-  deleteImagesForSession(sessionId);
+  // The database sync removes images that no other chat shows, including chats not loaded yet.
 
   batch(() => {
     setStore(

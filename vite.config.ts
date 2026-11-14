@@ -53,8 +53,11 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'models.json'],
       workbox: {
         // Workbox precaches only js, css and html by default, which leaves the self-hosted
-        // fonts out and an offline app on system fonts.
-        globPatterns: ['**/*.{js,css,html,woff2}'],
+        // fonts out and an offline app on system fonts. PGlite's WASM, data file and extension
+        // archives hold the database engine, without which an offline app has no history.
+        globPatterns: ['**/*.{js,css,html,woff2,wasm,data,gz}'],
+        // pglite.wasm is 9 MB before compression.
+        maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: ({ url, sameOrigin }) =>

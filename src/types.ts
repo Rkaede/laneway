@@ -101,6 +101,8 @@ export type ChatProps = {
     name: string;
     message: string;
   };
+  /** The messages are in the database and not loaded yet, so `messages` is empty. */
+  unloaded?: boolean;
 };
 
 export type SessionType = 'chat' | 'note';

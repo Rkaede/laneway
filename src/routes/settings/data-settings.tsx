@@ -4,6 +4,7 @@ import { Button } from '~/components/ui';
 import { showSuccess } from '~/components/ui/notifications';
 import { deleteData, setStore, store } from '~/store';
 import { exportBackup, parseBackup, restoreBackup } from '~/store/backup';
+import { completeState } from '~/store/database';
 import { deleteKeys } from '~/store/keys';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -19,7 +20,7 @@ export function Data() {
     setError('');
     setStatus('');
     try {
-      const omittedImages = await exportBackup(store);
+      const omittedImages = await exportBackup(await completeState());
       setStatus(
         omittedImages
           ? `Data exported. ${omittedImages} unavailable image${omittedImages === 1 ? '' : 's'} left out.`

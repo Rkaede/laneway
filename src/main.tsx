@@ -14,6 +14,7 @@ import { trackFocusSource } from './focus-source';
 import { registerPreloadErrorHandler } from './preload-error';
 import { NotFound } from './routes/not-found';
 import { Session } from './routes/session';
+import { startDatabase } from './store/database';
 import { selectRouteSession } from './store/selectors';
 
 registerPreloadErrorHandler(window, import.meta.url);
@@ -84,6 +85,8 @@ if (root) {
     ),
     root,
   );
+  // The app has drawn from the localStorage snapshot. Open the database for message history.
+  void startDatabase();
 } else {
   console.error('Root element not found');
 }
