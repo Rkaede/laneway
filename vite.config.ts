@@ -91,7 +91,11 @@ export default defineConfig({
       'solid-markdown > micromark',
       'solid-markdown > unified',
     ],
+    // PGlite finds its WASM and extension bundles relative to its own modules, which
+    // pre-bundling would move.
+    exclude: ['@electric-sql/pglite', '@electric-sql/pglite-pgvector'],
   },
+  worker: { format: 'es' },
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'src'),
