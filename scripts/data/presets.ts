@@ -34,7 +34,7 @@ export const presets: PresetProps[] = [
         status: 'idle',
       },
       {
-        modelId: 'anthropic/claude-fable-5.1',
+        modelId: 'anthropic/claude-fable-5.2',
         status: 'idle',
       },
       {

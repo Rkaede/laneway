@@ -42,4 +42,5 @@ export const anthropic: Partial<ModelProps>[] = [
   { id: 'anthropic/claude-opus-5.5', title: 'Claude Opus 5.5', reasoning: true },
   { id: 'anthropic/claude-sonnet-5.5', title: 'Claude Sonnet 5.5', reasoning: true },
   { id: 'anthropic/claude-haiku-5.5', title: 'Claude Haiku 5.5' },
+  { id: 'anthropic/claude-fable-5.2', title: 'Claude Fable 5.2', reasoning: true },
 ];

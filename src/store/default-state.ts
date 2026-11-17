@@ -104,7 +104,7 @@ const topShelf: PresetProps = {
   templateId: 'top-shelf',
   chats: [
     { modelId: 'openai/gpt-6-astra', status: 'idle' },
-    { modelId: 'anthropic/claude-fable-5.1', status: 'idle' },
+    { modelId: 'anthropic/claude-fable-5.2', status: 'idle' },
     { modelId: 'google/gemini-4-argon', status: 'idle' },
   ],
 };

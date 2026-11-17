@@ -107,4 +107,14 @@ export const google: Partial<ModelProps>[] = [
     title: 'Gemini 4 Argon',
     reasoning: true,
   },
+  {
+    id: 'google/gemini-4-carbon',
+    title: 'Gemini 4 Carbon',
+    reasoning: true,
+  },
+  {
+    id: 'google/gemini-4-hydrogen',
+    title: 'Gemini 4 Hydrogen',
+    reasoning: true,
+  },
 ];

@@ -292,9 +292,9 @@ describe('generateModels catalogue', () => {
   );
 
   it('resolves bundled presets, defaults and examples against available models', async () => {
-    // OpenRouter IDs verified on 2026-11-02; no live API calls in unit tests.
+    // OpenRouter IDs verified on 2026-11-17; no live API calls in unit tests.
     const availableIds = [
-      'anthropic/claude-fable-5.1',
+      'anthropic/claude-fable-5.2',
       'anthropic/claude-opus-5.5',
       'anthropic/claude-sonnet-4.6',
       'anthropic/claude-sonnet-5.5',
