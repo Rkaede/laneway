@@ -20,8 +20,11 @@ const START_PARAMS = [
   'wal_recycle=off',
 ];
 
-/** Opens a database and brings its schema up to date. With no data directory, it lives in memory. */
-export async function createDatabase(dataDir?: string) {
+/**
+ * Opens a database and brings its schema up to date, or up to `schema` when given. With no data
+ * directory, it lives in memory.
+ */
+export async function createDatabase(dataDir?: string, { schema }: { schema?: number } = {}) {
   const db = await PGlite.create({
     dataDir,
     // Queries return before IndexedDB has finished saving, as localStorage writes are debounced.
@@ -29,6 +32,6 @@ export async function createDatabase(dataDir?: string) {
     extensions: { vector, pg_trgm },
     startParams: START_PARAMS,
   });
-  await migrate(db);
+  await migrate(db, schema);
   return db;
 }

@@ -94,7 +94,18 @@ export const MIGRATIONS: string[] = [
     `,
 ];
 
-export async function migrate(db: PGliteInterface) {
+/**
+ * Tables a backup holds, parents before children so rows can be copied back in this order.
+ * `search_words` is left out because the chunks trigger rebuilds it, and `schema_migrations`
+ * because a backup records its schema version instead.
+ */
+export const BACKUP_TABLES = ['sessions', 'chats', 'messages', 'documents', 'chunks', 'kv'];
+
+/** Tables rebuilt from the others, emptied when a backup replaces the data. */
+export const DERIVED_TABLES = ['search_words'];
+
+/** Brings the schema up to `target`, the latest version unless a backup needs an older one. */
+export async function migrate(db: PGliteInterface, target = MIGRATIONS.length) {
   await db.exec(
     'create table if not exists schema_migrations (version int primary key, applied bigint not null)',
   );
@@ -107,7 +118,7 @@ export async function migrate(db: PGliteInterface) {
       `The database was written by a newer version of Laneway (schema ${current}). Reload to update.`,
     );
   }
-  for (let version = current + 1; version <= MIGRATIONS.length; version++) {
+  for (let version = current + 1; version <= target; version++) {
     await db.transaction(async (tx) => {
       await tx.exec(MIGRATIONS[version - 1]);
       await tx.query('insert into schema_migrations values ($1, $2)', [version, Date.now()]);

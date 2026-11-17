@@ -1,7 +1,11 @@
+import type { PGliteInterface } from '@electric-sql/pglite';
 import { nanoid } from 'nanoid';
 import { createStore, reconcile, type SetStoreFunction } from 'solid-js/store';
 
 import { getStreamCursor, getStreamDisplayMode } from '~/constants';
+import { type DatabaseDump, dumpDatabase, NewerBackupError } from '~/db/backup';
+import { MIGRATIONS } from '~/db/schema';
+import { createTar, gunzip, gzip, isGzip, readTar } from '~/services/archive';
 import { imageCache } from '~/services/image-cache';
 import type { ImagePart, MessageProps } from '~/types';
 import { download, filenameDate } from '~/util';
@@ -10,10 +14,38 @@ import { deserializeChatStore, serializeChatStore } from './chat-persistence';
 import { createDefaultState, type State } from './default-state';
 import { migrateStore } from './migrations';
 
-type Backup = { state: State; images: Map<string, Blob>; legacy: boolean };
+/** A backup from before the database: the whole store as JSON, with images in base64. */
+export type JsonBackup = {
+  kind: 'json';
+  state: State;
+  images: Map<string, Blob>;
+  legacy: boolean;
+};
+
+/** A backup archive: the database's tables, the rest of the store, and the images. */
+export type ArchiveBackup = {
+  kind: 'archive';
+  state: State;
+  database: DatabaseDump;
+  /** Image blobs by image cache id. */
+  images: Map<string, Blob>;
+};
+
+export type Backup = JsonBackup | ArchiveBackup;
+
+const ARCHIVE_VERSION = 2;
 
 function valid(condition: unknown): asserts condition {
   if (!condition) throw new Error('Invalid Laneway backup.');
+}
+
+/** Runs code that assumes a valid store, reporting a crash on an unexpected shape as invalid. */
+function invalidOnError<T>(read: () => T) {
+  try {
+    return read();
+  } catch {
+    throw new Error('Invalid Laneway backup.');
+  }
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -82,57 +114,122 @@ function imageKey(part: ImagePart) {
   return `${part.image.sourceType ?? 'store'}:${part.image.storageId}`;
 }
 
-export async function createBackup(state: State) {
-  const snapshot = JSON.parse(serializeChatStore(state)) as State;
-  const images: Record<string, { type: string; data: string }> = {};
-  const visited = new Set<string>();
+/** Image cache ids used by messages in the store, outside saved chats when those are left out. */
+export function stateImageIds(state: State) {
+  return imageParts(state)
+    .filter((part) => (part.image.sourceType ?? 'store') === 'store')
+    .map((part) => part.image.storageId);
+}
+
+/**
+ * Packs the database's tables, the rest of the store and every stored image into one gzipped tar
+ * archive. Saved chats come from the database, so the store's copy of them is left out. Images
+ * the app ships with (`sourceType: 'path'`) stay as paths.
+ */
+export async function createBackup(state: State, db: PGliteInterface) {
+  const { dump, images: databaseImages } = await dumpDatabase(db);
+  const rest = JSON.parse(serializeChatStore({ ...state, sessions: [], chats: [] })) as State;
+  const images: { id: string; blob: Blob }[] = [];
   let omittedImages = 0;
-  for (const part of imageParts(snapshot)) {
-    const key = imageKey(part);
-    if (visited.has(key)) continue;
-    visited.add(key);
+  for (const id of new Set([...databaseImages, ...stateImageIds(rest)])) {
     try {
-      const blob =
-        part.image.sourceType === 'path'
-          ? await fetch(part.image.storageId).then((response) => {
-              if (!response.ok) throw new Error(`Unable to read image: ${part.image.filename}`);
-              return response.blob();
-            })
-          : await imageCache.get(part.image.storageId);
-      if (!blob) throw new Error(`Image missing from storage: ${part.image.filename}`);
-      const bytes = new Uint8Array(await blob.arrayBuffer());
-      const chunks: string[] = [];
-      for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-        chunks.push(String.fromCharCode(...bytes.subarray(offset, offset + 0x8000)));
-      }
-      images[key] = { type: blob.type, data: btoa(chunks.join('')) };
+      const blob = await imageCache.get(id);
+      if (!blob) throw new Error(`Image missing from storage: ${id}`);
+      images.push({ id, blob });
     } catch {
       omittedImages++;
     }
   }
+  const manifest = {
+    format: 'laneway-backup',
+    version: ARCHIVE_VERSION,
+    created: new Date().toISOString(),
+    schema: dump.schema,
+    tables: dump.tables.map(({ name, columns }) => ({ name, columns })),
+    // Image ids become file names by position, so any id is safe in the archive.
+    images: images.map(({ id, blob }) => ({ id, type: blob.type })),
+  };
+  const archive = createTar([
+    { name: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
+    { name: 'state.json', data: JSON.stringify(rest) },
+    ...dump.tables.map((table) => ({ name: `tables/${table.name}.bin`, data: table.data })),
+    ...images.map(({ blob }, index) => ({ name: `images/${index}`, data: blob })),
+  ]);
   return {
-    file: new Blob(
-      [JSON.stringify({ format: 'laneway-backup', version: 1, state: snapshot, images })],
-      { type: 'application/json' },
-    ),
+    file: new Blob([await gzip(archive)], { type: 'application/gzip' }),
     omittedImages,
   };
 }
 
-export async function exportBackup(state: State) {
-  const { file, omittedImages } = await createBackup(state);
-  download(file, `laneway-backup-${filenameDate()}.json`);
+export async function exportBackup(state: State, db: PGliteInterface) {
+  const { file, omittedImages } = await createBackup(state, db);
+  download(file, `laneway-backup-${filenameDate()}.tar.gz`);
   return omittedImages;
 }
 
-export function parseBackup(serialized: string): Backup {
-  const data: unknown = JSON.parse(serialized);
-  valid(isObject(data));
-  const legacy = !('format' in data);
-  if (!legacy && (data.format !== 'laneway-backup' || data.version !== 1)) {
+/** Postgres identifiers as Laneway's schema writes them, safe to put in a COPY statement. */
+const IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
+
+async function parseArchive(file: Blob): Promise<ArchiveBackup> {
+  let files: ReturnType<typeof readTar>;
+  try {
+    files = readTar(await gunzip(file));
+  } catch {
+    throw new Error('Invalid Laneway backup.');
+  }
+  const read = (name: string) => {
+    const data = files.get(name);
+    valid(data);
+    return data;
+  };
+  const json = (name: string): unknown => JSON.parse(new TextDecoder().decode(read(name)));
+
+  const manifest = json('manifest.json');
+  valid(isObject(manifest));
+  if (manifest.format !== 'laneway-backup' || manifest.version !== ARCHIVE_VERSION) {
     throw new Error('Unsupported backup format or version.');
   }
-  const raw = legacy ? data : data.state;
+  const schema = manifest.schema;
+  valid(typeof schema === 'number' && Number.isInteger(schema) && schema >= 1);
+  if (schema > MIGRATIONS.length) throw new NewerBackupError();
+
+  valid(Array.isArray(manifest.tables));
+  const tables = manifest.tables.map((table: unknown) => {
+    valid(isObject(table) && typeof table.name === 'string' && IDENTIFIER.test(table.name));
+    const columns = table.columns;
+    valid(Array.isArray(columns) && columns.length > 0);
+    valid(columns.every((column) => typeof column === 'string' && IDENTIFIER.test(column)));
+    return {
+      name: table.name,
+      columns: columns as string[],
+      data: new Blob([read(`tables/${table.name}.bin`)]),
+    };
+  });
+  valid(new Set(tables.map((table) => table.name)).size === tables.length);
+
+  valid(Array.isArray(manifest.images));
+  const images = new Map<string, Blob>();
+  manifest.images.forEach((image: unknown, index) => {
+    valid(isObject(image) && typeof image.id === 'string' && image.id.length > 0);
+    valid(typeof image.type === 'string');
+    images.set(image.id, new Blob([read(`images/${index}`)], { type: image.type }));
+  });
+
+  const state = validateState(json('state.json'));
+  // Saved sessions and chats come from the database.
+  state.sessions = [];
+  state.chats = [];
+  return { kind: 'archive', state, database: { schema, tables }, images };
+}
+
+/** Reads a backup file in either format, checking it before anything is written. */
+export async function readBackupFile(file: Blob): Promise<Backup> {
+  if (await isGzip(file)) return parseArchive(file);
+  return parseBackup(await file.text());
+}
+
+/** Checks a saved store and runs its migrations. */
+function validateState(raw: unknown): State {
   valid(isObject(raw));
   valid(
     raw.schemaVersion === undefined ||
@@ -152,7 +249,7 @@ export function parseBackup(serialized: string): Backup {
       settings: {},
     }),
   );
-  const state = deserializeChatStore(JSON.stringify(raw));
+  const state = invalidOnError(() => deserializeChatStore(JSON.stringify(raw)));
   for (const chat of [...state.chats, ...state.draftChats]) {
     valid(['idle', 'loading', 'error', 'canceled'].includes(chat.status));
   }
@@ -176,7 +273,7 @@ export function parseBackup(serialized: string): Backup {
     if (owner.latest !== undefined) validateMessage(owner.latest, { requireId: false });
   }
   const [migrated, setMigrated] = createStore(state);
-  migrateStore(migrated, setMigrated);
+  invalidOnError(() => migrateStore(migrated, setMigrated));
   const defaults = createDefaultState();
   valid(matchesShape(migrated.settings, defaults.settings));
   valid(
@@ -190,6 +287,18 @@ export function parseBackup(serialized: string): Backup {
   valid(matchesShape(migrated.featureFlags, defaults.featureFlags));
   valid(matchesShape(migrated.speedDial, [{ id: '' }]));
   state.dialogs = defaults.dialogs;
+  return state;
+}
+
+/** Reads a JSON backup, from before backups held the database. */
+export function parseBackup(serialized: string): JsonBackup {
+  const data: unknown = JSON.parse(serialized);
+  valid(isObject(data));
+  const legacy = !('format' in data);
+  if (!legacy && (data.format !== 'laneway-backup' || data.version !== 1)) {
+    throw new Error('Unsupported backup format or version.');
+  }
+  const state = validateState(legacy ? data : data.state);
 
   const images = new Map<string, Blob>();
   if (!legacy) {
@@ -203,11 +312,11 @@ export function parseBackup(serialized: string): Backup {
       if (keys.has(key)) images.set(key, new Blob([bytes], { type: image.type }));
     }
   }
-  return { state, images, legacy };
+  return { kind: 'json', state, images, legacy };
 }
 
 export async function restoreBackup(
-  backup: Backup,
+  backup: JsonBackup,
   current: State,
   setState: SetStoreFunction<State>,
 ) {

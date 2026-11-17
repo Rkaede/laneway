@@ -3,11 +3,10 @@ import { createStore } from 'solid-js/store';
 
 import { imageCache } from '~/services/image-cache';
 import type { ImagePart, MessageProps } from '~/types';
-import * as util from '~/util';
 
-import { createBackup, exportBackup, parseBackup, restoreBackup } from './backup';
+import { parseBackup, restoreBackup } from './backup';
 import { deserializeChatStore, serializeChatStore } from './chat-persistence';
-import { createDefaultState } from './default-state';
+import { createDefaultState, type State } from './default-state';
 
 let images: Map<string, Blob>;
 
@@ -23,6 +22,56 @@ beforeEach(() => {
 });
 
 afterEach(() => mock.restore());
+
+/**
+ * A backup in the JSON format Laneway exported before backups held the database, which imports
+ * must still accept. Images are base64 under `sourceType:storageId` keys.
+ */
+async function createBackup(state: State) {
+  const snapshot = JSON.parse(serializeChatStore(state)) as State;
+  const messages = [
+    ...snapshot.chats,
+    ...snapshot.draftChats,
+    ...snapshot.assistants,
+    ...snapshot.presets.flatMap((preset) => preset.chats),
+  ].flatMap((owner: { messages?: MessageProps[]; latest?: MessageProps }) => [
+    ...(owner.messages ?? []),
+    ...(owner.latest ? [owner.latest] : []),
+  ]);
+  const images: Record<string, { type: string; data: string }> = {};
+  const visited = new Set<string>();
+  let omittedImages = 0;
+  for (const message of messages) {
+    if (typeof message.content === 'string') continue;
+    for (const part of message.content) {
+      if (part.type !== 'image') continue;
+      const key = `${part.image.sourceType ?? 'store'}:${part.image.storageId}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      try {
+        const blob =
+          part.image.sourceType === 'path'
+            ? await fetch(part.image.storageId).then((response) => {
+                if (!response.ok) throw new Error('Unable to read image');
+                return response.blob();
+              })
+            : await imageCache.get(part.image.storageId);
+        if (!blob) throw new Error('Image missing');
+        images[key] = {
+          type: blob.type,
+          data: Buffer.from(await blob.arrayBuffer()).toString('base64'),
+        };
+      } catch {
+        omittedImages++;
+      }
+    }
+  }
+  const file = new Blob(
+    [JSON.stringify({ format: 'laneway-backup', version: 1, state: snapshot, images })],
+    { type: 'application/json' },
+  );
+  return { file, omittedImages };
+}
 
 function imageMessage(storageId: string, sourceType?: 'store' | 'path'): MessageProps {
   return {
@@ -218,33 +267,6 @@ describe('backups', () => {
     expect(images.has('photo')).toBe(false);
     const draft = imagePart(current.draftChats[0].messages[0]).image;
     expect(await images.get(draft.storageId)!.text()).toBe('draft bytes');
-  });
-
-  it('downloads the resilient backup and returns the omitted image count', async () => {
-    const source = stateWithImages();
-    images.delete('photo');
-    const download = spyOn(util, 'download').mockImplementation(() => {});
-
-    expect(await exportBackup(source)).toBe(1);
-
-    expect(download).toHaveBeenCalledTimes(1);
-    const [file, filename] = download.mock.calls[0];
-    expect(file).toBeInstanceOf(Blob);
-    expect(filename).toMatch(/^laneway-backup-.*\.json$/);
-    expect(JSON.parse(await (file as Blob).text()).state.sessions).toEqual(source.sessions);
-  });
-
-  it('keeps exporting when image storage rejects a read', async () => {
-    const source = stateWithImages();
-    spyOn(imageCache, 'get').mockImplementation(async (id) => {
-      if (id === 'photo') throw new Error('Storage blocked');
-      return images.get(id) ?? null;
-    });
-
-    const { file, omittedImages } = await createBackup(source);
-
-    expect(omittedImages).toBe(1);
-    expect(Object.keys(JSON.parse(await file.text()).images)).toEqual(['store:draft']);
   });
 
   it.each(['HTTP error', 'network error'])(

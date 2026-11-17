@@ -17,8 +17,11 @@ export const databaseSync = createDatabaseSync({
   getState: () => unwrap(store),
 });
 
+/** The localStorage key of the snapshot. */
+export const SNAPSHOT_KEY = 'chat-store';
+
 const persisted = makePersistedStore(createStore(createDefaultState()), {
-  name: 'chat-store',
+  name: SNAPSHOT_KEY,
   // The snapshot is large and the store changes on every streamed token.
   deferSerialize: true,
   onChange: () => databaseSync.schedule(),
@@ -28,18 +31,32 @@ const persisted = makePersistedStore(createStore(createDefaultState()), {
       pendingDeletes: [
         ...new Set([...startupDeletes, ...databaseSync.pendingDeletes(unwrap(state))]),
       ],
+      generation: databaseSync.generation(),
     }),
   deserialize: (serialized) => {
     const snapshot = deserializeSnapshot(serialized);
     startupDeletes = snapshot.pendingDeletes;
+    databaseSync.setGeneration(snapshot.generation);
     return snapshot.state;
   },
 });
+
+// With no snapshot, the store is new, and so is any data it is saved over.
+if (databaseSync.generation() === undefined) databaseSync.setGeneration(null);
 
 export const [store, setStore] = persisted;
 
 /** Writes the snapshot again, after a sync changes which messages it needs to keep. */
 export const saveSnapshot = persisted.save;
+
+/** Writes the snapshot now, before another tab reads it. */
+export function writeSnapshotNow() {
+  persisted.save();
+  persisted.flush();
+}
+
+/** Stops saving the snapshot, before a reload that must not overwrite what another tab saved. */
+export const closeSnapshot = persisted.close;
 
 /** Takes the deletes read at startup, which the first sync carries out. */
 export function takeStartupDeletes() {

@@ -227,6 +227,7 @@ describe('snapshot', () => {
     const serialized = serializeSnapshot(state, {
       isPersisted: (chat) => chat.id !== 'c0',
       pendingDeletes: [],
+      generation: null,
     });
     expect(savedChats(serialized)).toEqual([
       // Not saved to the database yet, so the snapshot keeps it.
@@ -246,17 +247,31 @@ describe('snapshot', () => {
     const serialized = serializeSnapshot(state, {
       isPersisted: () => false,
       pendingDeletes: [],
+      generation: null,
     });
     expect(savedChats(serialized)).toEqual([{ id: 'c0', messages: 0, unloaded: true }]);
   });
 
-  it('carries deletes the database has not made yet, outside the state', () => {
+  it('carries deletes the database has not made yet, and the data generation, outside the state', () => {
     const serialized = serializeSnapshot(snapshotState(1), {
       isPersisted: () => true,
       pendingDeletes: ['gone'],
+      generation: 'g2',
     });
-    const { state, pendingDeletes } = deserializeSnapshot(serialized);
+    const { state, pendingDeletes, generation } = deserializeSnapshot(serialized);
     expect(pendingDeletes).toEqual(['gone']);
+    expect(generation).toBe('g2');
     expect(state).not.toHaveProperty('pendingDeletes');
+    expect(state).not.toHaveProperty('generation');
+  });
+
+  it('reads a snapshot from before generations as the first generation', () => {
+    const serialized = serializeSnapshot(snapshotState(1), {
+      isPersisted: () => true,
+      pendingDeletes: [],
+      generation: null,
+    });
+    expect(JSON.parse(serialized)).not.toHaveProperty('generation');
+    expect(deserializeSnapshot(serialized).generation).toBeNull();
   });
 });

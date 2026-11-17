@@ -1,13 +1,33 @@
 import { batch, createSignal } from 'solid-js';
-import { unwrap } from 'solid-js/store';
+import { reconcile, unwrap } from 'solid-js/store';
 
+import { restoreDatabase } from '~/db/backup';
 import { getDatabase, scheduleCheckpoint } from '~/db/client';
-import { loadMessages, type SyncResult } from '~/db/sync';
+import { storedImageIds } from '~/db/images';
+import { DataReplacedError, loadMessages, readGeneration, type SyncResult } from '~/db/sync';
 import { imageCache } from '~/services/image-cache';
 import type { ChatProps, MessageProps } from '~/types';
 
+import {
+  type ArchiveBackup,
+  type Backup,
+  exportBackup,
+  restoreBackup,
+  stateImageIds,
+} from './backup';
 import { chatImageIds } from './branches';
-import { databaseSync, saveSnapshot, setStore, store, takeStartupDeletes } from './index';
+import { deserializeSnapshot } from './chat-persistence';
+import type { State } from './default-state';
+import {
+  closeSnapshot,
+  databaseSync,
+  saveSnapshot,
+  setStore,
+  SNAPSHOT_KEY,
+  store,
+  takeStartupDeletes,
+  writeSnapshotNow,
+} from './index';
 
 const [databaseError, setDatabaseError] = createSignal<Error>();
 
@@ -34,6 +54,64 @@ function afterSync(result: SyncResult) {
   }
 }
 
+function startSync() {
+  databaseSync.start(afterSync, { replaced: () => void recover() });
+}
+
+/** Saves the store's changes now, recovering if another tab replaced the data meanwhile. */
+async function syncNow() {
+  try {
+    afterSync(await databaseSync.sync());
+  } catch (error) {
+    if (!(error instanceof DataReplacedError)) throw error;
+    await recover();
+  }
+}
+
+/**
+ * Rebuilds the store's sessions and chats from the database, keeping `rest` for everything else,
+ * and saves from then on against the data's current generation.
+ */
+async function rebuildFromDatabase(rest: State, generation: string | null) {
+  databaseSync.reset();
+  databaseSync.setGeneration(generation);
+  const saved = await databaseSync.prime([], { sessions: [], chats: [] });
+  setStore(reconcile({ ...rest, sessions: saved.sessions, chats: saved.chats }));
+  startSync();
+}
+
+let recovering: Promise<void> | undefined;
+
+/**
+ * Called when another tab replaced the data after this tab read its store, so the store's changes
+ * must be dropped. Uses the snapshot that tab saved for settings, assistants and presets when it
+ * matches the data, and otherwise keeps this tab's.
+ */
+function recover() {
+  recovering ??= (async () => {
+    try {
+      await databaseSync.stop();
+      for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
+      const generation = await readGeneration(await getDatabase());
+      let rest: State = unwrap(store);
+      try {
+        const saved = deserializeSnapshot(localStorage.getItem(SNAPSHOT_KEY) ?? '');
+        if (saved.generation === generation) rest = saved.state;
+      } catch {
+        // No readable snapshot, so this tab's store is the best there is.
+      }
+      await rebuildFromDatabase(rest, generation);
+      writeSnapshotNow();
+    } catch (error) {
+      console.error('Unable to reload replaced data.', error);
+      setDatabaseError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      recovering = undefined;
+    }
+  })();
+  return recovering;
+}
+
 let starting: Promise<void> | undefined;
 
 /**
@@ -42,6 +120,7 @@ let starting: Promise<void> | undefined;
  */
 export function startDatabase() {
   starting ??= (async () => {
+    listenForReplacedData();
     try {
       const missing = await databaseSync.prime(takeStartupDeletes());
       if (missing.sessions.length) {
@@ -51,8 +130,8 @@ export function startDatabase() {
           setStore('chats', (chats) => [...chats, ...missing.chats]);
         });
       }
-      databaseSync.start(afterSync);
-      afterSync(await databaseSync.sync());
+      startSync();
+      await syncNow();
     } catch (error) {
       console.error('Unable to open the database.', error);
       setDatabaseError(error instanceof Error ? error : new Error(String(error)));
@@ -91,12 +170,12 @@ export function loadChats(chatIds: string[]) {
   return Promise.all(chatIds.map((id) => loading.get(id)));
 }
 
-/** Messages read for search and export, which do not load chats into the store. */
+/** Messages read for search, which does not load chats into the store. */
 const readOnly = new Map<string, MessageProps[]>();
 
 /**
  * The chats with every message, reading unloaded ones from the database without loading them.
- * Search and backups need every message until they read the database directly.
+ * Search needs every message until it reads the database directly.
  */
 export async function chatsWithMessages(chats: ChatProps[]) {
   const missing = chats.filter((chat) => chat.unloaded && !readOnly.has(chat.id));
@@ -114,8 +193,87 @@ export async function chatsWithMessages(chats: ChatProps[]) {
   });
 }
 
-/** The whole state with every message, as a backup needs it. */
-export async function completeState() {
-  const state = unwrap(store);
-  return { ...state, chats: await chatsWithMessages(state.chats) };
+/** Opens the database for a backup, which needs every change saved first. */
+async function readyDatabase() {
+  await startDatabase();
+  const error = databaseError();
+  if (error) throw error;
+  await syncNow();
+  return getDatabase();
+}
+
+/** Downloads a backup of everything. Returns how many images were missing from storage. */
+export async function exportAllData() {
+  return exportBackup(unwrap(store), await readyDatabase());
+}
+
+/**
+ * Replaces the database with an archive's tables, then rebuilds the store from it. Until the
+ * database commits, a failure leaves everything as it was.
+ */
+async function restoreArchive(backup: ArchiveBackup) {
+  const db = await readyDatabase();
+  await databaseSync.stop();
+  const added: string[] = [];
+  let result: Awaited<ReturnType<typeof restoreDatabase>>;
+  try {
+    for (const [id, blob] of backup.images) {
+      await imageCache.add(id, blob);
+      added.push(id);
+    }
+    result = await restoreDatabase(db, backup.database);
+  } catch (error) {
+    // Image ids are unique, so an added image is one the current data already had only if it
+    // still uses it.
+    const inUse = new Set([
+      ...(await storedImageIds(db).catch(() => added)),
+      ...stateImageIds(unwrap(store)),
+    ]);
+    await Promise.allSettled(added.filter((id) => !inUse.has(id)).map(imageCache.remove));
+    startSync();
+    throw error;
+  }
+
+  for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
+  await rebuildFromDatabase(backup.state, result.generation);
+  scheduleCheckpoint();
+
+  const kept = new Set([...result.images, ...stateImageIds(backup.state)]);
+  for (const id of result.previousImages) if (!kept.has(id)) void imageCache.remove(id);
+}
+
+/** Replaces all data with a backup's, and reloads other tabs so they do not save over it. */
+export async function importBackup(backup: Backup) {
+  if (backup.kind === 'archive') {
+    await restoreArchive(backup);
+  } else {
+    await restoreBackup(backup, store, setStore);
+    // Save to the database before other tabs reload and read it.
+    await startDatabase();
+    if (!databaseError()) await syncNow();
+  }
+  announceDataReplaced();
+}
+
+/**
+ * Saves the snapshot now and reloads other tabs, after this tab replaced or deleted all data.
+ * Their stores are out of date, and saving them would bring back what was replaced.
+ */
+export function announceDataReplaced() {
+  writeSnapshotNow();
+  channel?.postMessage(DATA_REPLACED);
+}
+
+const DATA_REPLACED = 'data-replaced';
+let channel: BroadcastChannel | undefined;
+
+function listenForReplacedData() {
+  if (channel || typeof BroadcastChannel === 'undefined') return;
+  channel = new BroadcastChannel('laneway-data');
+  channel.addEventListener('message', (event) => {
+    if (event.data !== DATA_REPLACED) return;
+    closeSnapshot();
+    void databaseSync.stop();
+    window.location.reload();
+  });
 }

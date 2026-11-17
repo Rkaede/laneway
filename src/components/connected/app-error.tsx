@@ -1,21 +1,21 @@
 import type { Component } from 'solid-js';
 
 import { deleteData } from '~/store';
-import { exportBackup } from '~/store/backup';
-import { completeState } from '~/store/database';
+import { announceDataReplaced, exportAllData } from '~/store/database';
 
 import { AppErrorView } from './app-error-view';
 
 export const AppError: Component = () => {
   const handleClearData = () => {
     if (deleteData()) {
+      announceDataReplaced();
       window.location.reload();
     }
   };
 
   const handleExportData = async () => {
     try {
-      const omittedImages = await exportBackup(await completeState());
+      const omittedImages = await exportAllData();
       if (omittedImages) {
         window.alert(
           `Data exported. ${omittedImages} unavailable image${omittedImages === 1 ? '' : 's'} left out.`,

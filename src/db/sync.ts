@@ -1,7 +1,9 @@
 import type { PGliteInterface, Transaction } from '@electric-sql/pglite';
+import { nanoid } from 'nanoid';
 
 import type { ChatProps, MessageProps, SessionProps } from '~/types';
 
+import { IMAGE_PARTS, STORED_IMAGE } from './images';
 import {
   chatFromRow,
   chatRow,
@@ -34,6 +36,37 @@ export type SyncResult = {
 };
 
 const BATCH = 200;
+
+/**
+ * The `kv` key of the data's generation, which changes when a backup replaces everything. A store
+ * read from before the change must not be saved over the new data.
+ */
+const GENERATION = 'generation';
+
+export async function readGeneration(db: PGliteInterface | Transaction) {
+  const { rows } = await db.query<{ value: string }>('select value from kv where key = $1', [
+    GENERATION,
+  ]);
+  return rows[0]?.value ?? null;
+}
+
+/** Starts a new generation. Run in the transaction that replaces the data. */
+export async function newGeneration(tx: Transaction) {
+  const generation = nanoid();
+  await tx.query(
+    `insert into kv (key, value) values ($1, to_jsonb($2::text))
+     on conflict (key) do update set value = excluded.value`,
+    [GENERATION, generation],
+  );
+  return generation;
+}
+
+/** The data was replaced after this tab read its store, so the store must not be saved. */
+export class DataReplacedError extends Error {
+  constructor() {
+    super('The data was replaced in another tab.');
+  }
+}
 
 function messageSignatures(messages: MessageProps[]) {
   return new Map(
@@ -76,13 +109,6 @@ async function upsert(
   }
 }
 
-const IMAGE_PARTS = `
-  jsonb_array_elements(
-    case when jsonb_typeof(m.data->'content') = 'array' then m.data->'content' else '[]' end
-  ) as part`;
-const STORED_IMAGE = `part->>'type' = 'image'
-  and coalesce(part->'image'->>'sourceType', 'store') = 'store'`;
-
 /**
  * Keeps the database in step with the store. Each sync compares the store with what this tab last
  * wrote, and writes only the difference in one transaction. Deletes only cover sessions and chats
@@ -97,6 +123,9 @@ export function createDatabaseSync({
   getState: () => SyncState;
   delay?: number;
 }) {
+  /** The generation the store was read from. Unset, writes do not check it. */
+  let generation: string | null | undefined;
+  let onReplaced: (() => void) | undefined;
   const sessions = new Map<string, number>();
   const chats = new Map<string, number>();
   const messages = new Map<string, Map<string, number>>();
@@ -160,6 +189,9 @@ export function createDatabaseSync({
     const db = await getDatabase();
     let orphanedImages: string[] = [];
     await db.transaction(async (tx) => {
+      if (generation !== undefined && (await readGeneration(tx)) !== generation) {
+        throw new DataReplacedError();
+      }
       if (next.deleteSessions.length || next.deleteChats.length) {
         const { rows } = await tx.query<{ id: string }>(
           `select distinct part->'image'->>'storageId' as id
@@ -251,12 +283,12 @@ export function createDatabaseSync({
 
     /**
      * Reads what the database holds, so unchanged rows are not written again, and returns the
-     * sessions and chats that are in the database but not in the store. `deleted` lists sessions
-     * removed before the last sync could save that, which the first sync then deletes.
+     * sessions and chats that are in the database but not in `state`, the store by default.
+     * `deleted` lists sessions removed before the last sync could save that, which the first sync
+     * then deletes.
      */
-    async prime(deleted: string[] = []) {
+    async prime(deleted: string[] = [], state: SyncState = getState()) {
       const db = await getDatabase();
-      const state = getState();
       const [sessionRows, chatRows] = await Promise.all([
         db.query<ReturnType<typeof sessionRow>>(
           'select id, type, title, created, data from sessions',
@@ -306,8 +338,34 @@ export function createDatabaseSync({
      * Starts syncing on `schedule`, calling `listener` after each background sync. Until then,
      * changes wait for the first sync.
      */
-    start(listener: (result: SyncResult) => void) {
+    start(
+      listener: (result: SyncResult) => void,
+      { replaced }: { replaced?: () => void } = {},
+    ) {
       onSynced = listener;
+      onReplaced = replaced;
+    },
+
+    /** Sets the generation the store was read from, which every write then checks. */
+    setGeneration(value: string | null) {
+      generation = value;
+    },
+
+    /** The generation the store was read from, saved with the snapshot. */
+    generation: () => generation,
+
+    /** Stops syncing until `start` is called again, once any sync under way has finished. */
+    async stop() {
+      onSynced = undefined;
+      clearTimeout(timer);
+      await running?.catch(() => {});
+    },
+
+    /** Forgets what this tab has written, before the database's contents are replaced. */
+    reset() {
+      sessions.clear();
+      chats.clear();
+      messages.clear();
     },
 
     /** Debounced sync, for every store change. */
@@ -318,7 +376,10 @@ export function createDatabaseSync({
       timer = setTimeout(() => {
         sync()
           .then(listener)
-          .catch((error) => console.error('Saving to the database failed.', error));
+          .catch((error) => {
+            if (error instanceof DataReplacedError && onReplaced) onReplaced();
+            else console.error('Saving to the database failed.', error);
+          });
       }, delay);
     },
 

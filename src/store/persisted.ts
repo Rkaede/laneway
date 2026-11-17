@@ -12,6 +12,7 @@ export function createDebouncedStorage() {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let started: number | undefined;
   let warned = false;
+  let closed = false;
 
   function access<T>(operation: () => T) {
     try {
@@ -58,6 +59,7 @@ export function createDebouncedStorage() {
         : resolve(value);
     },
     setItem(key: string, value: PendingValue) {
+      if (closed) return;
       pending.set(key, value);
       started ??= performance.now();
       clearTimeout(timer);
@@ -74,6 +76,18 @@ export function createDebouncedStorage() {
         started = undefined;
       }
       access(() => storage?.removeItem(key));
+    },
+    /** Saves pending values now. */
+    flush,
+    /**
+     * Drops pending values and ignores later ones, for a page about to reload after another tab
+     * replaced the saved data.
+     */
+    close() {
+      closed = true;
+      pending.clear();
+      clearTimeout(timer);
+      started = undefined;
     },
   };
 }
@@ -117,5 +131,7 @@ export function makePersistedStore<T extends object>(
   return Object.assign(persisted, {
     /** Saves the store again, for when its serialised form changes without a store change. */
     save: () => storage.setItem(options.name, () => serialize(persisted[0])),
+    flush: storage.flush,
+    close: storage.close,
   });
 }

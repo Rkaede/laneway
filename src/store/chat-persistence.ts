@@ -21,6 +21,8 @@ type SnapshotOptions = {
   isPersisted: (chat: ChatProps) => boolean;
   /** Sessions deleted from the store that the database still has. */
   pendingDeletes: string[];
+  /** The generation of the data the store was read from. */
+  generation: string | null | undefined;
 };
 
 /**
@@ -30,7 +32,7 @@ type SnapshotOptions = {
  */
 export function serializeSnapshot(
   state: State,
-  { isPersisted, pendingDeletes }: SnapshotOptions,
+  { isPersisted, pendingDeletes, generation }: SnapshotOptions,
 ) {
   const raw = unwrap(state);
   const recent = new Set(
@@ -51,16 +53,19 @@ export function serializeSnapshot(
       chats,
       dialogs: undefined,
       pendingDeletes: pendingDeletes.length ? pendingDeletes : undefined,
+      generation: generation ?? undefined,
     },
     withoutControllers,
   );
 }
 
 export function deserializeSnapshot(serialized: string) {
-  const { pendingDeletes = [], ...state } = JSON.parse(serialized) as State & {
-    pendingDeletes?: string[];
-  };
-  return { state: normalizeState(state), pendingDeletes };
+  const {
+    pendingDeletes = [],
+    generation = null,
+    ...state
+  } = JSON.parse(serialized) as State & { pendingDeletes?: string[]; generation?: string };
+  return { state: normalizeState(state), pendingDeletes, generation };
 }
 
 export function deserializeChatStore(serialized: string) {

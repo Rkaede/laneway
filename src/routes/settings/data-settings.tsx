@@ -2,9 +2,9 @@ import { createSignal } from 'solid-js';
 
 import { Button } from '~/components/ui';
 import { showSuccess } from '~/components/ui/notifications';
-import { deleteData, setStore, store } from '~/store';
-import { exportBackup, parseBackup, restoreBackup } from '~/store/backup';
-import { completeState } from '~/store/database';
+import { deleteData } from '~/store';
+import { readBackupFile } from '~/store/backup';
+import { announceDataReplaced, exportAllData, importBackup } from '~/store/database';
 import { deleteKeys } from '~/store/keys';
 
 import { Section, Setting, SettingControl } from './shared';
@@ -20,7 +20,7 @@ export function Data() {
     setError('');
     setStatus('');
     try {
-      const omittedImages = await exportBackup(await completeState());
+      const omittedImages = await exportAllData();
       setStatus(
         omittedImages
           ? `Data exported. ${omittedImages} unavailable image${omittedImages === 1 ? '' : 's'} left out.`
@@ -39,15 +39,17 @@ export function Data() {
     setError('');
     setStatus('');
     try {
-      const backup = parseBackup(await file.text());
+      const backup = await readBackupFile(file);
       if (
         !window.confirm(
           'Replace your chats, notes, images, assistants, presets, and settings with this backup? This cannot be undone. Export your current data first if you need it. API keys will be kept.' +
-            (backup.legacy ? '\n\nThis older export does not include image files.' : ''),
+            (backup.kind === 'json' && backup.legacy
+              ? '\n\nThis older export does not include image files.'
+              : ''),
         )
       )
         return;
-      await restoreBackup(backup, store, setStore);
+      await importBackup(backup);
       showSuccess('Data imported.');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Unable to import data.');
@@ -68,7 +70,9 @@ export function Data() {
             variant="destructive"
             disabled={busy()}
             onClick={() => {
-              if (deleteData()) showSuccess('Data deleted.');
+              if (!deleteData()) return;
+              announceDataReplaced();
+              showSuccess('Data deleted.');
             }}
           >
             Delete Data
@@ -113,7 +117,7 @@ export function Data() {
           <input
             ref={fileInput}
             type="file"
-            accept=".json,application/json"
+            accept=".gz,.json,application/gzip,application/json"
             aria-label="Backup file"
             class="hidden"
             onChange={(event) => {

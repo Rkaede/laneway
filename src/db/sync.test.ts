@@ -4,7 +4,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import type { ChatProps, MessageProps, SessionProps } from '~/types';
 
 import { createDatabase } from './create';
-import { createDatabaseSync, loadMessages, type SyncState } from './sync';
+import {
+  createDatabaseSync,
+  DataReplacedError,
+  loadMessages,
+  newGeneration,
+  readGeneration,
+  type SyncState,
+} from './sync';
 
 let db: PGlite;
 
@@ -221,5 +228,38 @@ describe('isPersisted and pendingDeletes', () => {
     expect(sync.isPersisted(state.current.chats[0])).toBe(true);
     expect(sync.isPersisted(chat('c1', [message('m1'), message('m2')]))).toBe(false);
     expect(sync.pendingDeletes({ sessions: [], chats: [] })).toEqual(['s1']);
+  });
+});
+
+describe('generations', () => {
+  it('refuses to save a store read before the data was replaced', async () => {
+    const { state, sync } = setup({
+      sessions: [session('s1', ['c1'])],
+      chats: [chat('c1', [])],
+    });
+    sync.setGeneration(null);
+    await sync.sync();
+
+    const replaced = await db.transaction((tx) => newGeneration(tx));
+    expect(await readGeneration(db)).toBe(replaced);
+    state.current = { sessions: [], chats: [] };
+
+    expect(sync.sync()).rejects.toBeInstanceOf(DataReplacedError);
+    expect(await count('sessions')).toBe(1);
+
+    sync.setGeneration(replaced);
+    expect((await sync.sync()).wrote).toBe(true);
+    expect(await count('sessions')).toBe(0);
+  });
+
+  it('tells the store when a background save finds the data replaced', async () => {
+    const { sync } = setup({ sessions: [session('s1', [])], chats: [] });
+    sync.setGeneration('old');
+    let replaced = 0;
+    sync.start(() => {}, { replaced: () => replaced++ });
+    sync.schedule();
+    await Bun.sleep(400);
+    expect(replaced).toBe(1);
+    expect(await count('sessions')).toBe(0);
   });
 });
