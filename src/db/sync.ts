@@ -145,7 +145,12 @@ export function createDatabaseSync({
       messages: new Map(),
     };
 
+    // A repeated id would make one upsert write the same row twice, which Postgres refuses, so
+    // the first copy wins.
+    const seenSessions = new Set<string>();
     for (const session of state.sessions) {
+      if (seenSessions.has(session.id)) continue;
+      seenSessions.add(session.id);
       const row = sessionRow(session);
       const rowSignature = signature(row);
       if (sessions.get(session.id) !== rowSignature) {
@@ -154,9 +159,11 @@ export function createDatabaseSync({
     }
 
     const owners = chatOwners(state.sessions);
+    const seenChats = new Set<string>();
     for (const chat of state.chats) {
       const owner = owners.get(chat.id);
-      if (!owner) continue;
+      if (!owner || seenChats.has(chat.id)) continue;
+      seenChats.add(chat.id);
       const row = chatRow(chat, owner.sessionId, owner.position);
       const rowSignature = signature(row);
       if (chats.get(chat.id) !== rowSignature)

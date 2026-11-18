@@ -263,3 +263,20 @@ describe('generations', () => {
     expect(await count('sessions')).toBe(0);
   });
 });
+
+describe('repeated ids', () => {
+  it('saves a session or chat the store lists twice once, rather than failing every sync', async () => {
+    const first = session('s', ['c']);
+    const { sync } = setup({
+      sessions: [first, { ...first }],
+      chats: [chat('c', [message('m')]), chat('c', [message('m')])],
+    });
+
+    expect((await sync.sync()).wrote).toBe(true);
+    const { rows } = await db.query<{ count: number }>(
+      'select count(*)::int as count from chats',
+    );
+    expect(rows[0].count).toBe(1);
+    expect((await loadMessages(db, ['c'])).get('c')).toEqual([message('m')]);
+  });
+});
