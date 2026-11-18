@@ -235,7 +235,7 @@ describe('backups', () => {
 
     await restoreBackup(backup, current, setCurrent);
 
-    expect(current.schemaVersion).toBe(4);
+    expect(current.schemaVersion).toBe(createDefaultState().schemaVersion);
     expect(current.settings.theme).toBe('system');
     expect(current.settings.messages).toEqual(createDefaultState().settings.messages);
     expect(current.sessions).toEqual(source.sessions);
@@ -335,7 +335,10 @@ describe('backups', () => {
     '[]',
     JSON.stringify({ format: 'other', version: 1 }),
     JSON.stringify({ format: 'laneway-backup', version: 2 }),
-    JSON.stringify({ ...createDefaultState(), schemaVersion: 5 }),
+    JSON.stringify({
+      ...createDefaultState(),
+      schemaVersion: createDefaultState().schemaVersion + 1,
+    }),
     JSON.stringify({ ...createDefaultState(), chats: [null] }),
     JSON.stringify({ ...createDefaultState(), settings: { theme: 'dark' } }),
     JSON.stringify({

@@ -1,4 +1,5 @@
 import {
+  IconBookOpen,
   IconBox,
   IconLayoutGrid,
   IconListRestart,
@@ -44,6 +45,15 @@ export const navigationActions: Actions = {
     icon: IconBox,
     fn: (context: ActionContext) => {
       context.navigate('/models');
+    },
+  },
+  openLibrary: {
+    id: 'open-library',
+    name: 'Library',
+    keywords: ['library', 'documents', 'pdf', 'files'],
+    icon: IconBookOpen,
+    fn: (context: ActionContext) => {
+      context.navigate('/library');
     },
   },
   gotoLatest: {

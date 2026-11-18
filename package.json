@@ -38,9 +38,9 @@
     "dequal": "^2.0.3",
     "html-to-image": "^1.11.13",
     "lucide-solid": "^1.62.0",
-    "minisearch": "^7.2.0",
     "motion": "^14.7.1",
     "nanoid": "^6.0.2",
+    "pdfjs-dist": "^6.5.438",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "shiki": "^4.5.0",
@@ -86,5 +86,8 @@
     "picomatch": "^4.0.4",
     "rollup": "^4.60.2",
     "serialize-javascript": "^7.0.5"
+  },
+  "patchedDependencies": {
+    "@electric-sql/pglite@0.5.16": "patches/@electric-sql%2Fpglite@0.5.16.patch"
   }
 }

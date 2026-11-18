@@ -5,6 +5,7 @@ import { APIKeySetting } from './api-key-settings';
 import { Completions } from './completion-settings';
 import { Data } from './data-settings';
 import { GeneralSettings } from './general-settings';
+import { SearchSettings } from './search-settings';
 import { SpeedDial } from './speed-dial-settings';
 import { TTSSettings } from './tts-settings';
 
@@ -23,6 +24,7 @@ export default function Settings() {
         {store.featureFlags.completions && <Completions />}
         <TTSSettings />
         <APIKeySetting />
+        <SearchSettings />
         <SpeedDial />
         <Data />
       </div>

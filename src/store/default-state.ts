@@ -57,6 +57,8 @@ export interface State {
     };
     sidebarOpen: boolean;
     generateTitles: boolean;
+    /** Embed chats, notes and documents through OpenRouter, so search finds them by meaning. */
+    semanticSearch: boolean;
     theme: Theme;
     hasSeenWelcome: boolean;
     messages: {
@@ -116,7 +118,7 @@ export function createDefaultState(): State {
   const imageAttachment = examples.imageAttachment();
 
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     sessions: [story.session, imageAttachment.session],
     chats: [...story.chats, ...imageAttachment.chats],
     draftSession: {
@@ -211,6 +213,7 @@ export function createDefaultState(): State {
       },
       sidebarOpen: true,
       generateTitles: true,
+      semanticSearch: false,
       theme: 'system',
       hasSeenWelcome: false,
       messages: {

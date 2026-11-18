@@ -31,6 +31,8 @@ const Settings = lazy(() => import('./routes/settings/settings'));
 const Assistants = lazy(() => import('./routes/assistants'));
 const Presets = lazy(() => import('./routes/presets'));
 const ModelList = lazy(() => import('./routes/models'));
+const Library = lazy(() => import('./routes/library'));
+const LibraryDocument = lazy(() => import('./routes/library-document'));
 
 function AppRoot(props: RouteSectionProps) {
   const matches = useCurrentMatches();
@@ -61,6 +63,12 @@ if (root) {
             <Route path="/models" component={ModelList} info={{ title: 'Models' }} />
             <Route path="/presets" component={Presets} info={{ title: 'Presets' }} />
             <Route path="/assistants" component={Assistants} info={{ title: 'Assistants' }} />
+            <Route path="/library" component={Library} info={{ title: 'Library' }} />
+            <Route
+              path="/library/:id"
+              component={LibraryDocument}
+              info={{ title: 'Library' }}
+            />
             <Route path="/" component={Session} info={{ session: true }} />
             <Route path="*" component={NotFound} info={{ title: 'Page not found' }} />
           </Route>

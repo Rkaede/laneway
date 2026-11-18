@@ -17,7 +17,7 @@ describe('store migrations', () => {
       const state = createLegacyState();
       state.schemaVersion = version;
       state.sessions[0].title = 'Saved session';
-      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 4 };
+      const expected = { ...JSON.parse(JSON.stringify(state)), schemaVersion: 5 };
       delete state.settings.messages;
       delete state.settings.completions;
       delete state.featureFlags;
@@ -25,6 +25,7 @@ describe('store migrations', () => {
       delete state.settings.noteModel;
       delete state.settings.tts;
       delete state.settings.theme;
+      delete state.settings.semanticSearch;
       const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
 
       migrateStore(store, setStore);
@@ -49,7 +50,7 @@ describe('store migrations', () => {
         showModelTitle: true,
         [key]: false,
       });
-      expect(store.schemaVersion).toBe(4);
+      expect(store.schemaVersion).toBe(5);
     },
   );
 
@@ -69,7 +70,7 @@ describe('store migrations', () => {
           ...JSON.parse(JSON.stringify(state.settings)),
           tts: { ...createDefaultState().settings.tts, enabled: false },
         },
-        schemaVersion: 4,
+        schemaVersion: 5,
       };
       state.settings.tts = { enabled: false, service: 'openai', openai: { voice: 'echo' } };
       const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
@@ -132,7 +133,7 @@ describe('store migrations', () => {
       enabled: false,
     });
     expect(store.settings).not.toHaveProperty('openRouterUsage');
-    expect(store.schemaVersion).toBe(4);
+    expect(store.schemaVersion).toBe(5);
   });
 
   it('adds the streaming display setting to older stores and keeps a saved one', () => {
@@ -144,7 +145,7 @@ describe('store migrations', () => {
     migrateStore(store, setStore);
 
     expect(store.settings.streaming).toEqual({ display: 'paragraphs', cursor: 'square' });
-    expect(store.schemaVersion).toBe(4);
+    expect(store.schemaVersion).toBe(5);
 
     const saved = JSON.parse(JSON.stringify(createDefaultState()));
     saved.schemaVersion = 2;
@@ -166,7 +167,7 @@ describe('store migrations', () => {
     migrateStore(store, setStore);
 
     expect(store.settings.streaming).toEqual({ display: 'sentences', cursor: 'square' });
-    expect(store.schemaVersion).toBe(4);
+    expect(store.schemaVersion).toBe(5);
 
     const saved = JSON.parse(JSON.stringify(createDefaultState()));
     saved.schemaVersion = 3;
@@ -178,7 +179,7 @@ describe('store migrations', () => {
     expect(kept.settings.streaming.cursor).toBe('circle');
   });
 
-  it.each([4, 5])('does not rewrite schema version %s', (schemaVersion) => {
+  it.each([5, 6])('does not rewrite schema version %s', (schemaVersion) => {
     const state = createDefaultState();
     state.schemaVersion = schemaVersion;
     const set = mock(() => {});
@@ -190,6 +191,18 @@ describe('store migrations', () => {
   });
 
   it('initializes new and reset stores at the current schema version', () => {
-    expect(createDefaultState().schemaVersion).toBe(4);
+    expect(createDefaultState().schemaVersion).toBe(5);
+  });
+
+  it('leaves semantic search off for stores saved before it existed', () => {
+    const state = createLegacyState();
+    state.schemaVersion = 4;
+    delete state.settings.semanticSearch;
+    const [store, setStore] = createStore<ReturnType<typeof createDefaultState>>(state);
+
+    migrateStore(store, setStore);
+
+    expect(store.settings.semanticSearch).toBe(false);
+    expect(store.schemaVersion).toBe(5);
   });
 });

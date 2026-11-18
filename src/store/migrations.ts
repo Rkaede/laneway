@@ -80,4 +80,12 @@ export function migrateStore(store: State, setStore: SetStoreFunction<State>) {
     }
     setStore('schemaVersion', 4);
   }
+
+  if ((store.schemaVersion ?? 0) < 5) {
+    // Semantic search sends text to OpenRouter and costs money, so it starts off.
+    if (store.settings.semanticSearch === undefined) {
+      setStore('settings', 'semanticSearch', false);
+    }
+    setStore('schemaVersion', 5);
+  }
 }

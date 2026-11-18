@@ -1,12 +1,15 @@
+import type { PGliteInterface } from '@electric-sql/pglite';
 import { batch, createSignal } from 'solid-js';
 import { reconcile, unwrap } from 'solid-js/store';
 
 import { restoreDatabase } from '~/db/backup';
 import { getDatabase, scheduleCheckpoint } from '~/db/client';
+import { documentIds } from '~/db/documents';
 import { storedImageIds } from '~/db/images';
 import { DataReplacedError, loadMessages, readGeneration, type SyncResult } from '~/db/sync';
+import { documentFiles } from '~/services/document-files';
 import { imageCache } from '~/services/image-cache';
-import type { ChatProps, MessageProps } from '~/types';
+import type { ChatProps } from '~/types';
 
 import {
   type ArchiveBackup,
@@ -28,6 +31,7 @@ import {
   takeStartupDeletes,
   writeSnapshotNow,
 } from './index';
+import { scheduleIndexing, stopEmbedding } from './indexer';
 
 const [databaseError, setDatabaseError] = createSignal<Error>();
 
@@ -48,6 +52,7 @@ function afterSync(result: SyncResult) {
   // Chats the database now holds can drop their messages from the snapshot.
   saveSnapshot();
   scheduleCheckpoint();
+  scheduleIndexing();
   const state = unwrap(store);
   for (const id of unusedImages(result.orphanedImages, [...state.chats, ...state.draftChats])) {
     imageCache.remove(id);
@@ -91,6 +96,7 @@ function recover() {
   recovering ??= (async () => {
     try {
       await databaseSync.stop();
+      stopEmbedding();
       for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
       const generation = await readGeneration(await getDatabase());
       let rest: State = unwrap(store);
@@ -114,6 +120,8 @@ function recover() {
 
 let starting: Promise<void> | undefined;
 
+const STARTUP_INDEXING_DELAY = 3000;
+
 /**
  * Opens the database after the app has drawn from the snapshot. The first sync saves anything the
  * database lacks, which on the first run after updating is every chat in localStorage.
@@ -132,6 +140,9 @@ export function startDatabase() {
       }
       startSync();
       await syncNow();
+      // Messages saved before search used the database, or by a tab that closed before indexing
+      // them. A first run can take a while, so it waits until the app has settled.
+      scheduleIndexing(STARTUP_INDEXING_DELAY);
     } catch (error) {
       console.error('Unable to open the database.', error);
       setDatabaseError(error instanceof Error ? error : new Error(String(error)));
@@ -170,29 +181,6 @@ export function loadChats(chatIds: string[]) {
   return Promise.all(chatIds.map((id) => loading.get(id)));
 }
 
-/** Messages read for search, which does not load chats into the store. */
-const readOnly = new Map<string, MessageProps[]>();
-
-/**
- * The chats with every message, reading unloaded ones from the database without loading them.
- * Search needs every message until it reads the database directly.
- */
-export async function chatsWithMessages(chats: ChatProps[]) {
-  const missing = chats.filter((chat) => chat.unloaded && !readOnly.has(chat.id));
-  if (missing.length) {
-    const loaded = await loadMessages(
-      await getDatabase(),
-      missing.map((chat) => chat.id),
-    );
-    for (const [chatId, messages] of loaded) readOnly.set(chatId, messages);
-  }
-  return chats.map((chat) => {
-    if (!chat.unloaded) return chat;
-    const { unloaded: _unloaded, ...rest } = chat;
-    return { ...rest, messages: readOnly.get(chat.id) ?? [] };
-  });
-}
-
 /** Opens the database for a backup, which needs every change saved first. */
 async function readyDatabase() {
   await startDatabase();
@@ -214,22 +202,32 @@ export async function exportAllData() {
 async function restoreArchive(backup: ArchiveBackup) {
   const db = await readyDatabase();
   await databaseSync.stop();
+  stopEmbedding();
   const added: string[] = [];
+  const addedDocuments: string[] = [];
   let result: Awaited<ReturnType<typeof restoreDatabase>>;
   try {
     for (const [id, blob] of backup.images) {
       await imageCache.add(id, blob);
       added.push(id);
     }
+    for (const [id, blob] of backup.documents) {
+      await documentFiles.add(id, blob);
+      addedDocuments.push(id);
+    }
     result = await restoreDatabase(db, backup.database);
   } catch (error) {
-    // Image ids are unique, so an added image is one the current data already had only if it
-    // still uses it.
+    // Image and document ids are unique, so an added file is one the current data already had
+    // only if it still uses it.
     const inUse = new Set([
       ...(await storedImageIds(db).catch(() => added)),
       ...stateImageIds(unwrap(store)),
     ]);
     await Promise.allSettled(added.filter((id) => !inUse.has(id)).map(imageCache.remove));
+    const documentsInUse = new Set(await documentIds(db).catch(() => addedDocuments));
+    await Promise.allSettled(
+      addedDocuments.filter((id) => !documentsInUse.has(id)).map(documentFiles.remove),
+    );
     startSync();
     throw error;
   }
@@ -237,9 +235,22 @@ async function restoreArchive(backup: ArchiveBackup) {
   for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
   await rebuildFromDatabase(backup.state, result.generation);
   scheduleCheckpoint();
+  scheduleIndexing();
 
   const kept = new Set([...result.images, ...stateImageIds(backup.state)]);
   for (const id of result.previousImages) if (!kept.has(id)) void imageCache.remove(id);
+  await removeUnusedDocumentFiles(db);
+}
+
+/** Removes original files of documents the database no longer has. */
+async function removeUnusedDocumentFiles(db: PGliteInterface) {
+  try {
+    const kept = new Set(await documentIds(db));
+    const unused = (await documentFiles.ids()).filter((id) => !kept.has(id));
+    await Promise.allSettled(unused.map(documentFiles.remove));
+  } catch (error) {
+    console.warn('Unable to remove unused document files.', error);
+  }
 }
 
 /** Replaces all data with a backup's, and reloads other tabs so they do not save over it. */
@@ -273,6 +284,7 @@ function listenForReplacedData() {
   channel.addEventListener('message', (event) => {
     if (event.data !== DATA_REPLACED) return;
     closeSnapshot();
+    stopEmbedding();
     void databaseSync.stop();
     window.location.reload();
   });

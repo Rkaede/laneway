@@ -2,6 +2,7 @@ import { createStore, unwrap } from 'solid-js/store';
 
 import { getDatabase } from '~/db/client';
 import { createDatabaseSync } from '~/db/sync';
+import { documentFiles } from '~/services/document-files';
 import { imageCache } from '~/services/image-cache';
 
 import { deserializeSnapshot, serializeSnapshot } from './chat-persistence';
@@ -70,7 +71,7 @@ migrateStore(store, setStore);
 export const deleteData = () => {
   if (
     !window.confirm(
-      'Delete all your chats, notes, messages, images, assistants, and presets, and reset settings?\n\nThis cannot be undone. API keys will be kept. Export your data first if you need a backup.',
+      'Delete all your chats, notes, messages, images, documents, assistants, and presets, and reset settings?\n\nThis cannot be undone. API keys will be kept. Export your data first if you need a backup.',
     )
   ) {
     return false;
@@ -78,6 +79,13 @@ export const deleteData = () => {
   for (const chat of [...store.chats, ...store.draftChats]) chat.controller?.abort();
   setStore(createDefaultState());
   imageCache.clearAll();
+  // The sync deletes the sessions. Documents are not in the store, so they are deleted here.
+  getDatabase()
+    .then((db) => db.exec('delete from documents'))
+    .catch((error) => console.error('Unable to delete documents.', error));
+  documentFiles
+    .clearAll()
+    .catch((error) => console.error('Unable to delete documents.', error));
   if (typeof caches !== 'undefined') caches.delete('laneway-tts-cache');
   return true;
 };

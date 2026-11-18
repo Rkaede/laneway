@@ -92,6 +92,36 @@ export const MIGRATIONS: string[] = [
     -- data directory is a complete backup.
     create table kv (key text primary key, value jsonb not null);
     `,
+  `
+    -- The text of a message's text parts, which is what search and embeddings read.
+    create function message_text(data jsonb) returns text language sql immutable as $$
+      select case jsonb_typeof(data->'content')
+        when 'string' then data->>'content'
+        when 'array' then (
+          select coalesce(string_agg(part->>'text', E'\\n' order by n), '')
+          from jsonb_array_elements(data->'content') with ordinality as parts (part, n)
+          where part->>'type' = 'text'
+        )
+        else ''
+      end
+    $$;
+
+    -- Whether a message's chunks match its text. The indexer chunks messages that are not
+    -- indexed, so editing a message's text marks it for indexing again.
+    alter table messages add column indexed boolean not null default false;
+    create index messages_unindexed on messages (id) where not indexed;
+
+    create function reindex_edited_message() returns trigger language plpgsql as $$
+    begin
+      if message_text(old.data) is distinct from message_text(new.data) then
+        new.indexed := false;
+      end if;
+      return new;
+    end
+    $$;
+    create trigger messages_reindex before update of data on messages
+      for each row execute function reindex_edited_message();
+    `,
 ];
 
 /**

@@ -61,7 +61,7 @@ test('exports everything to an archive and imports it, reloading other tabs', as
   const download = await downloading;
   expect(download.suggestedFilename()).toMatch(/^laneway-backup-.*\.tar\.gz$/);
   const file = await download.path();
-  await expect(page.getByRole('status')).toHaveText('Data exported.');
+  await expect(page.getByRole('status').filter({ hasText: 'Data exported.' })).toBeVisible();
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Delete Data' }).click();
@@ -73,7 +73,9 @@ test('exports everything to an archive and imports it, reloading other tabs', as
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByLabel('Backup file').setInputFiles(file);
-  await expect(page.getByText('Data imported.')).toBeVisible();
+  // Restoring rebuilds the search dictionary and reopens the store, which takes several seconds
+  // when other tests share the machine.
+  await expect(page.getByText('Data imported.')).toBeVisible({ timeout: 20_000 });
   for (const title of titles) {
     await expect(page.getByRole('link', { name: title })).toBeVisible();
   }

@@ -3,9 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:te
 
 import { NewerBackupError, restoreDatabase } from '~/db/backup';
 import { createDatabase } from '~/db/create';
+import { addDocument, getDocument, listDocuments } from '~/db/documents';
 import { MIGRATIONS } from '~/db/schema';
 import { createDatabaseSync, loadMessages } from '~/db/sync';
 import { createTar, gunzip, gzip, readTar } from '~/services/archive';
+import { documentFiles } from '~/services/document-files';
 import { imageCache } from '~/services/image-cache';
 import type { MessageProps } from '~/types';
 import * as util from '~/util';
@@ -69,7 +71,11 @@ describe('backup archives', () => {
     expect(omittedImages).toBe(0);
     const files = await archiveFiles(file);
     const manifest = JSON.parse(new TextDecoder().decode(files.get('manifest.json')));
-    expect(manifest).toMatchObject({ format: 'laneway-backup', version: 2, schema: 1 });
+    expect(manifest).toMatchObject({
+      format: 'laneway-backup',
+      version: 2,
+      schema: MIGRATIONS.length,
+    });
     expect(manifest.images).toEqual([
       { id: 'photo', type: 'image/png' },
       { id: 'draft', type: 'image/jpeg' },
@@ -104,6 +110,69 @@ describe('backup archives', () => {
     );
     expect(backup.images.get('photo')!.type).toBe('image/png');
     expect(await backup.images.get('draft')!.text()).toBe('draft bytes');
+  });
+
+  it('carries library documents, their text and their original files', async () => {
+    const state = await savedState();
+    await addDocument(db, {
+      id: 'doc',
+      title: 'Report',
+      filename: 'report.pdf',
+      mimeType: 'application/pdf',
+      size: 9,
+      created: 1,
+      text: 'Quarterly numbers',
+    });
+    await addDocument(db, {
+      id: 'lost',
+      title: 'Lost',
+      filename: 'lost.txt',
+      mimeType: 'text/plain',
+      size: 4,
+      created: 2,
+      text: 'Original is gone',
+    });
+    spyOn(documentFiles, 'get').mockImplementation(async (id) =>
+      id === 'doc' ? new Blob(['pdf bytes'], { type: 'application/pdf' }) : null,
+    );
+
+    const backup = await readBackupFile((await createBackup(state, db)).file);
+    if (backup.kind !== 'archive') throw new Error('Expected an archive');
+
+    expect([...backup.documents.keys()]).toEqual(['doc']);
+    expect(await backup.documents.get('doc')!.text()).toBe('pdf bytes');
+    expect(backup.documents.get('doc')!.type).toBe('application/pdf');
+    const target = await createDatabase();
+    try {
+      await restoreDatabase(target, backup.database);
+      // A document whose original was missing keeps its text.
+      expect((await listDocuments(target)).map((document) => document.id).sort()).toEqual([
+        'doc',
+        'lost',
+      ]);
+      expect((await getDocument(target, 'doc'))?.chunks.map((chunk) => chunk.text)).toEqual([
+        'Quarterly numbers',
+      ]);
+    } finally {
+      await target.close();
+    }
+  });
+
+  it('reads archives made before the library, which list no documents', async () => {
+    const manifest = {
+      format: 'laneway-backup',
+      version: 2,
+      schema: 1,
+      tables: [],
+      images: [],
+    };
+    const backup = await readBackupFile(
+      await archive({
+        'manifest.json': JSON.stringify(manifest),
+        'state.json': JSON.stringify(createDefaultState()),
+      }),
+    );
+    expect(backup.kind === 'archive' && backup.documents.size).toBe(0);
   });
 
   it('still exports when images are missing or unreadable, and counts them', async () => {

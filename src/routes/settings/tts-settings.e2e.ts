@@ -25,7 +25,10 @@ test('picks an OpenRouter speech model and voice, and previews them', async ({ p
   await page.goto('/settings');
   const modelPicker = page.getByRole('button', { name: 'Speech model' });
   await expect(modelPicker).toBeDisabled();
-  await expect(page.getByText('OpenRouter API key not configured')).toBeVisible();
+  const section = page.locator('section', {
+    has: page.getByRole('heading', { name: 'Text to Speech' }),
+  });
+  await expect(section.getByText('OpenRouter API key not configured')).toBeVisible();
 
   await page.evaluate(async () => {
     const keysPath = '/src/store/keys.tsx';

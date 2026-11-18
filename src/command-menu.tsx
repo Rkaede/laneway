@@ -2,16 +2,14 @@ import { isMac } from '@solid-primitives/platform';
 import { useNavigate, useParams } from '@solidjs/router';
 import {
   createEffect,
-  createMemo,
+  createResource,
   createSignal,
   For,
   Match,
-  on,
   onCleanup,
   Show,
   Switch,
 } from 'solid-js';
-import { unwrap } from 'solid-js/store';
 
 import {
   CommandDialog,
@@ -26,22 +24,28 @@ import {
 import { commandMenuOpen, setCommandMenuOpen } from './command-menu-state';
 import { shouldIgnoreShortcut } from './command-shortcuts';
 import { ModelIcon } from './components/connected/model-icon';
-import { IconChat, IconLayoutGrid, IconSquarePen } from './components/icons/ui';
+import { IconChat, IconFileText, IconLayoutGrid, IconSquarePen } from './components/icons/ui';
 import { store } from './store';
 import { actions } from './store/actions';
-import { chatsWithMessages } from './store/database';
+import { indexVersion } from './store/indexer';
+import { documentsChanged } from './store/library';
 import { models } from './store/models';
 import {
+  type DocumentHit,
+  documentHref,
   recentSessions,
   type SearchHit,
   type SearchSnippet,
   sessionHref,
-  SessionIndex,
 } from './store/search';
+import { embedQuery, searchEverything } from './store/search-runner';
 import { tinykeys } from './tinykeys';
 import type { SessionTemplate, SessionType } from './types';
 
 const SEARCH_RESULT_PREFIX = 'search-result:';
+
+/** How long typing must pause before the query is embedded for semantic search. */
+const QUERY_EMBED_DELAY = 350;
 
 function formatSessionDate(created: number) {
   const date = new Date(created);
@@ -65,9 +69,29 @@ function Snippet(props: { snippet: SearchSnippet }) {
   return (
     <span class="truncate text-xs text-muted">
       {props.snippet.before}
-      <mark class="bg-transparent font-semibold text-main">{props.snippet.match}</mark>
+      <Show when={props.snippet.match}>
+        <mark class="bg-transparent font-semibold text-main">{props.snippet.match}</mark>
+      </Show>
       {props.snippet.after}
     </span>
+  );
+}
+
+function DocumentResult(props: { hit: DocumentHit; onOpen: (href: string) => void }) {
+  return (
+    <CommandItem
+      value={`${SEARCH_RESULT_PREFIX}document:${props.hit.documentId}`}
+      onSelect={() => props.onOpen(documentHref(props.hit.documentId, props.hit.chunkId))}
+    >
+      <IconFileText class="mr-2 size-4 shrink-0" />
+      <span class="flex min-w-0 flex-1 flex-col">
+        <span class="truncate">{props.hit.title}</span>
+        <Show when={props.hit.snippet}>{(snippet) => <Snippet snippet={snippet()} />}</Show>
+      </span>
+      <span class="ml-2 shrink-0 text-xs text-muted">
+        {formatSessionDate(props.hit.created)}
+      </span>
+    </CommandItem>
   );
 }
 
@@ -193,51 +217,31 @@ export function CommandMenu() {
     },
   ];
 
-  // Sync the index when the menu opens rather than whenever the store changes, which would
-  // re-index on every token while a reply streams. Only changed sessions are re-indexed.
-  const sessionIndex = new SessionIndex();
-  const [synced, markSynced] = createSignal(undefined, { equals: false });
-  // Until search reads the database directly, it reads the messages of chats that are not loaded.
-  let syncing: Promise<void> | undefined;
-  function syncIndex() {
-    syncing ??= (async () => {
-      try {
-        const { sessions, chats, assistants } = unwrap(store);
-        const withMessages = await chatsWithMessages(chats);
-        sessionIndex.sync({ sessions, chats: withMessages, assistants }, unwrap(models));
-        markSynced();
-      } catch (error) {
-        console.error('Unable to index chats for search.', error);
-      } finally {
-        syncing = undefined;
-      }
-    })();
-  }
-  createEffect(on(open, (isOpen) => isOpen && syncIndex()));
-
-  // Building the index from scratch takes around 100ms for a full store, so do it while the app
-  // is idle rather than when the menu first opens. Wait for the models, because they change what
-  // every session indexes.
-  createEffect(
-    on(
-      () => models.length > 0,
-      (loaded) => {
-        if (!loaded) return;
-        if (typeof requestIdleCallback === 'function') {
-          const id = requestIdleCallback(syncIndex, { timeout: 5000 });
-          onCleanup(() => cancelIdleCallback(id));
-        } else {
-          const id = setTimeout(syncIndex, 2000);
-          onCleanup(() => clearTimeout(id));
-        }
-      },
-    ),
-  );
-
-  const results = createMemo(() => {
-    synced();
-    return sessionIndex.search(query());
+  // Semantic search embeds the query once typing pauses, rather than on every keystroke.
+  const [settledQuery, setSettledQuery] = createSignal('');
+  createEffect(() => {
+    const current = query();
+    const timer = setTimeout(() => setSettledQuery(current), QUERY_EMBED_DELAY);
+    onCleanup(() => clearTimeout(timer));
   });
+  const [embedding] = createResource(settledQuery, embedQuery);
+
+  // Keyword results come at once, and are searched again when the query's embedding arrives or
+  // newly saved text becomes searchable.
+  const [found] = createResource(
+    () => ({
+      query: open() ? query() : '',
+      embedding: settledQuery() === query() ? embedding.latest : undefined,
+      version: indexVersion() + documentsChanged(),
+    }),
+    ({ query, embedding }) =>
+      searchEverything(query, embedding).catch((error) => {
+        console.error('Search failed.', error);
+        return { sessions: [], documents: [] };
+      }),
+  );
+  const results = () => (searching() ? (found.latest?.sessions ?? []) : []);
+  const documentResults = () => (searching() ? (found.latest?.documents ?? []) : []);
   const recent = () => recentSessions(store.sessions);
   const searching = () => query().trim() !== '';
 
@@ -272,7 +276,7 @@ export function CommandMenu() {
       />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <Show when={searching() && results().length > 0}>
+        <Show when={results().length > 0}>
           <CommandGroup heading="Chats and notes">
             <For each={results()}>
               {(hit) => (
@@ -286,6 +290,13 @@ export function CommandMenu() {
                   onOpen={openSession}
                 />
               )}
+            </For>
+          </CommandGroup>
+        </Show>
+        <Show when={documentResults().length > 0}>
+          <CommandGroup heading="Documents">
+            <For each={documentResults()}>
+              {(hit) => <DocumentResult hit={hit} onOpen={openSession} />}
             </For>
           </CommandGroup>
         </Show>

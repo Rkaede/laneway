@@ -4,8 +4,10 @@ import { createStore, reconcile, type SetStoreFunction } from 'solid-js/store';
 
 import { getStreamCursor, getStreamDisplayMode } from '~/constants';
 import { type DatabaseDump, dumpDatabase, NewerBackupError } from '~/db/backup';
+import { documentIds } from '~/db/documents';
 import { MIGRATIONS } from '~/db/schema';
 import { createTar, gunzip, gzip, isGzip, readTar } from '~/services/archive';
+import { documentFiles } from '~/services/document-files';
 import { imageCache } from '~/services/image-cache';
 import type { ImagePart, MessageProps } from '~/types';
 import { download, filenameDate } from '~/util';
@@ -29,6 +31,8 @@ export type ArchiveBackup = {
   database: DatabaseDump;
   /** Image blobs by image cache id. */
   images: Map<string, Blob>;
+  /** The original files of library documents, by document id. */
+  documents: Map<string, Blob>;
 };
 
 export type Backup = JsonBackup | ArchiveBackup;
@@ -140,6 +144,12 @@ export async function createBackup(state: State, db: PGliteInterface) {
       omittedImages++;
     }
   }
+  // A document whose original is missing keeps its text, so it is still searchable.
+  const documents: { id: string; blob: Blob }[] = [];
+  for (const id of await documentIds(db)) {
+    const blob = await documentFiles.get(id).catch(() => null);
+    if (blob) documents.push({ id, blob });
+  }
   const manifest = {
     format: 'laneway-backup',
     version: ARCHIVE_VERSION,
@@ -148,12 +158,14 @@ export async function createBackup(state: State, db: PGliteInterface) {
     tables: dump.tables.map(({ name, columns }) => ({ name, columns })),
     // Image ids become file names by position, so any id is safe in the archive.
     images: images.map(({ id, blob }) => ({ id, type: blob.type })),
+    documents: documents.map(({ id, blob }) => ({ id, type: blob.type })),
   };
   const archive = createTar([
     { name: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
     { name: 'state.json', data: JSON.stringify(rest) },
     ...dump.tables.map((table) => ({ name: `tables/${table.name}.bin`, data: table.data })),
     ...images.map(({ blob }, index) => ({ name: `images/${index}`, data: blob })),
+    ...documents.map(({ blob }, index) => ({ name: `documents/${index}`, data: blob })),
   ]);
   return {
     file: new Blob([await gzip(archive)], { type: 'application/gzip' }),
@@ -207,19 +219,26 @@ async function parseArchive(file: Blob): Promise<ArchiveBackup> {
   });
   valid(new Set(tables.map((table) => table.name)).size === tables.length);
 
-  valid(Array.isArray(manifest.images));
-  const images = new Map<string, Blob>();
-  manifest.images.forEach((image: unknown, index) => {
-    valid(isObject(image) && typeof image.id === 'string' && image.id.length > 0);
-    valid(typeof image.type === 'string');
-    images.set(image.id, new Blob([read(`images/${index}`)], { type: image.type }));
-  });
+  /** Files listed in the manifest as `{ id, type }`, stored by position under `folder`. */
+  const blobs = (list: unknown, folder: string) => {
+    valid(Array.isArray(list));
+    const result = new Map<string, Blob>();
+    list.forEach((item: unknown, index) => {
+      valid(isObject(item) && typeof item.id === 'string' && item.id.length > 0);
+      valid(typeof item.type === 'string');
+      result.set(item.id, new Blob([read(`${folder}/${index}`)], { type: item.type }));
+    });
+    return result;
+  };
+  const images = blobs(manifest.images, 'images');
+  // Backups made before the library have no documents.
+  const documents = blobs(manifest.documents ?? [], 'documents');
 
   const state = validateState(json('state.json'));
   // Saved sessions and chats come from the database.
   state.sessions = [];
   state.chats = [];
-  return { kind: 'archive', state, database: { schema, tables }, images };
+  return { kind: 'archive', state, database: { schema, tables }, images, documents };
 }
 
 /** Reads a backup file in either format, checking it before anything is written. */

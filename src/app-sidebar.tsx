@@ -12,6 +12,7 @@ import {
 import { setCommandMenuOpen } from '~/command-menu-state';
 import { requestApiKey } from '~/components/connected/api-key-request';
 import {
+  IconBookOpen,
   IconBox,
   IconKey,
   IconLayoutGrid,
@@ -190,6 +191,7 @@ const pages = [
   { href: '/presets', label: 'Presets', icon: IconLayoutGrid },
   { href: '/assistants', label: 'Assistants', icon: IconScanFace },
   { href: '/models', label: 'Models', icon: IconBox },
+  { href: '/library', label: 'Library', icon: IconBookOpen },
 ];
 
 function PagesMenu() {
